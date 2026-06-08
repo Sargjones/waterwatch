@@ -1,1 +1,86 @@
-
+{
+  "meta": {
+    "generated_utc": "2026-06-08T23:50:02.314487+00:00",
+    "dashboard": "waterwatch.criticalto.ca",
+    "city": "Metro Vancouver",
+    "province": "BC",
+    "data_licences": [
+      "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)",
+      "Open Government Licence \u2013 BC (BC River Forecast Centre)"
+    ]
+  },
+  "restriction": {
+    "stage": 3,
+    "start_date": "2026-06-08",
+    "end_date": "2026-10-15",
+    "fine_cad": 500,
+    "lawn_watering": false,
+    "tree_shrub_watering": false,
+    "vegetable_garden": true,
+    "vehicle_washing": false,
+    "pressure_washing": false,
+    "pools_hot_tubs": false,
+    "stanley_park_tunnel": true,
+    "source_url": "https://metrovancouver.org/services/water/water-restrictions",
+    "last_verified": "2026-06-08",
+    "days_remaining": 128,
+    "active": true
+  },
+  "snowpack": {
+    "pct_of_normal": 53,
+    "reference": "April 1 peak, South Coast region",
+    "source": "BC River Forecast Centre",
+    "note": "2026 reading \u2014 one of the lowest on record",
+    "last_updated": "2026-05-01"
+  },
+  "reservoirs": {
+    "capilano": {
+      "name": "Capilano",
+      "pct_of_target": 68,
+      "historical_note": "Entered May at ~68% of seasonal target"
+    },
+    "seymour": {
+      "name": "Seymour",
+      "pct_of_target": 65,
+      "historical_note": "Entered May at ~65% of seasonal target"
+    },
+    "coquitlam": {
+      "name": "Coquitlam",
+      "pct_of_target": 72,
+      "historical_note": "Slightly higher due to larger volumetric capacity"
+    },
+    "last_updated": "2026-06-01",
+    "source": "Metro Vancouver Reservoir Levels and Water Use",
+    "source_url": "https://metrovancouver.org/services/water/reservoir-levels-water-use",
+    "note": "Metro Vancouver publishes weekly updates May\u2013Oct. Values shown are % of seasonal target, not % of total capacity."
+  },
+  "watershed_inflow": {
+    "capilano": {
+      "station_id": "08GA010",
+      "station_name": "Capilano River above Intake",
+      "url": "https://dd.weather.gc.ca/hydrometric/csv/BC/hourly/BC_08GA010_hourly_hydrometric.csv",
+      "level_m": null,
+      "discharge_cms": null,
+      "timestamp": null,
+      "status": "error: <urlopen error timed out>"
+    },
+    "seymour": {
+      "station_id": "08GA074",
+      "station_name": "Seymour River above Orchid Creek",
+      "url": "https://dd.weather.gc.ca/hydrometric/csv/BC/hourly/BC_08GA074_hourly_hydrometric.csv",
+      "level_m": null,
+      "discharge_cms": null,
+      "timestamp": null,
+      "status": "error: <urlopen error timed out>"
+    },
+    "coquitlam": {
+      "station_id": "08MH141",
+      "station_name": "Coquitlam River near Port Coquitlam",
+      "url": "https://dd.weather.gc.ca/hydrometric/csv/BC/hourly/BC_08MH141_hourly_hydrometric.csv",
+      "level_m": null,
+      "discharge_cms": null,
+      "timestamp": null,
+      "status": "error: <urlopen error timed out>"
+    }
+  }
+}
