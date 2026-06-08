@@ -27,7 +27,7 @@ STATIONS = {
     "coquitlam": {"id": "08MH141", "name": "Coquitlam River near Port Coquitlam"},
 }
 
-DATAMART_BASE = "https://dd.weather.gc.ca/hydrometric/csv/BC/hourly"
+DATAMART_BASE = "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly"
 
 # ── Restriction stage config (update manually when Metro Van changes stage) ──
 # Source: https://vancouver.ca/home-property-development/understanding-watering-restrictions.aspx
