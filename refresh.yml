@@ -1,0 +1,31 @@
+name: WaterWatch data refresh
+
+on:
+  schedule:
+    # Every Monday at 10am PT (18:00 UTC) — after Metro Vancouver publishes weekly update
+    - cron: '0 18 * * 1'
+    # Also every 6 hours for watershed inflow (Environment Canada updates hourly)
+    - cron: '0 */6 * * *'
+  workflow_dispatch:  # Allow manual trigger from GitHub Actions UI
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run data scraper
+        run: python3 scraper/fetch_data.py
+
+      - name: Commit updated data
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "WaterWatch Bot"
+          git add site/data/waterwatch.json
+          git diff --staged --quiet || git commit -m "data: refresh waterwatch.json [$(date -u '+%Y-%m-%d %H:%M UTC')]"
+          git push
