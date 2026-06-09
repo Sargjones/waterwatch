@@ -12,3 +12,7 @@
   [headers.values]
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
+[[redirects]]
+  from = "/canmore"
+  to = "/canmore.html"
+  status = 200
