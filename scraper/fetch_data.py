@@ -23,7 +23,7 @@ from pathlib import Path
 # All three Metro Vancouver source watersheds
 STATIONS = {
     "capilano":  {"id": "08GA010", "name": "Capilano River above Intake"},
-    "seymour":   {"id": "08GA074", "name": "Seymour River above Orchid Creek"},
+    "seymour": {"id": "08GA030", "name": "Seymour River at Seymour Falls"},
     "coquitlam": {"id": "08MH141", "name": "Coquitlam River near Port Coquitlam"},
 }
 
@@ -173,7 +173,7 @@ def main():
     payload = build_payload()
 
     # Write to /data/waterwatch.json relative to script location
-    out_dir = Path.home() / "Desktop" / "waterwatch_test"
+    out_dir = Path(__file__).parent.parent / "site" / "data"
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / "waterwatch.json"
 
