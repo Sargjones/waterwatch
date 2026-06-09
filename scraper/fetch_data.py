@@ -173,7 +173,7 @@ def main():
     payload = build_payload()
 
     # Write to /data/waterwatch.json relative to script location
-    out_dir = Path(__file__).parent.parent / "site" / "data"
+    oout_dir = Path(__file__).parent.parent / "site" / "data"
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / "waterwatch.json"
 
