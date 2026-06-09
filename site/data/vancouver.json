@@ -1,12 +1,11 @@
 {
   "meta": {
-    "generated_utc": "2026-06-09T00:15:17.509390+00:00",
-    "dashboard": "waterwatch.criticalto.ca",
     "city": "Metro Vancouver",
     "province": "BC",
+    "dashboard": "waterwatch.criticalto.ca/vancouver",
+    "generated_utc": "2026-06-09T00:54:22.657314+00:00",
     "data_licences": [
-      "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)",
-      "Open Government Licence \u2013 BC (BC River Forecast Centre)"
+      "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
   },
   "restriction": {
@@ -23,8 +22,7 @@
     "stanley_park_tunnel": true,
     "source_url": "https://metrovancouver.org/services/water/water-restrictions",
     "last_verified": "2026-06-08",
-    "days_remaining": 127,
-    "active": true
+    "days_remaining": 127
   },
   "snowpack": {
     "pct_of_normal": 53,
@@ -33,35 +31,14 @@
     "note": "2026 reading \u2014 one of the lowest on record",
     "last_updated": "2026-05-01"
   },
-  "reservoirs": {
-    "capilano": {
-      "name": "Capilano",
-      "pct_of_target": 68,
-      "historical_note": "Entered May at ~68% of seasonal target"
-    },
-    "seymour": {
-      "name": "Seymour",
-      "pct_of_target": 65,
-      "historical_note": "Entered May at ~65% of seasonal target"
-    },
-    "coquitlam": {
-      "name": "Coquitlam",
-      "pct_of_target": 72,
-      "historical_note": "Slightly higher due to larger volumetric capacity"
-    },
-    "last_updated": "2026-06-01",
-    "source": "Metro Vancouver Reservoir Levels and Water Use",
-    "source_url": "https://metrovancouver.org/services/water/reservoir-levels-water-use",
-    "note": "Metro Vancouver publishes weekly updates May\u2013Oct. Values shown are % of seasonal target, not % of total capacity."
-  },
   "watershed_inflow": {
     "capilano": {
       "station_id": "08GA010",
       "station_name": "Capilano River above Intake",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08GA010_hourly_hydrometric.csv",
-      "level_m": 1.028,
-      "discharge_cms": 5.62,
-      "timestamp": "2026-06-08T15:40:00-08:00",
+      "level_m": 1.027,
+      "discharge_cms": 5.6,
+      "timestamp": "2026-06-08T16:10:00-08:00",
       "status": "ok"
     },
     "seymour": {
@@ -70,7 +47,7 @@
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08GA030_hourly_hydrometric.csv",
       "level_m": 0.921,
       "discharge_cms": 3.98,
-      "timestamp": "2026-06-08T15:35:00-08:00",
+      "timestamp": "2026-06-08T16:05:00-08:00",
       "status": "ok"
     },
     "coquitlam": {
@@ -79,8 +56,29 @@
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08MH141_hourly_hydrometric.csv",
       "level_m": 1.826,
       "discharge_cms": 3.96,
-      "timestamp": "2026-06-08T15:50:00-08:00",
+      "timestamp": "2026-06-08T16:15:00-08:00",
       "status": "ok"
     }
+  },
+  "reservoirs": {
+    "capilano": {
+      "name": "Capilano",
+      "pct_of_target": 68,
+      "note": "Entered May at ~68% of seasonal target"
+    },
+    "seymour": {
+      "name": "Seymour",
+      "pct_of_target": 65,
+      "note": "Entered May at ~65% of seasonal target"
+    },
+    "coquitlam": {
+      "name": "Coquitlam",
+      "pct_of_target": 72,
+      "note": "Slightly higher due to larger volumetric capacity"
+    },
+    "last_updated": "2026-06-01",
+    "source": "Metro Vancouver Reservoir Levels and Water Use",
+    "source_url": "https://metrovancouver.org/services/water/reservoir-levels-water-use",
+    "note": "Values shown are % of seasonal storage target, not % of maximum capacity."
   }
 }
