@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated_utc": "2026-06-08T23:50:02.314487+00:00",
+    "generated_utc": "2026-06-09T00:15:17.509390+00:00",
     "dashboard": "waterwatch.criticalto.ca",
     "city": "Metro Vancouver",
     "province": "BC",
@@ -23,7 +23,7 @@
     "stanley_park_tunnel": true,
     "source_url": "https://metrovancouver.org/services/water/water-restrictions",
     "last_verified": "2026-06-08",
-    "days_remaining": 128,
+    "days_remaining": 127,
     "active": true
   },
   "snowpack": {
@@ -58,29 +58,29 @@
     "capilano": {
       "station_id": "08GA010",
       "station_name": "Capilano River above Intake",
-      "url": "https://dd.weather.gc.ca/hydrometric/csv/BC/hourly/BC_08GA010_hourly_hydrometric.csv",
-      "level_m": null,
-      "discharge_cms": null,
-      "timestamp": null,
-      "status": "error: <urlopen error timed out>"
+      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08GA010_hourly_hydrometric.csv",
+      "level_m": 1.028,
+      "discharge_cms": 5.62,
+      "timestamp": "2026-06-08T15:40:00-08:00",
+      "status": "ok"
     },
     "seymour": {
-      "station_id": "08GA074",
-      "station_name": "Seymour River above Orchid Creek",
-      "url": "https://dd.weather.gc.ca/hydrometric/csv/BC/hourly/BC_08GA074_hourly_hydrometric.csv",
-      "level_m": null,
-      "discharge_cms": null,
-      "timestamp": null,
-      "status": "error: <urlopen error timed out>"
+      "station_id": "08GA030",
+      "station_name": "Seymour River at Seymour Falls",
+      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08GA030_hourly_hydrometric.csv",
+      "level_m": 0.921,
+      "discharge_cms": 3.98,
+      "timestamp": "2026-06-08T15:35:00-08:00",
+      "status": "ok"
     },
     "coquitlam": {
       "station_id": "08MH141",
       "station_name": "Coquitlam River near Port Coquitlam",
-      "url": "https://dd.weather.gc.ca/hydrometric/csv/BC/hourly/BC_08MH141_hourly_hydrometric.csv",
-      "level_m": null,
-      "discharge_cms": null,
-      "timestamp": null,
-      "status": "error: <urlopen error timed out>"
+      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08MH141_hourly_hydrometric.csv",
+      "level_m": 1.826,
+      "discharge_cms": 3.96,
+      "timestamp": "2026-06-08T15:50:00-08:00",
+      "status": "ok"
     }
   }
 }
