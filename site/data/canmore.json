@@ -3,7 +3,7 @@
     "city": "Canmore",
     "province": "AB",
     "dashboard": "waterwatch.criticalto.ca/canmore",
-    "generated_utc": "2026-06-09T14:57:39.393939+00:00",
+    "generated_utc": "2026-06-09T20:10:11.991274+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -32,27 +32,27 @@
       "station_id": "05BB001",
       "station_name": "Bow River at Banff (25km upstream)",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BB001_hourly_hydrometric.csv",
-      "level_m": 2.735,
-      "discharge_cms": 109.0,
-      "timestamp": "2026-06-09T06:25:00-07:00",
+      "level_m": 2.721,
+      "discharge_cms": 106.0,
+      "timestamp": "2026-06-09T12:25:00-07:00",
       "status": "ok"
     },
     "spray_banff": {
       "station_id": "05BC001",
       "station_name": "Spray River at Banff",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BC001_hourly_hydrometric.csv",
-      "level_m": 1.253,
-      "discharge_cms": 10.7,
-      "timestamp": "2026-06-09T06:25:00-07:00",
+      "level_m": 1.248,
+      "discharge_cms": 10.5,
+      "timestamp": "2026-06-09T12:25:00-07:00",
       "status": "ok"
     },
     "waiparous": {
       "station_id": "05BG006",
       "station_name": "Waiparous Creek near Cochrane",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BG006_hourly_hydrometric.csv",
-      "level_m": 0.923,
-      "discharge_cms": 2.81,
-      "timestamp": "2026-06-09T07:05:00-07:00",
+      "level_m": 0.917,
+      "discharge_cms": 2.74,
+      "timestamp": "2026-06-09T12:05:00-07:00",
       "status": "ok"
     }
   },
