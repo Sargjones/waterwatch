@@ -26,6 +26,6 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "WaterWatch Bot"
-          git add site/data/waterwatch.json
+          git add site/data/vancouver.json site/data/canmore.json
           git diff --staged --quiet || git commit -m "data: refresh waterwatch.json [$(date -u '+%Y-%m-%d %H:%M UTC')]"
           git push
