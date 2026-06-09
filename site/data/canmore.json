@@ -1,1 +1,31 @@
-{}
+{
+  "meta": {"city": "Canmore", "province": "AB", "generated_utc": "2026-06-09T00:40:00+00:00"},
+  "restriction": {"stage": 0, "stage_label": "No active restrictions", "days_remaining": 0},
+  "snowpack": {"pct_of_normal": 68},
+  "watershed_inflow": {
+    "bow_banff": {
+      "station_id": "05BB001",
+      "station_name": "Bow River at Banff (25km upstream)",
+      "level_m": 2.771,
+      "discharge_cms": 116.0,
+      "timestamp": "2026-06-09T00:40:00+00:00",
+      "status": "ok"
+    },
+    "spray_banff": {
+      "station_id": "05BC001",
+      "station_name": "Spray River at Banff",
+      "level_m": 1.261,
+      "discharge_cms": 11.1,
+      "timestamp": "2026-06-09T00:40:00+00:00",
+      "status": "ok"
+    },
+    "waiparous": {
+      "station_id": "05BG006",
+      "station_name": "Waiparous Creek near Cochrane",
+      "level_m": 0.927,
+      "discharge_cms": 2.86,
+      "timestamp": "2026-06-09T00:40:00+00:00",
+      "status": "ok"
+    }
+  }
+}
