@@ -3,7 +3,7 @@
     "city": "Metro Vancouver",
     "province": "BC",
     "dashboard": "waterwatch.criticalto.ca/vancouver",
-    "generated_utc": "2026-06-09T00:54:22.657314+00:00",
+    "generated_utc": "2026-06-09T01:21:59.739265+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -38,7 +38,7 @@
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08GA010_hourly_hydrometric.csv",
       "level_m": 1.027,
       "discharge_cms": 5.6,
-      "timestamp": "2026-06-08T16:10:00-08:00",
+      "timestamp": "2026-06-08T16:30:00-08:00",
       "status": "ok"
     },
     "seymour": {
@@ -47,16 +47,16 @@
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08GA030_hourly_hydrometric.csv",
       "level_m": 0.921,
       "discharge_cms": 3.98,
-      "timestamp": "2026-06-08T16:05:00-08:00",
+      "timestamp": "2026-06-08T16:35:00-08:00",
       "status": "ok"
     },
     "coquitlam": {
       "station_id": "08MH141",
       "station_name": "Coquitlam River near Port Coquitlam",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08MH141_hourly_hydrometric.csv",
-      "level_m": 1.826,
-      "discharge_cms": 3.96,
-      "timestamp": "2026-06-08T16:15:00-08:00",
+      "level_m": 1.825,
+      "discharge_cms": 3.93,
+      "timestamp": "2026-06-08T16:50:00-08:00",
       "status": "ok"
     }
   },

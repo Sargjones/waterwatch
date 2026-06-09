@@ -3,7 +3,7 @@
     "city": "Canmore",
     "province": "AB",
     "dashboard": "waterwatch.criticalto.ca/canmore",
-    "generated_utc": "2026-06-09T00:54:23.148896+00:00",
+    "generated_utc": "2026-06-09T01:22:00.827098+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -32,18 +32,18 @@
       "station_id": "05BB001",
       "station_name": "Bow River at Banff (25km upstream)",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BB001_hourly_hydrometric.csv",
-      "level_m": 2.771,
-      "discharge_cms": 116.0,
-      "timestamp": "2026-06-08T16:25:00-07:00",
+      "level_m": 2.766,
+      "discharge_cms": 115.0,
+      "timestamp": "2026-06-08T17:25:00-07:00",
       "status": "ok"
     },
     "spray_banff": {
       "station_id": "05BC001",
       "station_name": "Spray River at Banff",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BC001_hourly_hydrometric.csv",
-      "level_m": 1.261,
+      "level_m": 1.262,
       "discharge_cms": 11.1,
-      "timestamp": "2026-06-08T16:25:00-07:00",
+      "timestamp": "2026-06-08T17:25:00-07:00",
       "status": "ok"
     },
     "waiparous": {
