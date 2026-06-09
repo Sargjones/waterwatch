@@ -671,7 +671,7 @@ function renderReservoirs(reservoirs) {
           <div class="bar-fill ${cls}" style="width:${pct}%"></div>
           <div class="bar-target-line" style="left:100%"></div>
         </div>
-        <div class="reservoir-note">${r.historical_note}</div>
+        <div class="reservoir-note">${r.note || r.historical_note || ''}</div>
       </div>`;
   }).join('');
 
