@@ -3,7 +3,7 @@
     "city": "Canmore",
     "province": "AB",
     "dashboard": "waterwatch.criticalto.ca/canmore",
-    "generated_utc": "2026-06-09T01:35:36.852745+00:00",
+    "generated_utc": "2026-06-09T01:38:08.562343+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -50,9 +50,9 @@
       "station_id": "05BG006",
       "station_name": "Waiparous Creek near Cochrane",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BG006_hourly_hydrometric.csv",
-      "level_m": 0.927,
-      "discharge_cms": 2.86,
-      "timestamp": "2026-06-08T17:05:00-07:00",
+      "level_m": 0.926,
+      "discharge_cms": 2.85,
+      "timestamp": "2026-06-08T18:05:00-07:00",
       "status": "ok"
     }
   },
