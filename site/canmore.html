@@ -1,1 +1,69 @@
-
+{
+  "meta": {
+    "city": "Canmore",
+    "province": "AB",
+    "dashboard": "waterwatch.criticalto.ca/canmore",
+    "generated_utc": "2026-06-09T01:22:00.827098+00:00",
+    "data_licences": [
+      "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
+    ]
+  },
+  "restriction": {
+    "stage": 0,
+    "stage_label": "No active restrictions",
+    "start_date": null,
+    "end_date": null,
+    "fine_cad": null,
+    "operator": "EPCOR Water Services (on behalf of Town of Canmore)",
+    "source_url": "https://www.canmore.ca/your-community/public-safety/hazard-monitoring/drought-monitoring",
+    "last_verified": "2026-06-08",
+    "note": "Canmore draws water from two sources: Bow River aquifer (groundwater) and Rundle Forebay (surface water via Spray Lakes/TransAlta canal system). EPCOR operates under a utility management agreement with the Town until 2030.",
+    "days_remaining": 0
+  },
+  "snowpack": {
+    "pct_of_normal": 68,
+    "reference": "April 1 peak, Bow River Basin",
+    "source": "Alberta River Forecast Centre",
+    "note": "2026 reading \u2014 below average but not crisis level",
+    "last_updated": "2026-05-01"
+  },
+  "watershed_inflow": {
+    "bow_banff": {
+      "station_id": "05BB001",
+      "station_name": "Bow River at Banff (25km upstream)",
+      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BB001_hourly_hydrometric.csv",
+      "level_m": 2.766,
+      "discharge_cms": 115.0,
+      "timestamp": "2026-06-08T17:25:00-07:00",
+      "status": "ok"
+    },
+    "spray_banff": {
+      "station_id": "05BC001",
+      "station_name": "Spray River at Banff",
+      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BC001_hourly_hydrometric.csv",
+      "level_m": 1.262,
+      "discharge_cms": 11.1,
+      "timestamp": "2026-06-08T17:25:00-07:00",
+      "status": "ok"
+    },
+    "waiparous": {
+      "station_id": "05BG006",
+      "station_name": "Waiparous Creek near Cochrane",
+      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BG006_hourly_hydrometric.csv",
+      "level_m": 0.927,
+      "discharge_cms": 2.86,
+      "timestamp": "2026-06-08T17:05:00-07:00",
+      "status": "ok"
+    }
+  },
+  "watershed_context": {
+    "primary_source": "Rundle Forebay (surface water, ~50% of supply)",
+    "secondary_source": "Bow River aquifer (groundwater, ~50% of supply)",
+    "forebay_fed_by": "Spray Lakes reservoir via TransAlta canal system (Kananaskis Country)",
+    "operator": "EPCOR Water Services Inc.",
+    "agreement_expires": "2030",
+    "note": "No public API for Rundle Forebay levels. Bow River at Banff (25km upstream) is the best available public indicator of watershed health.",
+    "source": "EPCOR Canada / Town of Canmore",
+    "source_url": "https://www.epcor.com/ca/en/about/our-company/where-we-operate/canmore.html"
+  }
+}
