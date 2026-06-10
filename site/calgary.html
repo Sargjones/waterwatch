@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calgary WaterWatch — Bow & Elbow System</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --blue: #388bfd;
+      --green: #3fb950;
+      --yellow: #d29922;
+      --red: #f85149;
+      --orange: #db6d28;
+      --teal: #39d353;
+      --purple: #bc8cff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 14px; line-height: 1.6; }
+
+    header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    header h1 { font-size: 1.2rem; font-weight: 600; color: var(--text); }
+    header h1 span { color: var(--blue); }
+    .header-meta { color: var(--muted); font-size: 12px; margin-left: auto; }
+    .back-link { color: var(--muted); font-size: 12px; text-decoration: none; }
+    .back-link:hover { color: var(--text); }
+
+    .alert-banner { background: #2d1a0e; border: 1px solid var(--orange); border-left: 4px solid var(--orange); padding: 12px 20px; display: flex; align-items: flex-start; gap: 12px; }
+    .alert-banner .icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .alert-banner strong { color: var(--orange); }
+    .alert-banner p { color: var(--muted); font-size: 13px; margin-top: 2px; }
+    .alert-banner a { color: var(--blue); text-decoration: none; }
+    .alert-banner a:hover { text-decoration: underline; }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 20px 16px; }
+
+    .section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+
+    /* STATIONS */
+    .stations-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-bottom: 24px; }
+    .station-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+    .station-card.active { border-color: var(--blue); }
+    .station-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .station-name { font-weight: 600; font-size: 13px; }
+    .station-id { font-size: 11px; color: var(--muted); font-family: monospace; margin-top: 2px; }
+    .station-badge { font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 600; }
+    .badge-bow { background: rgba(56,139,253,0.15); color: var(--blue); }
+    .badge-elbow { background: rgba(63,185,80,0.15); color: var(--green); }
+    .metric-row { display: flex; gap: 20px; }
+    .metric { flex: 1; }
+    .metric-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .metric-value { font-size: 1.5rem; font-weight: 700; line-height: 1.2; }
+    .metric-unit { font-size: 11px; color: var(--muted); }
+    .metric-normal { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .trend { font-size: 11px; margin-top: 6px; }
+    .trend.up { color: var(--yellow); }
+    .trend.down { color: var(--blue); }
+    .trend.stable { color: var(--green); }
+    .loading { color: var(--muted); font-size: 13px; }
+
+    /* RESERVOIR */
+    .reservoir-section { margin-bottom: 24px; }
+    .reservoir-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+    .reservoir-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+    .reservoir-card.bearspaw { border-left: 3px solid var(--blue); }
+    .reservoir-card.glenmore { border-left: 3px solid var(--green); }
+    .res-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .res-name { font-weight: 600; font-size: 13px; }
+    .res-source { font-size: 10px; color: var(--muted); }
+    .res-pct { font-size: 2rem; font-weight: 700; }
+    .res-pct.above { color: var(--green); }
+    .res-pct.normal { color: var(--blue); }
+    .res-pct.below { color: var(--yellow); }
+    .res-bar-bg { height: 8px; background: var(--border); border-radius: 4px; margin: 8px 0; overflow: hidden; }
+    .res-bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+    .fill-above { background: var(--green); }
+    .fill-normal { background: var(--blue); }
+    .fill-below { background: var(--yellow); }
+    .res-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
+    .res-status { display: inline-block; margin-top: 6px; font-size: 11px; padding: 1px 6px; border-radius: 8px; }
+    .status-above { background: rgba(63,185,80,0.15); color: var(--green); }
+    .status-normal { background: rgba(56,139,253,0.15); color: var(--blue); }
+    .status-below { background: rgba(210,153,34,0.15); color: var(--yellow); }
+
+    /* MAP */
+    .map-section { margin-bottom: 24px; }
+    #map { height: 300px; border-radius: 8px; border: 1px solid var(--border); }
+
+    /* CHART */
+    .chart-section { margin-bottom: 24px; }
+    .chart-controls { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+    .chart-controls label { font-size: 12px; color: var(--muted); }
+    .chart-toggle { background: var(--surface); border: 1px solid var(--border); color: var(--muted); padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    .chart-toggle.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .chart-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+    canvas { max-height: 280px; }
+
+    /* INFRASTRUCTURE STORY */
+    .story-section { margin-bottom: 24px; }
+    .story-card { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--orange); border-radius: 8px; padding: 20px; }
+    .story-card h3 { font-size: 14px; font-weight: 600; color: var(--orange); margin-bottom: 10px; }
+    .story-card p { color: var(--muted); font-size: 13px; margin-bottom: 8px; line-height: 1.65; }
+    .story-card p:last-child { margin-bottom: 0; }
+    .story-card a { color: var(--blue); text-decoration: none; }
+    .story-card a:hover { text-decoration: underline; }
+    .timeline { margin: 14px 0; border-left: 2px solid var(--border); padding-left: 16px; }
+    .tl-item { margin-bottom: 12px; position: relative; }
+    .tl-item::before { content: ''; position: absolute; left: -20px; top: 5px; width: 8px; height: 8px; border-radius: 50%; background: var(--orange); }
+    .tl-item.resolved::before { background: var(--green); }
+    .tl-date { font-size: 11px; font-weight: 600; color: var(--muted); font-family: monospace; }
+    .tl-text { font-size: 13px; color: var(--text); }
+
+    /* SYSTEM CONTEXT */
+    .context-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 24px; }
+    .context-card h3 { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+    .system-diagram { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--muted); padding: 8px 0; }
+    .sys-node { background: var(--bg); border: 1px solid var(--border); padding: 6px 10px; border-radius: 6px; color: var(--text); font-size: 12px; }
+    .sys-node.treatment { border-color: var(--blue); color: var(--blue); }
+    .sys-node.source { border-color: var(--green); color: var(--green); }
+    .sys-node.risk { border-color: var(--orange); color: var(--orange); }
+    .sys-arrow { color: var(--muted); font-size: 14px; }
+
+    footer { text-align: center; padding: 20px; color: var(--muted); font-size: 11px; border-top: 1px solid var(--border); }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 600px) {
+      .stations-grid { grid-template-columns: 1fr; }
+      .reservoir-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <a class="back-link" href="/">← WaterWatch</a>
+    <h1 style="margin-top:4px">Calgary <span>Bow & Elbow</span> Water System</h1>
+  </div>
+  <div class="header-meta">
+    Updated <span id="last-updated">—</span> · Source: Environment Canada / Alberta Rivers
+  </div>
+</header>
+
+<div class="alert-banner" id="feeder-alert">
+  <div class="icon">🔧</div>
+  <div>
+    <strong>Bearspaw South Feeder Main — Reinforcement complete April 2026</strong>
+    <p>The critical feeder main supplying ~60% of Calgary's treated water failed in June 2024 and again Dec 30, 2025. Emergency reinforcement was completed in April 2026. A parallel replacement main is under construction, expected by end of 2026. <a href="https://www.calgary.ca/emergencies/feeder-main-repair.html" target="_blank">City update →</a></p>
+  </div>
+</div>
+
+<main>
+
+  <!-- STATIONS -->
+  <div class="section-title">River Flow — Real-Time Stations</div>
+  <div class="stations-grid" id="stations-grid">
+    <div class="station-card" id="card-05BH004">
+      <div class="station-header">
+        <div>
+          <div class="station-name">Bow River at Calgary</div>
+          <div class="station-id">05BH004</div>
+        </div>
+        <span class="station-badge badge-bow">Bow</span>
+      </div>
+      <div class="metric-row">
+        <div class="metric">
+          <div class="metric-label">Discharge</div>
+          <div class="metric-value" id="flow-05BH004"><span class="loading">—</span></div>
+          <div class="metric-unit">m³/s</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Level</div>
+          <div class="metric-value" id="level-05BH004"><span class="loading">—</span></div>
+          <div class="metric-unit">m</div>
+        </div>
+      </div>
+      <div class="trend" id="trend-05BH004"></div>
+    </div>
+
+    <div class="station-card" id="card-05BJ001">
+      <div class="station-header">
+        <div>
+          <div class="station-name">Elbow R. below Glenmore Dam</div>
+          <div class="station-id">05BJ001</div>
+        </div>
+        <span class="station-badge badge-elbow">Elbow</span>
+      </div>
+      <div class="metric-row">
+        <div class="metric">
+          <div class="metric-label">Discharge</div>
+          <div class="metric-value" id="flow-05BJ001"><span class="loading">—</span></div>
+          <div class="metric-unit">m³/s</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Level</div>
+          <div class="metric-value" id="level-05BJ001"><span class="loading">—</span></div>
+          <div class="metric-unit">m</div>
+        </div>
+      </div>
+      <div class="trend" id="trend-05BJ001"></div>
+    </div>
+
+    <div class="station-card" id="card-05BJ004">
+      <div class="station-header">
+        <div>
+          <div class="station-name">Elbow R. at Bragg Creek</div>
+          <div class="station-id">05BJ004</div>
+        </div>
+        <span class="station-badge badge-elbow">Elbow upstream</span>
+      </div>
+      <div class="metric-row">
+        <div class="metric">
+          <div class="metric-label">Discharge</div>
+          <div class="metric-value" id="flow-05BJ004"><span class="loading">—</span></div>
+          <div class="metric-unit">m³/s</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Level</div>
+          <div class="metric-value" id="level-05BJ004"><span class="loading">—</span></div>
+          <div class="metric-unit">m</div>
+        </div>
+      </div>
+      <div class="trend" id="trend-05BJ004"></div>
+    </div>
+  </div>
+
+  <!-- RESERVOIRS -->
+  <div class="section-title">Reservoir Storage</div>
+  <div class="reservoir-section">
+    <div class="reservoir-grid" id="reservoir-grid">
+      <!-- Bearspaw: fed by Bow, operated by TransAlta/City, no Alberta Rivers station — context card -->
+      <div class="reservoir-card bearspaw">
+        <div class="res-header">
+          <div>
+            <div class="res-name">Bearspaw Reservoir</div>
+            <div class="res-source">Bow River · TransAlta / City of Calgary</div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);text-align:right">Source: Bow at Calgary<br>flow proxy</div>
+        </div>
+        <div id="bearspaw-content">
+          <p style="font-size:12px;color:var(--muted);line-height:1.6">
+            Bearspaw is a run-of-river reservoir with limited storage — inflows from the Bow frequently exceed capacity. Real-time storage data is not published by Alberta Environment; upstream flow at <strong>05BH004</strong> is the best available proxy. The City draws drinking water from Bearspaw WTP for the northwest system.
+          </p>
+        </div>
+      </div>
+
+      <!-- Glenmore: station 05BJ008 in Alberta Rivers PDF -->
+      <div class="reservoir-card glenmore">
+        <div class="res-header">
+          <div>
+            <div class="res-name">Glenmore Reservoir</div>
+            <div class="res-source">Elbow River · City of Calgary WTP · <span style="font-family:monospace">05BJ008</span></div>
+          </div>
+        </div>
+        <div id="glenmore-storage">
+          <div class="res-pct" id="glenmore-pct">—</div>
+          <div class="res-bar-bg"><div class="res-bar-fill" id="glenmore-bar" style="width:0%"></div></div>
+          <div class="res-meta">
+            <span id="glenmore-storage-val">Loading…</span>
+            <span id="glenmore-max">Max: 23,502 dam³</span>
+          </div>
+          <div id="glenmore-status-badge"></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:8px" id="glenmore-reading-date"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAP -->
+  <div class="map-section">
+    <div class="section-title">Station & Infrastructure Map</div>
+    <div id="map"></div>
+  </div>
+
+  <!-- FLOW PROFILE CHART -->
+  <div class="chart-section">
+    <div class="section-title">Flow Profile — 7-Day History</div>
+    <div class="chart-controls">
+      <span style="font-size:12px;color:var(--muted)">View:</span>
+      <button class="chart-toggle active" id="btn-linear" onclick="setScale('linear')">Linear</button>
+      <button class="chart-toggle" id="btn-log" onclick="setScale('log')">Log</button>
+      <span style="margin-left:auto;font-size:11px;color:var(--muted)" id="chart-note"></span>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="flowChart"></canvas>
+    </div>
+  </div>
+
+  <!-- INFRASTRUCTURE STORY -->
+  <div class="story-section">
+    <div class="section-title">Infrastructure Context — Bearspaw South Feeder Main</div>
+    <div class="story-card">
+      <h3>⚠ Two catastrophic failures in 18 months — and a $342M reckoning</h3>
+      <p>
+        The Bearspaw South Feeder Main is the most critical single pipe in Calgary's water network, carrying approximately 60% of the city's treated drinking water from the Bearspaw Water Treatment Plant into the distribution system. Installed in the mid-1970s, the prestressed concrete cylinder pipe (PCCP) was first flagged as a high-consequence risk in 2004 — but repeated recommendations to inspect, monitor, and rehabilitate it were deferred across multiple councils and management cycles over 20 years.
+      </p>
+
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-date">2004</div>
+          <div class="tl-text">Risk first formally identified after a feeder main rupture in northeast Calgary</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">2017 · 2020 · 2022</div>
+          <div class="tl-text">Three separate recommendations to inspect the Bearspaw feeder main deferred or redirected</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">June 2024</div>
+          <div class="tl-text">First catastrophic rupture floods Trans-Canada Highway; city begins concrete encasement repairs and installs acoustic fibre-optic monitoring (1 million sensing wires)</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">December 30, 2025</div>
+          <div class="tl-text">Second catastrophic failure — same main, ~1 km from June 2024 break. Pipe splits in a "zipper" failure with no warning wire snaps in preceding two months. 13 people rescued from icy floodwater. City-wide conservation order issued.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">January 2026</div>
+          <div class="tl-text">Independent panel report released: city ignored 20+ years of warning signs; problems span multiple councils and management teams. City council votes unanimously to implement all recommendations.</div>
+        </div>
+        <div class="tl-item resolved">
+          <div class="tl-date">April 2026</div>
+          <div class="tl-text">Emergency reinforcement completed. Parallel replacement main under active construction, expected complete by end of 2026.</div>
+        </div>
+        <div class="tl-item resolved">
+          <div class="tl-date">2027–2030</div>
+          <div class="tl-text">$342M remediation program proposed — nearly double the $168M spent 2023–2026. City requesting provincial cost-sharing.</div>
+        </div>
+      </div>
+
+      <p>
+        The dual-source design of Calgary's water system — Bearspaw WTP drawing from the Bow, Glenmore WTP drawing from the Elbow — is both a strength and a vulnerability. When Bearspaw is compromised, the Elbow/Glenmore system cannot fully compensate for the whole city. This is why the flow data at <strong>05BH004</strong> and <strong>05BJ001</strong> is not just environmental monitoring: it is directly linked to Calgary's most pressing infrastructure story.
+      </p>
+      <p>
+        <a href="https://www.calgary.ca/emergencies/feeder-main-repair.html" target="_blank">Calgary.ca — Feeder Main Repair updates →</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- SYSTEM DIAGRAM -->
+  <div class="context-card">
+    <h3>Calgary Dual-Source Water System</h3>
+    <div class="system-diagram">
+      <div class="sys-node source">Bow River<br><small>05BH004</small></div>
+      <div class="sys-arrow">→</div>
+      <div class="sys-node">Bearspaw<br>Reservoir</div>
+      <div class="sys-arrow">→</div>
+      <div class="sys-node treatment">Bearspaw WTP<br><small>NW Calgary</small></div>
+      <div class="sys-arrow">→</div>
+      <div class="sys-node risk">Feeder Main<br><small>⚠ PCCP 1970s</small></div>
+      <div class="sys-arrow">→</div>
+      <div class="sys-node">Distribution</div>
+    </div>
+    <div class="system-diagram" style="margin-top:8px">
+      <div class="sys-node source">Elbow River<br><small>05BJ004 upstream</small></div>
+      <div class="sys-arrow">→</div>
+      <div class="sys-node">Glenmore<br>Reservoir</div>
+      <div class="sys-arrow">→</div>
+      <div class="sys-node treatment">Glenmore WTP<br><small>SW Calgary</small></div>
+      <div class="sys-arrow" style="opacity:0.3">→ ——</div>
+      <div class="sys-node" style="opacity:0.5">Elbow below dam<br><small>05BJ001</small></div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <p>WaterWatch · <a href="/">criticalto.ca</a> · Flow data: Environment Canada Water Survey · Reservoir: Alberta Environment & Protected Areas · Last build: <span id="footer-date"></span></p>
+</footer>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const STATIONS = [
+  { id: '05BH004', name: 'Bow at Calgary',         river: 'bow' },
+  { id: '05BJ001', name: 'Elbow below Glenmore',   river: 'elbow' },
+  { id: '05BJ004', name: 'Elbow at Bragg Creek',   river: 'elbow' },
+];
+
+const STATION_COORDS = {
+  '05BH004': [51.0447, -114.0719],
+  '05BJ001': [50.9950, -114.0800],
+  '05BJ004': [50.9503, -114.5700],
+};
+
+const RIVER_COLOURS = { bow: '#388bfd', elbow: '#3fb950' };
+
+let chartInstance = null;
+let chartScale = 'linear';
+let allSeries = {};
+
+// ── LOAD DATA ─────────────────────────────────────────────────────────────────
+async function loadData() {
+  try {
+    const resp = await fetch('data/calgary.json?t=' + Date.now());
+    if (!resp.ok) throw new Error('not found');
+    const data = await resp.json();
+    renderAll(data);
+  } catch(e) {
+    // Fallback: fetch live from MSC Datamart
+    fetchLive();
+  }
+}
+
+async function fetchLive() {
+  const prov = 'AB';
+  for (const stn of STATIONS) {
+    try {
+      const url = `https://dd.weather.gc.ca/hydrometric/csv/${prov}/hourly/${prov}_${stn.id}_hourly_hydrometric.csv`;
+      const r = await fetch(url);
+      const text = await r.text();
+      const rows = text.trim().split('\n').slice(1).filter(l=>l.trim());
+      const parsed = rows.map(row => {
+        const cols = row.split(',');
+        return { datetime: cols[1]?.trim(), flow: parseFloat(cols[2]), level: parseFloat(cols[6]) };
+      }).filter(r => !isNaN(r.flow));
+      if (parsed.length) {
+        const latest = parsed[parsed.length - 1];
+        updateCard(stn.id, latest.flow, latest.level, parsed);
+        allSeries[stn.id] = { data: parsed, river: stn.river, name: stn.name };
+      }
+    } catch(e) { console.warn('Live fetch failed for', stn.id, e); }
+  }
+  buildChart();
+}
+
+function renderAll(data) {
+  document.getElementById('last-updated').textContent = data.fetched_at ? 
+    new Date(data.fetched_at).toLocaleString('en-CA', {timeZone:'America/Edmonton', hour:'2-digit', minute:'2-digit', day:'numeric', month:'short'}) : '—';
+
+  if (data.stations) {
+    for (const stn of STATIONS) {
+      const s = data.stations[stn.id];
+      if (s) {
+        updateCard(stn.id, s.latest_flow, s.latest_level, s.history);
+        allSeries[stn.id] = { data: s.history || [], river: stn.river, name: stn.name };
+      }
+    }
+  }
+
+  if (data.glenmore) {
+    renderGlenmore(data.glenmore);
+  }
+
+  buildChart();
+  document.getElementById('footer-date').textContent = data.fetched_at || '—';
+}
+
+function updateCard(id, flow, level, history) {
+  const flowEl = document.getElementById('flow-' + id);
+  const levelEl = document.getElementById('level-' + id);
+  const trendEl = document.getElementById('trend-' + id);
+
+  if (flowEl && flow != null && !isNaN(flow)) flowEl.textContent = flow.toFixed(1);
+  if (levelEl && level != null && !isNaN(level)) levelEl.textContent = level.toFixed(2);
+
+  // Simple trend from last 2 readings
+  if (trendEl && history && history.length >= 2) {
+    const prev = parseFloat(history[history.length - 2]?.flow);
+    const curr = parseFloat(history[history.length - 1]?.flow);
+    if (!isNaN(prev) && !isNaN(curr)) {
+      const delta = ((curr - prev) / prev * 100);
+      if (Math.abs(delta) < 2) {
+        trendEl.className = 'trend stable';
+        trendEl.textContent = '→ Stable';
+      } else if (delta > 0) {
+        trendEl.className = 'trend up';
+        trendEl.textContent = `↑ +${delta.toFixed(1)}% vs prev reading`;
+      } else {
+        trendEl.className = 'trend down';
+        trendEl.textContent = `↓ ${delta.toFixed(1)}% vs prev reading`;
+      }
+    }
+  }
+}
+
+function renderGlenmore(g) {
+  const pct = g.pct_capacity;
+  const status = g.compared_to_normal || 'NORMAL';
+  const storage = g.storage_dam3;
+  const readingDate = g.reading_date;
+
+  const pctEl = document.getElementById('glenmore-pct');
+  const barEl = document.getElementById('glenmore-bar');
+  const stoEl = document.getElementById('glenmore-storage-val');
+  const badgeEl = document.getElementById('glenmore-status-badge');
+  const dateEl = document.getElementById('glenmore-reading-date');
+
+  if (pctEl) {
+    pctEl.textContent = pct != null ? `${pct}%` : '—';
+    pctEl.className = 'res-pct ' + (status === 'ABOVE' ? 'above' : status === 'BELOW' ? 'below' : 'normal');
+  }
+  if (barEl) {
+    barEl.style.width = (pct || 0) + '%';
+    barEl.className = 'res-bar-fill ' + (status === 'ABOVE' ? 'fill-above' : status === 'BELOW' ? 'fill-below' : 'fill-normal');
+  }
+  if (stoEl) stoEl.textContent = storage ? `${storage.toLocaleString()} dam³` : '—';
+  if (badgeEl) {
+    badgeEl.innerHTML = `<span class="res-status status-${status.toLowerCase()}">${status} normal range</span>`;
+  }
+  if (dateEl && readingDate) dateEl.textContent = `Reading: ${readingDate}`;
+}
+
+// ── CHART ─────────────────────────────────────────────────────────────────────
+function buildChart() {
+  const ctx = document.getElementById('flowChart').getContext('2d');
+  if (chartInstance) chartInstance.destroy();
+
+  const datasets = [];
+  const labels = [];
+  let labelsSet = false;
+
+  for (const [id, series] of Object.entries(allSeries)) {
+    if (!series.data || !series.data.length) continue;
+    const colour = RIVER_COLOURS[series.river] || '#888';
+    const values = series.data.map(d => parseFloat(d.flow));
+    if (!labelsSet) {
+      series.data.forEach(d => labels.push(d.datetime?.slice(0, 16) || ''));
+      labelsSet = true;
+    }
+    datasets.push({
+      label: series.name,
+      data: values,
+      borderColor: colour,
+      backgroundColor: colour + '18',
+      borderWidth: 1.5,
+      pointRadius: 0,
+      fill: true,
+      tension: 0.3,
+    });
+  }
+
+  if (!datasets.length) {
+    document.getElementById('chart-note').textContent = 'No history data available';
+    return;
+  }
+
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: '#8b949e', font: { size: 11 } } },
+        tooltip: { backgroundColor: '#161b22', borderColor: '#30363d', borderWidth: 1, titleColor: '#e6edf3', bodyColor: '#8b949e' }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#8b949e', maxTicksLimit: 8, font: { size: 10 }, maxRotation: 0 },
+          grid: { color: '#21262d' },
+        },
+        y: {
+          type: chartScale,
+          title: { display: true, text: 'Discharge (m³/s)', color: '#8b949e', font: { size: 11 } },
+          ticks: { color: '#8b949e', font: { size: 10 } },
+          grid: { color: '#21262d' },
+        }
+      }
+    }
+  });
+}
+
+function setScale(scale) {
+  chartScale = scale;
+  document.getElementById('btn-linear').classList.toggle('active', scale === 'linear');
+  document.getElementById('btn-log').classList.toggle('active', scale === 'log');
+  buildChart();
+}
+
+// ── MAP ───────────────────────────────────────────────────────────────────────
+function initMap() {
+  const map = L.map('map', { zoomControl: true }).setView([51.02, -114.25], 10);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap contributors © CARTO',
+    subdomains: 'abcd', maxZoom: 19
+  }).addTo(map);
+
+  const stnMarkers = [
+    { id: '05BH004', name: 'Bow River at Calgary', coords: STATION_COORDS['05BH004'], colour: '#388bfd' },
+    { id: '05BJ001', name: 'Elbow below Glenmore Dam', coords: STATION_COORDS['05BJ001'], colour: '#3fb950' },
+    { id: '05BJ004', name: 'Elbow at Bragg Creek', coords: STATION_COORDS['05BJ004'], colour: '#3fb950' },
+  ];
+
+  for (const s of stnMarkers) {
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="width:12px;height:12px;background:${s.colour};border:2px solid #fff;border-radius:50%;box-shadow:0 0 6px ${s.colour}80"></div>`,
+      iconSize: [12, 12], iconAnchor: [6, 6]
+    });
+    L.marker(s.coords, { icon }).addTo(map)
+      .bindPopup(`<strong>${s.name}</strong><br><code style="font-size:11px">${s.id}</code>`);
+  }
+
+  // Infrastructure markers
+  const infra = [
+    { coords: [51.108, -114.218], label: 'Bearspaw WTP', colour: '#388bfd' },
+    { coords: [50.990, -114.113], label: 'Glenmore WTP', colour: '#3fb950' },
+    { coords: [51.080, -114.185], label: '⚠ Bearspaw S. Feeder Main (break zones)', colour: '#db6d28' },
+  ];
+
+  for (const p of infra) {
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="width:10px;height:10px;background:${p.colour};border:2px solid #fff;border-radius:2px;"></div>`,
+      iconSize: [10, 10], iconAnchor: [5, 5]
+    });
+    L.marker(p.coords, { icon }).addTo(map)
+      .bindPopup(`<strong>${p.label}</strong>`);
+  }
+
+  // Bow River line (schematic)
+  L.polyline([[51.19, -114.55], [51.044, -114.07]], { color: '#388bfd', weight: 2, opacity: 0.5, dashArray: '4 3' }).addTo(map);
+  // Elbow River line (schematic)
+  L.polyline([[50.95, -114.57], [51.00, -114.08]], { color: '#3fb950', weight: 2, opacity: 0.5, dashArray: '4 3' }).addTo(map);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.getElementById('footer-date').textContent = new Date().toLocaleDateString('en-CA');
+initMap();
+loadData();
+</script>
+</body>
+</html>
