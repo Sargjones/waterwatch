@@ -296,7 +296,7 @@
           </div>
         </div>
       </div>
-      <svg id="flow-chart-svg" viewBox="0 0 1000 300" preserveAspectRatio="xMidYMid meet"></svg>
+      <svg id="flow-chart-svg" viewBox="0 0 1000 320" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
   </div>
 
@@ -309,7 +309,7 @@
       <div class="supply-row"><span class="supply-label">Operator</span><span class="supply-value">EPCOR Water Services — utility agreement with Town of Canmore (expires 2030)</span></div>
       <div class="supply-row"><span class="supply-label">Treatment</span><span class="supply-value">Pumphouse 1 (groundwater, chlorination) · Pumphouse 2 / Rundle Forebay (coagulation, gravity filtration, UV)</span></div>
       <div class="warning-note">
-        <strong>River Road & low-lying areas: groundwater flooding risk.</strong>
+        <strong>Downtown Canmore & low-lying areas: groundwater flooding risk.</strong>
         The downtown aquifer responds to both Bow River levels and sustained rainfall.
         When the river runs high — especially combined with heavy rain — groundwater pressure rises
         and can enter basements even when the Bow has not overflowed its banks.
@@ -352,7 +352,7 @@
       </div>
       <div class="tip">
         <div class="tip-impact high">High impact</div>
-        <div class="tip-title">River Road residents: check Banff after rain</div>
+        <div class="tip-title">Downtown Canmore residents: check Banff after rain</div>
         <div class="tip-detail">When Bow at Banff exceeds 150 cms — especially after sustained rain — check your basement. The shallow aquifer responds within hours. Sump pumps should be tested each spring.</div>
       </div>
       <div class="tip">
@@ -559,8 +559,8 @@ function updateMapMarkers(inflow) {
 // ── Flow corridor chart ───────────────────────────────────────────────────────
 function drawChart(inflow) {
   const svg = document.getElementById('flow-chart-svg');
-  const W = 1000, H = 300;
-  const PAD = { top: 40, right: 40, bottom: 80, left: 60 };
+  const W = 1000, H = 320;
+  const PAD = { top: 52, right: 80, bottom: 90, left: 60 };
   const chartW = W - PAD.left - PAD.right;
   const chartH = H - PAD.top - PAD.bottom;
 
@@ -626,10 +626,12 @@ function drawChart(inflow) {
       return `${x},${y}`;
     });
 
-    // Smooth curve through main stations
+    // Smooth curve through main stations — drawn at mid-bar height to avoid label collision
     const pts = mainStations.map((v) => {
       const origIdx = STATIONS.findIndex(s => s.key === v.key);
-      return { x: xPos(origIdx), y: chartMode === 'normalized' ? yScale(v.pct) : yScale(v.cms) };
+      const yTop = chartMode === 'normalized' ? yScale(v.pct) : yScale(v.cms);
+      const yMid = yTop + (PAD.top + chartH - yTop) * 0.5;
+      return { x: xPos(origIdx), y: yMid };
     });
 
     let d = `M ${pts[0].x} ${pts[0].y}`;
@@ -666,11 +668,11 @@ function drawChart(inflow) {
       const displayVal = chartMode === 'normalized'
         ? `${Math.round(v.pct)}%`
         : `${v.cms.toFixed(0)} cms`;
-      html += `<text x="${x}" y="${yTop - 6}" text-anchor="middle" font-family="Fraunces,serif" font-size="13" font-weight="700" fill="${color}">${displayVal}</text>`;
+      html += `<text x="${x}" y="${yTop - 8}" text-anchor="middle" font-family="Fraunces,serif" font-size="13" font-weight="700" fill="${color}">${displayVal}</text>`;
 
-      // % of normal label in log mode
+      // % of normal label in log mode — above the cms value
       if (chartMode === 'log') {
-        html += `<text x="${x}" y="${yTop - 20}" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="${color}" opacity="0.8">${Math.round(v.pct)}% of normal</text>`;
+        html += `<text x="${x}" y="${yTop - 22}" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="${color}" opacity="0.8">${Math.round(v.pct)}% of normal</text>`;
       }
     } else {
       // No data bar
@@ -679,15 +681,13 @@ function drawChart(inflow) {
     }
 
     // Station name below X axis
-    html += `<text x="${x}" y="${baseY + 16}" text-anchor="middle" font-family="DM Mono,monospace" font-size="10" font-weight="500" fill="#1a1400">${v.name}</text>`;
-
+    html += `<text x="${x}" y="${baseY + 18}" text-anchor="middle" font-family="DM Mono,monospace" font-size="10" font-weight="500" fill="#1a1400">${v.name}</text>`;
     // Station ID
-    html += `<text x="${x}" y="${baseY + 28}" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="#6b5a2a">${v.id}</text>`;
-
+    html += `<text x="${x}" y="${baseY + 31}" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="#6b5a2a">${v.id}</text>`;
     // Direction arrow between stations (except last)
     if (i < STATIONS.length - 1) {
       const arrowX = x + xStep / 2;
-      html += `<text x="${arrowX}" y="${baseY + 16}" text-anchor="middle" font-size="10" fill="#6b5a2a">→</text>`;
+      html += `<text x="${arrowX}" y="${baseY + 18}" text-anchor="middle" font-size="10" fill="#6b5a2a">→</text>`;
     }
   });
 
@@ -706,8 +706,8 @@ function drawChart(inflow) {
   html += `<line x1="${PAD.left}" y1="${PAD.top + chartH}" x2="${W - PAD.right}" y2="${PAD.top + chartH}" stroke="rgba(26,20,0,0.25)" stroke-width="1"/>`;
 
   // West/East labels
-  html += `<text x="${PAD.left}" y="${H - 6}" font-family="DM Mono,monospace" font-size="9" fill="#6b5a2a">← West (Rocky Mountains)</text>`;
-  html += `<text x="${W - PAD.right}" y="${H - 6}" text-anchor="end" font-family="DM Mono,monospace" font-size="9" fill="#6b5a2a">East (Foothills) →</text>`;
+  html += `<text x="${PAD.left}" y="${H - 8}" font-family="DM Mono,monospace" font-size="9" fill="#6b5a2a">← West (Rocky Mountains)</text>`;
+  html += `<text x="${W - PAD.right}" y="${H - 8}" text-anchor="end" font-family="DM Mono,monospace" font-size="9" fill="#6b5a2a">East (Foothills) →</text>`;
 
   svg.innerHTML = html;
 }
