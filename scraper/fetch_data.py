@@ -82,6 +82,7 @@ CANMORE = {
         "bow_banff":   {"id": "05BB001", "province": "AB", "name": "Bow River at Banff (25km upstream)"},
         "spray_banff": {"id": "05BC001", "province": "AB", "name": "Spray River at Banff"},
         "waiparous":   {"id": "05BG006", "province": "AB", "name": "Waiparous Creek near Cochrane"},
+        "bow_cochrane": {"id": "05BH005", "province": "AB", "name": "Bow River near Cochrane (downstream indicator)"},
     },
     "restriction": {
         # Canmore uses a staged drought response — no mandatory restrictions currently active
