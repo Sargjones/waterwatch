@@ -411,7 +411,7 @@ const STATIONS = [
     name:     'Spray at Banff',
     fullName: 'Spray River at Banff',
     id:       '05BC001',
-    lat:      51.1602, lon: -115.5545,
+    lat:      51.1302, lon: -115.5145,
     role:     'Rundle Forebay supply proxy',
     juneNormal: 18,    // cms — Spray River June mean
     type:     'tributary',
@@ -421,7 +421,7 @@ const STATIONS = [
     name:     'Waiparous Ck',
     fullName: 'Waiparous Creek near Cochrane',
     id:       '05BG006',
-    lat:      51.32,  lon: -114.82,
+    lat:      51.26,  lon: -114.82,
     role:     'Local mountain tributary',
     juneNormal: 8,     // cms — Waiparous June mean
     type:     'tributary',
@@ -616,22 +616,13 @@ function drawChart(inflow) {
     html += `<text x="${W - PAD.right + 4}" y="${y100 + 4}" font-family="DM Mono,monospace" font-size="9" fill="#5a7a2d">100%</text>`;
   }
 
-  // Connecting path (main Bow only)
-  const mainStations = vals.filter(v => v.type === 'main');
-  if (mainStations.every(v => v.cms !== null)) {
-    const pathPts = mainStations.map((v, i) => {
-      const origIdx = STATIONS.findIndex(s => s.key === v.key);
-      const x = xPos(origIdx);
-      const y = chartMode === 'normalized' ? yScale(v.pct) : yScale(v.cms);
-      return `${x},${y}`;
-    });
-
-    // Smooth curve through main stations — drawn at mid-bar height to avoid label collision
+  // Connecting curve — mainstem Bow only (Banff → Cochrane), drawn at bar tops
+  const mainStations = vals.filter(v => v.type === 'main' && v.cms !== null);
+  if (mainStations.length >= 2) {
     const pts = mainStations.map((v) => {
       const origIdx = STATIONS.findIndex(s => s.key === v.key);
       const yTop = chartMode === 'normalized' ? yScale(v.pct) : yScale(v.cms);
-      const yMid = yTop + (PAD.top + chartH - yTop) * 0.5;
-      return { x: xPos(origIdx), y: yMid };
+      return { x: xPos(origIdx), y: yTop };
     });
 
     let d = `M ${pts[0].x} ${pts[0].y}`;
