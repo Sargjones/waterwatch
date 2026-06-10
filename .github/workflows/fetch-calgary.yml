@@ -24,7 +24,7 @@ jobs:
         run: pip install pdfminer.six
 
       - name: Fetch Calgary data
-        run: python scripts/fetch_calgary.py
+        run: python scraper/fetch_calgary.py
 
       - name: Commit & push if changed
         run: |
