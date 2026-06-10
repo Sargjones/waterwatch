@@ -3,7 +3,7 @@
     "city": "Metro Vancouver",
     "province": "BC",
     "dashboard": "waterwatch.criticalto.ca/vancouver",
-    "generated_utc": "2026-06-09T23:57:35.097137+00:00",
+    "generated_utc": "2026-06-10T00:39:01.475311+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -22,7 +22,7 @@
     "stanley_park_tunnel": true,
     "source_url": "https://metrovancouver.org/services/water/water-restrictions",
     "last_verified": "2026-06-08",
-    "days_remaining": 127
+    "days_remaining": 126
   },
   "snowpack": {
     "pct_of_normal": 53,
@@ -36,28 +36,28 @@
       "station_id": "08GA010",
       "station_name": "Capilano River above Intake",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08GA010_hourly_hydrometric.csv",
-      "level_m": null,
-      "discharge_cms": null,
-      "timestamp": null,
-      "status": "error: <urlopen error timed out>"
+      "level_m": 1.15,
+      "discharge_cms": 7.18,
+      "timestamp": "2026-06-09T16:20:00-08:00",
+      "status": "ok"
     },
     "seymour": {
       "station_id": "08GA030",
       "station_name": "Seymour River at Seymour Falls",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08GA030_hourly_hydrometric.csv",
-      "level_m": null,
-      "discharge_cms": null,
-      "timestamp": null,
-      "status": "error: <urlopen error timed out>"
+      "level_m": 0.984,
+      "discharge_cms": 5.28,
+      "timestamp": "2026-06-09T16:05:00-08:00",
+      "status": "ok"
     },
     "coquitlam": {
       "station_id": "08MH141",
       "station_name": "Coquitlam River near Port Coquitlam",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08MH141_hourly_hydrometric.csv",
-      "level_m": null,
-      "discharge_cms": null,
-      "timestamp": null,
-      "status": "error: <urlopen error timed out>"
+      "level_m": 2.011,
+      "discharge_cms": 9.66,
+      "timestamp": "2026-06-09T16:15:00-08:00",
+      "status": "ok"
     }
   },
   "reservoirs": {

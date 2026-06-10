@@ -3,7 +3,7 @@
     "city": "Canmore",
     "province": "AB",
     "dashboard": "waterwatch.criticalto.ca/canmore",
-    "generated_utc": "2026-06-09T23:58:35.422843+00:00",
+    "generated_utc": "2026-06-10T00:39:02.002463+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -32,28 +32,37 @@
       "station_id": "05BB001",
       "station_name": "Bow River at Banff (25km upstream)",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BB001_hourly_hydrometric.csv",
-      "level_m": null,
-      "discharge_cms": null,
-      "timestamp": null,
-      "status": "error: <urlopen error timed out>"
+      "level_m": 2.712,
+      "discharge_cms": 105.0,
+      "timestamp": "2026-06-09T16:25:00-07:00",
+      "status": "ok"
     },
     "spray_banff": {
       "station_id": "05BC001",
       "station_name": "Spray River at Banff",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BC001_hourly_hydrometric.csv",
-      "level_m": null,
-      "discharge_cms": null,
-      "timestamp": null,
-      "status": "error: <urlopen error timed out>"
+      "level_m": 1.241,
+      "discharge_cms": 10.2,
+      "timestamp": "2026-06-09T16:25:00-07:00",
+      "status": "ok"
     },
     "waiparous": {
       "station_id": "05BG006",
       "station_name": "Waiparous Creek near Cochrane",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BG006_hourly_hydrometric.csv",
-      "level_m": null,
-      "discharge_cms": null,
-      "timestamp": null,
-      "status": "error: <urlopen error timed out>"
+      "level_m": 0.917,
+      "discharge_cms": 2.74,
+      "timestamp": "2026-06-09T17:05:00-07:00",
+      "status": "ok"
+    },
+    "bow_cochrane": {
+      "station_id": "05BH005",
+      "station_name": "Bow River near Cochrane (downstream indicator)",
+      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BH005_hourly_hydrometric.csv",
+      "level_m": 17.181,
+      "discharge_cms": 290.0,
+      "timestamp": "2026-06-09T15:15:00-07:00",
+      "status": "ok"
     }
   },
   "watershed_context": {
