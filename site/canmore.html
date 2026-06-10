@@ -7,6 +7,8 @@
 <meta name="description" content="Live water supply intelligence for Canmore, Alberta. Bow River watershed conditions, Spray River flow, and conservation guidance for Canmore residents.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   :root {
     --ink: #1a1400;
@@ -19,36 +21,23 @@
     --accent-light: #7aaa3a;
     --amber: #8a5e00;
     --amber-bg: #fdf3dc;
+    --danger: #8b2020;
+    --danger-light: #c0392b;
     --mountain: #2d5a7a;
     --mountain-light: #4a8ab0;
+    --normal: #5a7a2d;
+    --elevated: #8a5e00;
+    --high: #8b2020;
     --border: rgba(26,20,0,0.12);
     --border-strong: rgba(26,20,0,0.25);
     --mono: 'DM Mono', monospace;
     --serif: 'Fraunces', serif;
   }
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--mono); font-size: 14px; line-height: 1.6; min-height: 100vh; }
 
-  body {
-    background: var(--paper);
-    color: var(--ink);
-    font-family: var(--mono);
-    font-size: 14px;
-    line-height: 1.6;
-    min-height: 100vh;
-  }
-
-  .site-header {
-    border-bottom: 1px solid var(--border-strong);
-    padding: 1.25rem 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--paper);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
+  /* ── Header ── */
+  .site-header { border-bottom: 1px solid var(--border-strong); padding: 1.25rem 2rem; display: flex; align-items: center; justify-content: space-between; background: var(--paper); position: sticky; top: 0; z-index: 1000; }
   .logo { display: flex; align-items: baseline; gap: 0.5rem; }
   .logo-mark { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
   .logo-region { font-size: 11px; font-weight: 500; color: var(--ink-muted); letter-spacing: 0.08em; text-transform: uppercase; }
@@ -57,75 +46,153 @@
   .live-dot { display: inline-block; width: 6px; height: 6px; background: var(--accent-light); border-radius: 50%; margin-right: 5px; animation: pulse 2s infinite; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-  /* No active restriction — use a calm mountain blue banner */
-  .status-banner {
-    background: var(--mountain);
-    color: #fff;
-    padding: 0.75rem 2rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    font-size: 13px;
-  }
+  /* ── Status banner ── */
+  .status-banner { background: var(--mountain); color: #fff; padding: 0.75rem 2rem; display: flex; align-items: center; gap: 1rem; font-size: 13px; }
   .status-stage { font-family: var(--serif); font-size: 1.1rem; font-weight: 700; white-space: nowrap; }
   .status-text { flex: 1; }
-  .status-note { font-size: 11px; opacity: 0.8; white-space: nowrap; }
 
-  main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+  /* ── Main layout ── */
+  main { max-width: 1200px; margin: 0 auto; padding: 2rem; }
 
-  .section-label {
-    font-size: 10px; font-weight: 500; letter-spacing: 0.12em;
-    text-transform: uppercase; color: var(--ink-muted);
-    margin-bottom: 1rem; padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--border);
-  }
+  .city-switch { display: flex; gap: 1rem; margin-bottom: 2rem; padding: 1rem 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .city-switch a { color: var(--ink-muted); text-decoration: none; }
+  .city-switch a.active { color: var(--ink); font-weight: 500; border-bottom: 2px solid var(--ink); padding-bottom: 2px; }
 
-  .metrics-row {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 1px; background: var(--border);
-    border: 1px solid var(--border); border-radius: 4px;
-    overflow: hidden; margin-bottom: 2rem;
-  }
+  .section-label { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+
+  /* ── Key metrics ── */
+  .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 2rem; }
   .metric { background: var(--paper-card); padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 0.25rem; }
   .metric-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); }
-  .metric-value { font-family: var(--serif); font-size: 2.25rem; font-weight: 700; line-height: 1; color: var(--ink); }
-  .metric-value.mountain { color: var(--mountain-light); }
-  .metric-value.amber { color: var(--amber); }
+  .metric-value { font-family: var(--serif); font-size: 2.25rem; font-weight: 700; line-height: 1; }
   .metric-value.good { color: var(--accent); }
+  .metric-value.amber { color: var(--amber); }
+  .metric-value.danger { color: var(--danger); }
+  .metric-value.mountain { color: var(--mountain-light); }
   .metric-sub { font-size: 11px; color: var(--ink-muted); line-height: 1.4; }
 
+  /* ── Map ── */
+  .viz-section { margin-bottom: 2rem; }
+  #bow-map {
+    width: 100%;
+    height: 320px;
+    border: 1px solid var(--border);
+    border-radius: 4px 4px 0 0;
+    background: var(--paper-warm);
+  }
+
+  /* Custom Leaflet marker styles */
+  .station-marker {
+    background: var(--paper-card);
+    border: 2px solid var(--border-strong);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.15s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  }
+  .station-marker:hover { transform: scale(1.15); }
+  .station-marker.flow-normal { border-color: var(--normal); color: var(--normal); background: #eaf3de; }
+  .station-marker.flow-elevated { border-color: var(--elevated); color: var(--elevated); background: var(--amber-bg); }
+  .station-marker.flow-high { border-color: var(--high); color: var(--high); background: #fcebeb; }
+  .station-marker.flow-secondary { border-color: var(--mountain); color: var(--mountain); background: #e6f1fb; }
+  .canmore-marker {
+    background: var(--ink);
+    border: 2px solid var(--ink);
+    border-radius: 3px;
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 500;
+    padding: 2px 5px;
+    white-space: nowrap;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+  .dam-marker {
+    background: #fff;
+    border: 2px solid var(--ink-muted);
+    border-radius: 2px;
+    color: var(--ink-muted);
+    font-size: 9px;
+    padding: 1px 4px;
+    white-space: nowrap;
+  }
+  .leaflet-popup-content-wrapper { font-family: var(--mono); font-size: 12px; border-radius: 4px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .leaflet-popup-content { margin: 10px 14px; line-height: 1.6; }
+  .popup-name { font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+  .popup-val { font-family: var(--serif); font-size: 1.4rem; font-weight: 700; }
+  .popup-val.flow-normal { color: var(--normal); }
+  .popup-val.flow-elevated { color: var(--elevated); }
+  .popup-val.flow-high { color: var(--high); }
+  .popup-val.flow-secondary { color: var(--mountain); }
+  .popup-role { font-size: 10px; color: var(--ink-muted); margin-top: 2px; }
+
+  /* ── Flow profile chart ── */
+  .chart-container {
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    background: var(--paper-card);
+    padding: 0;
+    overflow: hidden;
+  }
+  .chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--paper-warm);
+  }
+  .chart-title { font-size: 11px; font-weight: 500; color: var(--ink); }
+  .chart-subtitle { font-size: 10px; color: var(--ink-muted); margin-top: 1px; }
+  .toggle-group { display: flex; gap: 0; border: 1px solid var(--border-strong); border-radius: 3px; overflow: hidden; }
+  .toggle-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 4px 12px;
+    background: var(--paper-card);
+    color: var(--ink-muted);
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .toggle-btn.active { background: var(--ink); color: #fff; }
+  .toggle-btn:not(.active):hover { background: var(--paper-warm); color: var(--ink); }
+
+  #flow-chart-svg {
+    width: 100%;
+    display: block;
+  }
+
+  /* ── Two col below ── */
   .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+  .card { background: var(--paper-card); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; }
 
-  .card {
-    background: var(--paper-card); border: 1px solid var(--border);
-    border-radius: 4px; padding: 1.5rem;
-  }
+  .supply-row { display: flex; gap: 10px; padding: 0.6rem 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .supply-row:last-of-type { border-bottom: none; }
+  .supply-label { color: var(--ink-muted); min-width: 140px; flex-shrink: 0; }
+  .supply-value { color: var(--ink); flex: 1; line-height: 1.5; }
 
-  /* Station rows */
-  .station-row {
-    display: grid; grid-template-columns: 1fr auto auto;
-    gap: 1rem; align-items: center;
-    padding: 0.75rem 0; border-bottom: 1px solid var(--border);
-  }
-  .station-row:last-of-type { border-bottom: none; }
-  .station-name { font-size: 12px; color: var(--ink); }
-  .station-id { font-size: 10px; color: var(--ink-muted); }
-  .station-discharge { font-family: var(--serif); font-size: 1.1rem; font-weight: 700; color: var(--ink); text-align: right; white-space: nowrap; }
-  .station-unit { font-size: 10px; color: var(--ink-muted); }
-  .station-level { font-size: 11px; color: var(--ink-muted); text-align: right; }
+  .warning-note { background: #fcebeb; border-left: 3px solid var(--danger); padding: 0.75rem 1rem; font-size: 12px; color: var(--danger); line-height: 1.5; border-radius: 0 4px 4px 0; margin-top: 1rem; }
+  .info-note { background: var(--amber-bg); border-left: 3px solid var(--amber); padding: 0.75rem 1rem; font-size: 12px; color: var(--amber); line-height: 1.5; border-radius: 0 4px 4px 0; margin-top: 1rem; }
 
-  /* Snowpack bar */
-  .snowpack-bar-track { height: 12px; background: var(--paper-warm); border-radius: 2px; overflow: hidden; position: relative; margin: 0.75rem 0 0.35rem; }
+  .snowpack-bar-track { height: 10px; background: var(--paper-warm); border-radius: 2px; overflow: hidden; margin: 0.75rem 0 0.35rem; }
   .snowpack-bar-fill { height: 100%; background: var(--amber); border-radius: 2px; }
   .snowpack-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--ink-muted); }
 
-  /* Supply context */
-  .supply-row { display: flex; gap: 10px; padding: 0.6rem 0; border-bottom: 1px solid var(--border); font-size: 12px; }
-  .supply-row:last-of-type { border-bottom: none; }
-  .supply-label { color: var(--ink-muted); min-width: 140px; }
-  .supply-value { color: var(--ink); flex: 1; line-height: 1.5; }
+  .stages-grid { display: grid; grid-template-columns: auto 1fr; gap: 0 1rem; font-size: 12px; color: var(--ink-muted); line-height: 1.8; }
+  .s0 { color: var(--accent); font-weight: 500; }
+  .s1 { color: var(--accent); font-weight: 500; }
+  .s2 { color: var(--amber); font-weight: 500; }
+  .s3 { color: var(--danger-light); font-weight: 500; }
+  .s4 { color: var(--danger); font-weight: 500; }
 
-  /* Tips */
   .tips-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem; }
   .tip { padding: 1rem; background: var(--paper-warm); border-radius: 4px; }
   .tip-impact { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.4rem; }
@@ -134,36 +201,23 @@
   .tip-title { font-size: 12px; font-weight: 500; color: var(--ink); margin-bottom: 0.3rem; line-height: 1.4; }
   .tip-detail { font-size: 11px; color: var(--ink-muted); line-height: 1.5; }
 
-  /* City switcher */
-  .city-switch {
-    display: flex; gap: 1rem; margin-bottom: 2rem;
-    padding: 1rem 0; border-bottom: 1px solid var(--border);
-    font-size: 12px;
-  }
-  .city-switch a { color: var(--ink-muted); text-decoration: none; }
-  .city-switch a.active { color: var(--ink); font-weight: 500; border-bottom: 2px solid var(--ink); padding-bottom: 2px; }
-  .city-switch a:hover { color: var(--ink); }
-
-  .info-note {
-    background: var(--amber-bg); border-left: 3px solid var(--amber);
-    padding: 0.75rem 1rem; font-size: 12px; color: var(--amber);
-    line-height: 1.5; border-radius: 0 4px 4px 0; margin-top: 1rem;
-  }
-
-  .site-footer {
-    border-top: 1px solid var(--border); padding: 1.5rem 2rem;
-    font-size: 11px; color: var(--ink-muted);
-    max-width: 1100px; margin: 0 auto;
-    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
-  }
+  .site-footer { border-top: 1px solid var(--border); padding: 1.5rem 2rem; font-size: 11px; color: var(--ink-muted); max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
   .site-footer a { color: var(--accent); text-decoration: none; }
-  .site-footer a:hover { text-decoration: underline; }
+
+  /* Legend */
+  .legend { display: flex; gap: 1rem; align-items: center; font-size: 10px; color: var(--ink-muted); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 3px; }
+  .ld-normal { background: var(--normal); }
+  .ld-elevated { background: var(--elevated); }
+  .ld-high { background: var(--high); }
+  .ld-secondary { background: var(--mountain); }
 
   @media (max-width: 768px) {
     main { padding: 1rem; }
     .metrics-row { grid-template-columns: 1fr 1fr; }
     .two-col, .tips-grid { grid-template-columns: 1fr; }
     .site-footer { grid-template-columns: 1fr; }
+    #bow-map { height: 240px; }
   }
 </style>
 </head>
@@ -180,22 +234,18 @@
   </div>
 </header>
 
-<div class="status-banner">
+<div class="status-banner" id="status-banner">
   <span class="status-stage" id="banner-stage">Monitoring</span>
-  <span class="status-text" id="banner-text">
-    No mandatory water restrictions currently active in Canmore.
-    Canmore draws from the Bow River aquifer and Rundle Forebay — both monitored year-round.
-  </span>
-  <span class="status-note" id="banner-operator">EPCOR · Town of Canmore</span>
+  <span class="status-text" id="banner-text">No mandatory water restrictions currently active in Canmore. Bow River watershed monitored year-round.</span>
 </div>
 
 <main>
-
   <div class="city-switch">
     <a href="/index.html">Metro Vancouver</a>
     <a href="/canmore.html" class="active">Canmore, AB</a>
   </div>
 
+  <!-- Key metrics -->
   <div class="metrics-row">
     <div class="metric">
       <span class="metric-label">Restriction stage</span>
@@ -208,102 +258,85 @@
       <span class="metric-sub">of normal — below average</span>
     </div>
     <div class="metric">
-      <span class="metric-label">Bow River at Banff</span>
+      <span class="metric-label">Bow at Banff</span>
       <span class="metric-value mountain" id="m-bow">—</span>
       <span class="metric-sub">cms · 25km upstream of Canmore</span>
     </div>
     <div class="metric">
-      <span class="metric-label">Spray River at Banff</span>
-      <span class="metric-value mountain" id="m-spray">—</span>
-      <span class="metric-sub">cms · feeds Rundle Forebay</span>
+      <span class="metric-label">Bow near Cochrane</span>
+      <span class="metric-value mountain" id="m-cochrane">—</span>
+      <span class="metric-sub">cms · downstream of Ghost Dam</span>
     </div>
   </div>
 
-  <!-- Watershed inflow + Supply context -->
-  <p class="section-label">Watershed inflow</p>
-  <div class="two-col">
+  <!-- MAP + CHART stacked -->
+  <p class="section-label">Bow River corridor — live conditions</p>
+  <div class="viz-section">
 
-    <div class="card">
-      <div style="font-size:11px; color:var(--ink-muted); margin-bottom:0.75rem; line-height:1.5;">
-        Real-time streamflow from three stations in the Bow River watershed near Canmore.
-        No active gauge exists on the Bow at Canmore itself — Banff (25km upstream) is the
-        best available public indicator.
+    <!-- Leaflet map -->
+    <div id="bow-map"></div>
+
+    <!-- Flow profile chart -->
+    <div class="chart-container">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Flow corridor — west to east along the Bow</div>
+          <div class="chart-subtitle" id="chart-subtitle">Showing flow as % of June historical normal — higher = above average for this time of year</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:1rem;">
+          <div class="legend">
+            <span><span class="legend-dot ld-normal"></span>Normal</span>
+            <span><span class="legend-dot ld-elevated"></span>Elevated</span>
+            <span><span class="legend-dot ld-high"></span>High</span>
+            <span><span class="legend-dot ld-secondary"></span>Tributary</span>
+          </div>
+          <div class="toggle-group">
+            <button class="toggle-btn active" id="btn-normalized" onclick="setMode('normalized')">% of normal</button>
+            <button class="toggle-btn" id="btn-log" onclick="setMode('log')">Log scale (cms)</button>
+          </div>
+        </div>
       </div>
-      <div id="station-rows"></div>
-      <div style="margin-top:1rem; padding-top:0.75rem; border-top:1px solid var(--border); font-size:10px; color:var(--ink-muted);">
-        Source: Environment Canada Datamart (Open Govt Licence) · Updates hourly
-      </div>
+      <svg id="flow-chart-svg" viewBox="0 0 1000 300" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
+  </div>
 
+  <!-- Supply context + Snowpack -->
+  <div class="two-col">
     <div class="card">
       <div style="font-size:12px; font-weight:500; color:var(--ink); margin-bottom:1rem;">Canmore water supply</div>
-      <div id="supply-rows">
-        <div class="supply-row">
-          <span class="supply-label">Surface water (~50%)</span>
-          <span class="supply-value">Rundle Forebay — fed by Spray Lakes reservoir via TransAlta canal system from Kananaskis Country</span>
-        </div>
-        <div class="supply-row">
-          <span class="supply-label">Groundwater (~50%)</span>
-          <span class="supply-value">Shallow aquifer beneath downtown Canmore, hydrologically connected to the Bow River</span>
-        </div>
-        <div class="supply-row">
-          <span class="supply-label">Operator</span>
-          <span class="supply-value">EPCOR Water Services under utility management agreement with the Town of Canmore (expires 2030)</span>
-        </div>
-        <div class="supply-row">
-          <span class="supply-label">Treatment</span>
-          <span class="supply-value">Pumphouse 1 (groundwater, chlorination) · Pumphouse 2 / Rundle Forebay (coagulation, gravity filtration, UV)</span>
-        </div>
+      <div class="supply-row"><span class="supply-label">Surface water (~50%)</span><span class="supply-value">Rundle Forebay — fed by Spray Lakes reservoir via TransAlta canal system from Kananaskis Country</span></div>
+      <div class="supply-row"><span class="supply-label">Groundwater (~50%)</span><span class="supply-value">Shallow aquifer beneath downtown Canmore, hydrologically connected to the Bow River</span></div>
+      <div class="supply-row"><span class="supply-label">Operator</span><span class="supply-value">EPCOR Water Services — utility agreement with Town of Canmore (expires 2030)</span></div>
+      <div class="supply-row"><span class="supply-label">Treatment</span><span class="supply-value">Pumphouse 1 (groundwater, chlorination) · Pumphouse 2 / Rundle Forebay (coagulation, gravity filtration, UV)</span></div>
+      <div class="warning-note">
+        <strong>River Road & low-lying areas: groundwater flooding risk.</strong>
+        The downtown aquifer responds to both Bow River levels and sustained rainfall.
+        When the river runs high — especially combined with heavy rain — groundwater pressure rises
+        and can enter basements even when the Bow has not overflowed its banks.
+        Sustained Bow at Banff readings above 150 cms signal elevated risk.
+        This is distinct from overbank flooding and is not captured by standard flood advisories.
       </div>
-      <div class="info-note">
-        Rundle Forebay levels are not publicly available — EPCOR operates on a SCADA system
-        with no public data feed. The Spray River at Banff is the best available proxy for
-        forebay supply health.
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Snowpack context -->
-  <p class="section-label">Supply context</p>
-  <div class="two-col" style="margin-bottom:2rem;">
-    <div class="card">
-      <div style="font-size:12px; font-weight:500; color:var(--ink); margin-bottom:0.25rem;">Bow Basin snowpack</div>
-      <div style="font-size:11px; color:var(--ink-muted); line-height:1.5; margin-bottom:0.5rem;">
-        The Bow River Basin snowpack at spring peak was 68% of the historical normal —
-        below average but not at crisis level. The Bow River at Banff discharge of ~145 cms
-        reflects active snowmelt in the upper Rockies. This will taper significantly by late July
-        as snowpack is exhausted and summer drought sets in.
-      </div>
-      <div class="snowpack-bar-track">
-        <div class="snowpack-bar-fill" id="snowpack-bar" style="width:68%"></div>
-      </div>
-      <div class="snowpack-labels">
-        <span>0%</span>
-        <span id="snowpack-label">68% of normal (2026)</span>
-        <span>100% normal</span>
-      </div>
-      <div style="font-size:10px; color:var(--ink-muted); margin-top:0.5rem;">
-        Source: Alberta River Forecast Centre · Bow River Basin · April 2026 peak
-      </div>
+      <div class="info-note">Rundle Forebay levels are not publicly available — EPCOR operates on SCADA. Spray River at Banff is the best available public proxy.</div>
     </div>
 
     <div class="card">
-      <div style="font-size:12px; font-weight:500; color:var(--ink); margin-bottom:0.75rem;">Canmore's restriction stages</div>
-      <div style="font-size:12px; color:var(--ink-muted); line-height:1.8;">
-        <div style="display:grid; grid-template-columns: auto 1fr; gap: 0 1rem;">
-          <span style="color:var(--accent); font-weight:500;">Stage 1</span><span>Voluntary outdoor water reduction</span>
-          <span style="color:var(--amber); font-weight:500;">Stage 2</span><span>Mandatory outdoor restrictions — odd/even watering days</span>
-          <span style="color:#c0392b; font-weight:500;">Stage 3</span><span>Severe restrictions — no non-essential outdoor use</span>
-          <span style="color:#8b2020; font-weight:500;">Stage 4</span><span>Emergency — indoor conservation required</span>
-        </div>
+      <div style="font-size:12px; font-weight:500; color:var(--ink); margin-bottom:0.5rem;">Bow Basin snowpack — 2026</div>
+      <div style="font-size:11px; color:var(--ink-muted); margin-bottom:0.5rem; line-height:1.5;">68% of normal at spring peak. Once snowmelt ends (typically late July), river levels drop sharply and drought risk increases. The 2026 season saw a rain-on-snow event in early June that briefly drove flows near Cochrane above 480 cms.</div>
+      <div class="snowpack-bar-track"><div class="snowpack-bar-fill" style="width:68%"></div></div>
+      <div class="snowpack-labels"><span>0%</span><span>68% of normal (2026)</span><span>100% normal</span></div>
+      <div style="font-size:10px; color:var(--ink-muted); margin-top:0.5rem; margin-bottom:1rem;">Alberta River Forecast Centre · Bow River Basin · April 2026 peak</div>
+
+      <div style="font-size:12px; font-weight:500; color:var(--ink); margin-bottom:0.5rem;">Restriction stages</div>
+      <div class="stages-grid">
+        <span class="s0">None</span><span>Normal monitoring</span>
+        <span class="s1">Stage 1</span><span>Voluntary outdoor reduction</span>
+        <span class="s2">Stage 2</span><span>Mandatory odd/even watering days</span>
+        <span class="s3">Stage 3</span><span>No non-essential outdoor use</span>
+        <span class="s4">Stage 4</span><span>Emergency — indoor conservation</span>
       </div>
-      <div style="margin-top:0.75rem; font-size:11px; color:var(--ink-muted);">
-        Restrictions can be triggered by drought <em>or</em> infrastructure issues —
-        in 2023 a pressure valve failure triggered Stage 3 restrictions unrelated to drought.
-        In 2025, TransAlta canal maintenance triggered Stage 1 from July–October.
-        Monitor: <a href="https://www.canmore.ca/your-community/public-safety/hazard-monitoring/drought-monitoring"
-        target="_blank" style="color:var(--accent)">canmore.ca drought monitoring →</a>
+      <div style="margin-top:0.5rem; font-size:11px; color:var(--ink-muted);">
+        Restrictions can be triggered by drought <em>or</em> infrastructure failure independently.
+        <a href="https://www.canmore.ca/your-community/public-safety/hazard-monitoring/drought-monitoring" target="_blank" style="color:var(--accent);">canmore.ca drought monitoring →</a>
       </div>
     </div>
   </div>
@@ -314,50 +347,44 @@
     <div class="tips-grid">
       <div class="tip">
         <div class="tip-impact high">High impact</div>
-        <div class="tip-title">Know your water source by street</div>
-        <div class="tip-detail">North of the Trans-Canada Highway — groundwater from downtown wells. South of the Bow River and central Canmore — Rundle Forebay surface water. Each has different drought vulnerability.</div>
+        <div class="tip-title">Watch the Bow at Banff in July–August</div>
+        <div class="tip-detail">Once snowmelt ends the Bow drops sharply. Low Banff discharge is the earliest public signal of potential restrictions — before EPCOR or the Town announce anything. This dashboard will show it first.</div>
       </div>
       <div class="tip">
         <div class="tip-impact high">High impact</div>
-        <div class="tip-title">Watch the Bow River level in July–August</div>
-        <div class="tip-detail">Once snowmelt ends (typically late July), the Bow River drops significantly. Low Bow River flow at Banff is an early signal of potential restrictions. This dashboard will show it.</div>
+        <div class="tip-title">River Road residents: check Banff after rain</div>
+        <div class="tip-detail">When Bow at Banff exceeds 150 cms — especially after sustained rain — check your basement. The shallow aquifer responds within hours. Sump pumps should be tested each spring.</div>
       </div>
       <div class="tip">
         <div class="tip-impact high">High impact</div>
         <div class="tip-title">Don't swim in the Rundle Forebay</div>
-        <div class="tip-detail">The Rundle Forebay supplies roughly half of Canmore's drinking water. Swimming, dogs, and recreational use increase treatment costs and risk. Signage exists but is poorly enforced.</div>
+        <div class="tip-detail">The Rundle Forebay supplies roughly half of Canmore's drinking water. Recreational use increases treatment costs and contamination risk.</div>
       </div>
       <div class="tip">
         <div class="tip-impact medium">Medium impact</div>
         <div class="tip-title">Water gardens before 7am</div>
-        <div class="tip-detail">Canmore's dry mountain air means evaporation rates are higher than coastal cities. Early morning watering loses 30% less water to evaporation than midday watering.</div>
+        <div class="tip-detail">Canmore's dry mountain air means higher evaporation rates than coastal cities. Early morning watering loses 30% less water than midday.</div>
       </div>
       <div class="tip">
         <div class="tip-impact medium">Medium impact</div>
-        <div class="tip-title">Report leaks to EPCOR immediately</div>
-        <div class="tip-detail">Canmore had 23% municipal water loss at its best in recent years — leaks in the aging distribution system are a persistent issue. Report at 403.609.6400.</div>
+        <div class="tip-title">Report leaks to EPCOR: 403.609.6400</div>
+        <div class="tip-detail">Canmore's aging distribution system has historically lost 20–25% of treated water to leaks. Every reported leak matters at that scale.</div>
       </div>
       <div class="tip">
         <div class="tip-impact medium">Medium impact</div>
         <div class="tip-title">Sign up for Voyent Alert</div>
-        <div class="tip-detail">The Town of Canmore uses Voyent Alert for emergency notifications including water restrictions. Free to sign up at canmore.ca — you'll know about restrictions before your neighbour does.</div>
+        <div class="tip-detail">The Town uses Voyent Alert for restriction notifications. Free at canmore.ca — you'll know about restrictions before your neighbour does.</div>
       </div>
     </div>
   </div>
-
 </main>
 
 <footer class="site-footer">
+  <div><strong>WaterWatch Canmore</strong> is a public intelligence tool built by <a href="https://criticalto.ca">CriticalTO</a>. Not affiliated with the Town of Canmore or EPCOR. Hydrometric data: Environment Canada Datamart (Open Govt Licence).</div>
   <div>
-    <strong>WaterWatch Canmore</strong> is a public intelligence tool built by
-    <a href="https://criticalto.ca">CriticalTO</a>.
-    Not affiliated with the Town of Canmore or EPCOR.
-    Hydrometric data sourced under Open Government Licence from Environment Canada.
-  </div>
-  <div>
-    <a href="https://www.canmore.ca/your-community/public-safety/hazard-monitoring/drought-monitoring" target="_blank">Town of Canmore drought monitoring</a> ·
+    <a href="https://www.canmore.ca/your-community/public-safety/hazard-monitoring/drought-monitoring" target="_blank">Canmore drought monitoring</a> ·
     <a href="https://www.epcor.com/ca/en/about/our-company/where-we-operate/canmore.html" target="_blank">EPCOR Canmore</a> ·
-    <a href="https://wateroffice.ec.gc.ca" target="_blank">Environment Canada water data</a> ·
+    <a href="https://wateroffice.ec.gc.ca" target="_blank">Environment Canada</a> ·
     <a href="/index.html">Metro Vancouver</a>
   </div>
 </footer>
@@ -365,70 +392,379 @@
 <script>
 const DATA_URL = './data/canmore.json';
 
+// ── Station definitions ───────────────────────────────────────────────────────
+// June historical normals (cms) based on Environment Canada long-term records
+// Cochrane normal is post-Ghost Dam regulated flow
+const STATIONS = [
+  {
+    key:      'bow_banff',
+    name:     'Bow at Banff',
+    fullName: 'Bow River at Banff',
+    id:       '05BB001',
+    lat:      51.1722, lon: -115.5718,
+    role:     'Primary supply indicator — 25km upstream of Canmore',
+    juneNormal: 115,   // cms — long-term June mean at Banff
+    type:     'main',
+  },
+  {
+    key:      'spray_banff',
+    name:     'Spray at Banff',
+    fullName: 'Spray River at Banff',
+    id:       '05BC001',
+    lat:      51.1602, lon: -115.5545,
+    role:     'Rundle Forebay supply proxy',
+    juneNormal: 18,    // cms — Spray River June mean
+    type:     'tributary',
+  },
+  {
+    key:      'waiparous',
+    name:     'Waiparous Ck',
+    fullName: 'Waiparous Creek near Cochrane',
+    id:       '05BG006',
+    lat:      51.32,  lon: -114.82,
+    role:     'Local mountain tributary',
+    juneNormal: 8,     // cms — Waiparous June mean
+    type:     'tributary',
+  },
+  {
+    key:      'bow_cochrane',
+    name:     'Bow near Cochrane',
+    fullName: 'Bow River near Cochrane',
+    id:       '05BH005',
+    lat:      51.1737, lon: -114.4664,
+    role:     'Downstream indicator — what has already passed through Canmore',
+    juneNormal: 210,   // cms — regulated June mean below Ghost Dam
+    type:     'main',
+  },
+];
+
+const CANMORE = { lat: 51.0890, lon: -115.3441 };
+const GHOST_DAM = { lat: 51.19, lon: -114.74 };
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let chartMode = 'normalized'; // 'normalized' | 'log'
+let liveData = null;
+let map = null;
+let stationMarkers = {};
+
+// ── Flow classification ───────────────────────────────────────────────────────
+function flowClass(cms, normal) {
+  if (cms === null) return 'normal';
+  const ratio = cms / normal;
+  if (ratio > 1.8) return 'high';
+  if (ratio > 1.2) return 'elevated';
+  return 'normal';
+}
+
+function flowColor(cls, type) {
+  if (type === 'tributary') return 'var(--mountain-light)';
+  if (cls === 'high')     return 'var(--high)';
+  if (cls === 'elevated') return 'var(--elevated)';
+  return 'var(--normal)';
+}
+
+function flowClassLabel(cms, normal) {
+  if (cms === null) return '';
+  const ratio = cms / normal;
+  if (ratio > 1.8) return 'High flow';
+  if (ratio > 1.2) return 'Elevated';
+  return 'Normal range';
+}
+
+// ── Map ───────────────────────────────────────────────────────────────────────
+function initMap() {
+  map = L.map('bow-map', {
+    center: [51.18, -115.10],
+    zoom: 10,
+    zoomControl: true,
+    scrollWheelZoom: false,
+  });
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 16,
+  }).addTo(map);
+
+  // Bow River corridor line (approximate)
+  const bowLine = [
+    [51.43, -116.19], // Lake Louise
+    [51.17, -115.57], // Banff
+    [51.09, -115.34], // Canmore
+    [51.19, -114.74], // Ghost Dam
+    [51.17, -114.47], // Cochrane
+  ];
+  L.polyline(bowLine, {
+    color: '#4a8ab0',
+    weight: 3,
+    opacity: 0.6,
+    dashArray: null,
+  }).addTo(map);
+
+  // Ghost Dam marker
+  const damIcon = L.divIcon({
+    html: '<div class="dam-marker">⚡ Ghost Dam</div>',
+    className: '',
+    iconAnchor: [40, 10],
+  });
+  L.marker([GHOST_DAM.lat, GHOST_DAM.lon], { icon: damIcon }).addTo(map);
+
+  // Canmore marker
+  const canmoreIcon = L.divIcon({
+    html: '<div class="canmore-marker">📍 Canmore</div>',
+    className: '',
+    iconAnchor: [35, 10],
+  });
+  L.marker([CANMORE.lat, CANMORE.lon], { icon: canmoreIcon }).addTo(map);
+
+  // Station markers (populated when data loads)
+  STATIONS.forEach(s => {
+    const icon = L.divIcon({
+      html: `<div class="station-marker flow-${s.type === 'tributary' ? 'secondary' : 'normal'}" style="width:40px;height:40px;">—</div>`,
+      className: '',
+      iconAnchor: [20, 20],
+    });
+    const marker = L.marker([s.lat, s.lon], { icon })
+      .addTo(map)
+      .bindPopup(`<div class="popup-name">${s.fullName}</div><div class="popup-val">—</div><div class="popup-role">${s.role}</div>`);
+    stationMarkers[s.key] = marker;
+  });
+}
+
+function updateMapMarkers(inflow) {
+  STATIONS.forEach(s => {
+    const d = inflow[s.key];
+    if (!d || d.discharge_cms === null) return;
+    const cms = d.discharge_cms;
+    const cls = flowClass(cms, s.juneNormal);
+    const markerClass = s.type === 'tributary' ? 'flow-secondary' : `flow-${cls}`;
+    const color = flowColor(cls, s.type);
+    const label = flowClassLabel(cms, s.juneNormal);
+
+    const icon = L.divIcon({
+      html: `<div class="station-marker ${markerClass}" style="width:48px;height:48px;font-size:11px;">${cms.toFixed(0)}<br><span style="font-size:9px;opacity:0.7">cms</span></div>`,
+      className: '',
+      iconAnchor: [24, 24],
+    });
+    stationMarkers[s.key].setIcon(icon);
+    stationMarkers[s.key].setPopupContent(`
+      <div class="popup-name">${s.fullName}</div>
+      <div class="popup-val ${markerClass}">${cms.toFixed(1)} cms</div>
+      <div style="font-size:11px;color:var(--ink-muted);">${d.level_m ? d.level_m.toFixed(2) + 'm water level' : ''}</div>
+      <div style="font-size:10px;color:${color};margin-top:3px;">${label} — ${Math.round((cms/s.juneNormal)*100)}% of June normal</div>
+      <div class="popup-role">${s.role}</div>
+    `);
+  });
+}
+
+// ── Flow corridor chart ───────────────────────────────────────────────────────
+function drawChart(inflow) {
+  const svg = document.getElementById('flow-chart-svg');
+  const W = 1000, H = 300;
+  const PAD = { top: 40, right: 40, bottom: 80, left: 60 };
+  const chartW = W - PAD.left - PAD.right;
+  const chartH = H - PAD.top - PAD.bottom;
+
+  // Gather values
+  const vals = STATIONS.map(s => {
+    const d = inflow[s.key];
+    const cms = d && d.discharge_cms !== null ? d.discharge_cms : null;
+    const pct = cms !== null ? (cms / s.juneNormal) * 100 : null;
+    return { ...s, cms, pct };
+  });
+
+  // X positions — evenly spaced
+  const xStep = chartW / (STATIONS.length - 1);
+  const xPos = (i) => PAD.left + i * xStep;
+
+  // Y scale
+  let yScale, yLabel, yTicks;
+  if (chartMode === 'normalized') {
+    const maxPct = Math.max(...vals.map(v => v.pct || 0), 200);
+    yScale = (pct) => PAD.top + chartH - (pct / (maxPct * 1.1)) * chartH;
+    yLabel = '% of June normal';
+    yTicks = [50, 100, 150, 200].filter(t => t <= maxPct * 1.1);
+  } else {
+    // Log scale
+    const maxCms = Math.max(...vals.map(v => v.cms || 1), 10);
+    const logMax = Math.log10(maxCms * 1.3);
+    const logMin = Math.log10(1);
+    yScale = (cms) => {
+      if (!cms || cms <= 0) return PAD.top + chartH;
+      return PAD.top + chartH - ((Math.log10(cms) - logMin) / (logMax - logMin)) * chartH;
+    };
+    yLabel = 'Discharge (cms, log scale)';
+    yTicks = [1, 5, 10, 50, 100, 500].filter(t => Math.log10(t) <= logMax);
+  }
+
+  // Build SVG
+  let html = '';
+
+  // Grid lines + Y ticks
+  yTicks.forEach(t => {
+    const y = chartMode === 'normalized' ? yScale(t) : yScale(t);
+    html += `<line x1="${PAD.left}" y1="${y}" x2="${W - PAD.right}" y2="${y}" stroke="rgba(26,20,0,0.06)" stroke-width="1"/>`;
+    html += `<text x="${PAD.left - 6}" y="${y + 4}" text-anchor="end" font-family="DM Mono,monospace" font-size="9" fill="#6b5a2a">${t}${chartMode === 'normalized' ? '%' : ''}</text>`;
+  });
+
+  // Y axis label
+  html += `<text x="14" y="${PAD.top + chartH/2}" text-anchor="middle" transform="rotate(-90,14,${PAD.top + chartH/2})" font-family="DM Mono,monospace" font-size="9" fill="#6b5a2a">${yLabel}</text>`;
+
+  // 100% normal reference line (normalized mode)
+  if (chartMode === 'normalized') {
+    const y100 = yScale(100);
+    html += `<line x1="${PAD.left}" y1="${y100}" x2="${W - PAD.right}" y2="${y100}" stroke="rgba(90,122,45,0.4)" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+    html += `<text x="${W - PAD.right + 4}" y="${y100 + 4}" font-family="DM Mono,monospace" font-size="9" fill="#5a7a2d">100%</text>`;
+  }
+
+  // Connecting path (main Bow only)
+  const mainStations = vals.filter(v => v.type === 'main');
+  if (mainStations.every(v => v.cms !== null)) {
+    const pathPts = mainStations.map((v, i) => {
+      const origIdx = STATIONS.findIndex(s => s.key === v.key);
+      const x = xPos(origIdx);
+      const y = chartMode === 'normalized' ? yScale(v.pct) : yScale(v.cms);
+      return `${x},${y}`;
+    });
+
+    // Smooth curve through main stations
+    const pts = mainStations.map((v) => {
+      const origIdx = STATIONS.findIndex(s => s.key === v.key);
+      return { x: xPos(origIdx), y: chartMode === 'normalized' ? yScale(v.pct) : yScale(v.cms) };
+    });
+
+    let d = `M ${pts[0].x} ${pts[0].y}`;
+    for (let i = 1; i < pts.length; i++) {
+      const cp1x = pts[i-1].x + (pts[i].x - pts[i-1].x) * 0.4;
+      const cp1y = pts[i-1].y;
+      const cp2x = pts[i].x - (pts[i].x - pts[i-1].x) * 0.4;
+      const cp2y = pts[i].y;
+      d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${pts[i].x} ${pts[i].y}`;
+    }
+
+    // Fill under curve
+    const fillD = d + ` L ${pts[pts.length-1].x} ${PAD.top + chartH} L ${pts[0].x} ${PAD.top + chartH} Z`;
+    html += `<path d="${fillD}" fill="rgba(74,138,176,0.08)"/>`;
+    html += `<path d="${d}" fill="none" stroke="rgba(74,138,176,0.4)" stroke-width="2" stroke-dasharray="6,3"/>`;
+  }
+
+  // Bars + labels
+  vals.forEach((v, i) => {
+    const x = xPos(i);
+    const cls = flowClass(v.cms, v.juneNormal);
+    const color = v.cms !== null ? flowColor(cls, v.type) : 'rgba(26,20,0,0.15)';
+    const barW = 48;
+    const baseY = PAD.top + chartH;
+
+    if (v.cms !== null) {
+      const yTop = chartMode === 'normalized' ? yScale(v.pct) : yScale(v.cms);
+      const barH = baseY - yTop;
+
+      // Bar
+      html += `<rect x="${x - barW/2}" y="${yTop}" width="${barW}" height="${barH}" fill="${color}" opacity="0.75" rx="2"/>`;
+
+      // Value label on top of bar
+      const displayVal = chartMode === 'normalized'
+        ? `${Math.round(v.pct)}%`
+        : `${v.cms.toFixed(0)} cms`;
+      html += `<text x="${x}" y="${yTop - 6}" text-anchor="middle" font-family="Fraunces,serif" font-size="13" font-weight="700" fill="${color}">${displayVal}</text>`;
+
+      // % of normal label in log mode
+      if (chartMode === 'log') {
+        html += `<text x="${x}" y="${yTop - 20}" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="${color}" opacity="0.8">${Math.round(v.pct)}% of normal</text>`;
+      }
+    } else {
+      // No data bar
+      html += `<rect x="${x - barW/2}" y="${baseY - 20}" width="${barW}" height="20" fill="rgba(26,20,0,0.08)" rx="2"/>`;
+      html += `<text x="${x}" y="${baseY - 7}" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="#6b5a2a">—</text>`;
+    }
+
+    // Station name below X axis
+    html += `<text x="${x}" y="${baseY + 16}" text-anchor="middle" font-family="DM Mono,monospace" font-size="10" font-weight="500" fill="#1a1400">${v.name}</text>`;
+
+    // Station ID
+    html += `<text x="${x}" y="${baseY + 28}" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="#6b5a2a">${v.id}</text>`;
+
+    // Direction arrow between stations (except last)
+    if (i < STATIONS.length - 1) {
+      const arrowX = x + xStep / 2;
+      html += `<text x="${arrowX}" y="${baseY + 16}" text-anchor="middle" font-size="10" fill="#6b5a2a">→</text>`;
+    }
+  });
+
+  // Canmore position marker on X axis
+  // Canmore sits between Banff (idx 0) and Cochrane (idx 3), roughly at Banff + 20% of full span
+  const canmoreX = PAD.left + (0 + 0.35) * xStep * 3;
+  html += `<line x1="${canmoreX}" y1="${PAD.top}" x2="${canmoreX}" y2="${PAD.top + chartH}" stroke="rgba(26,20,0,0.15)" stroke-width="1" stroke-dasharray="3,2"/>`;
+  html += `<text x="${canmoreX}" y="${PAD.top - 6}" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="#6b5a2a">← Canmore</text>`;
+
+  // Ghost Dam marker on X axis
+  const ghostX = PAD.left + (0 + 2.65) * xStep * (3/3);
+  html += `<line x1="${ghostX}" y1="${PAD.top}" x2="${ghostX}" y2="${PAD.top + chartH}" stroke="rgba(26,20,0,0.1)" stroke-width="1" stroke-dasharray="2,2"/>`;
+  html += `<text x="${ghostX}" y="${PAD.top - 6}" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="#6b5a2a">⚡ Ghost Dam</text>`;
+
+  // X axis baseline
+  html += `<line x1="${PAD.left}" y1="${PAD.top + chartH}" x2="${W - PAD.right}" y2="${PAD.top + chartH}" stroke="rgba(26,20,0,0.25)" stroke-width="1"/>`;
+
+  // West/East labels
+  html += `<text x="${PAD.left}" y="${H - 6}" font-family="DM Mono,monospace" font-size="9" fill="#6b5a2a">← West (Rocky Mountains)</text>`;
+  html += `<text x="${W - PAD.right}" y="${H - 6}" text-anchor="end" font-family="DM Mono,monospace" font-size="9" fill="#6b5a2a">East (Foothills) →</text>`;
+
+  svg.innerHTML = html;
+}
+
+// ── Toggle ────────────────────────────────────────────────────────────────────
+function setMode(mode) {
+  chartMode = mode;
+  document.getElementById('btn-normalized').classList.toggle('active', mode === 'normalized');
+  document.getElementById('btn-log').classList.toggle('active', mode === 'log');
+  document.getElementById('chart-subtitle').textContent = mode === 'normalized'
+    ? 'Showing flow as % of June historical normal — higher = above average for this time of year'
+    : 'Showing actual discharge in cubic metres per second — logarithmic scale to compare tributaries and mainstem';
+  if (liveData) drawChart(liveData.watershed_inflow);
+}
+
+// ── Data load ─────────────────────────────────────────────────────────────────
 async function init() {
+  initMap();
+
   try {
     const resp = await fetch(DATA_URL + '?t=' + Date.now());
-    const data = await resp.json();
+    liveData = await resp.json();
 
-    const gen = new Date(data.meta.generated_utc);
+    const gen = new Date(liveData.meta.generated_utc);
     document.getElementById('last-updated').textContent =
       'Data: ' + gen.toLocaleDateString('en-CA', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
 
-    // Snowpack
-    const sp = data.snowpack.pct_of_normal;
+    const sp = liveData.snowpack.pct_of_normal;
     document.getElementById('m-snowpack').textContent = sp + '%';
-    document.getElementById('snowpack-bar').style.width = sp + '%';
-    document.getElementById('snowpack-label').textContent = sp + '% of normal (2026)';
 
-    // Restriction stage
-    const r = data.restriction;
-    if (r.stage === 0) {
-      document.getElementById('m-stage').textContent = 'None';
-    } else {
-      document.getElementById('m-stage').textContent = 'Stage ' + r.stage;
+    const r = liveData.restriction;
+    const stageEl = document.getElementById('m-stage');
+    if (r.stage === 0) { stageEl.textContent = 'None'; stageEl.className = 'metric-value good'; }
+    else if (r.stage <= 2) { stageEl.textContent = 'Stage ' + r.stage; stageEl.className = 'metric-value amber'; }
+    else { stageEl.textContent = 'Stage ' + r.stage; stageEl.className = 'metric-value danger'; }
+
+    if (r.stage > 0) {
+      document.getElementById('status-banner').style.background = r.stage >= 3 ? '#8b2020' : '#8a5e00';
+      document.getElementById('banner-stage').textContent = 'Stage ' + r.stage;
+      document.getElementById('banner-text').textContent = r.stage_label || 'Water restrictions active.';
     }
 
-    // Key flow metrics for header cards
-    const inflow = data.watershed_inflow;
-    if (inflow.bow_banff?.discharge_cms !== null) {
-      document.getElementById('m-bow').textContent = inflow.bow_banff.discharge_cms.toFixed(1);
+    const inflow = liveData.watershed_inflow;
+
+    if (inflow.bow_banff?.discharge_cms != null) {
+      const v = inflow.bow_banff.discharge_cms;
+      document.getElementById('m-bow').textContent = v.toFixed(1);
+      document.getElementById('m-bow').className = 'metric-value ' + (v > 300 ? 'danger' : v > 150 ? 'amber' : 'mountain');
     }
-    if (inflow.spray_banff?.discharge_cms !== null) {
-      document.getElementById('m-spray').textContent = inflow.spray_banff.discharge_cms.toFixed(1);
+    if (inflow.bow_cochrane?.discharge_cms != null) {
+      const v = inflow.bow_cochrane.discharge_cms;
+      document.getElementById('m-cochrane').textContent = v.toFixed(1);
+      document.getElementById('m-cochrane').className = 'metric-value ' + (v > 300 ? 'danger' : v > 150 ? 'amber' : 'mountain');
     }
 
-    // Station rows
-    const stationOrder = [
-      {key: 'bow_banff',   label: 'Bow River at Banff'},
-      {key: 'spray_banff', label: 'Spray River at Banff'},
-      {key: 'waiparous',   label: 'Waiparous Creek nr Cochrane'},
-    ];
-
-    const html = stationOrder.map(({key, label}) => {
-      const s = inflow[key];
-      if (!s) return '';
-      const discharge = s.discharge_cms !== null ? s.discharge_cms.toFixed(1) : '—';
-      const level = s.level_m !== null ? s.level_m.toFixed(2) + ' m' : '—';
-      const ts = s.timestamp
-        ? new Date(s.timestamp).toLocaleTimeString('en-CA', {hour:'2-digit', minute:'2-digit', timeZoneName:'short'})
-        : 'unavailable';
-      return `
-        <div class="station-row">
-          <div>
-            <div class="station-name">${s.station_name}</div>
-            <div class="station-id">${s.station_id} · ${ts}</div>
-          </div>
-          <div>
-            <div class="station-discharge">${discharge}</div>
-            <div class="station-unit">cms</div>
-          </div>
-          <div>
-            <div class="station-level">${level}</div>
-          </div>
-        </div>`;
-    }).join('');
-
-    document.getElementById('station-rows').innerHTML = html;
+    updateMapMarkers(inflow);
+    drawChart(inflow);
 
   } catch(e) {
     console.error('WaterWatch Canmore data load failed:', e);
