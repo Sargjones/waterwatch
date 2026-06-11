@@ -27,7 +27,7 @@ STATIONS = {
     "05BJ004": "Elbow River at Bragg Creek",
 }
 
-DATAMART_BASE = "https://dd.weather.gc.ca/hydrometric/csv"
+DATAMART_BASE = "https://dd.weather.gc.ca/today/hydrometric/csv"
 RESERVOIR_PDF_URL = "https://rivers.alberta.ca/forecasting/data/reports/Res_storage.pdf"
 
 # Glenmore station in Alberta Rivers report
