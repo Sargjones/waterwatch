@@ -16,7 +16,6 @@ import json
 import re
 import sys
 import urllib.request
-import urllib.parse
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -28,7 +27,7 @@ STATIONS = {
     "05BJ004": "Elbow River at Bragg Creek",
 }
 
-OGC_API_BASE = "https://api.weather.gc.ca/collections/hydrometric-realtime/items"
+DATAMART_BASE = "https://dd.weather.gc.ca/hydrometric/csv"
 RESERVOIR_PDF_URL = "https://rivers.alberta.ca/forecasting/data/reports/Res_storage.pdf"
 
 # Glenmore station in Alberta Rivers report
@@ -42,65 +41,71 @@ OUTPUT_PATH = Path("site/data/calgary.json")
 
 # ── FETCH RIVER DATA ──────────────────────────────────────────────────────────
 
-def fetch_station(station_id: str) -> dict:
-    """Fetch hourly data from MSC OGC API using per-station path endpoint."""
-    # The OGC API ignores query params for station filtering;
-    # correct pattern is /items/{STATION_NUMBER} for latest reading,
-    # then /items?station_number=X for history (with client-side filter).
-    # Approach: fetch latest via path, then bulk fetch and filter for history.
+def fetch_station(station_id: str, retries: int = 3) -> dict:
+    """Fetch hourly CSV from MSC Datamart and return latest + 7d history."""
+    url = f"{DATAMART_BASE}/AB/hourly/AB_{station_id}_hourly_hydrometric.csv"
+    print(f"  Fetching {station_id}: {url}")
 
-    # Step 1: latest observation via path lookup
-    latest_url = f"{OGC_API_BASE}/{station_id}?f=json"
-    print(f"  Fetching {station_id} latest: {latest_url}")
+    raw = None
+    for attempt in range(1, retries + 1):
+        req = urllib.request.Request(url, headers={"User-Agent": "WaterWatch/1.0 (criticalto.ca)"})
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                raw = resp.read().decode("utf-8", errors="replace")
+            break
+        except Exception as e:
+            print(f"  ✗ {station_id} attempt {attempt}/{retries}: {e}")
+            if attempt < retries:
+                import time; time.sleep(5)
 
-    latest_flow = latest_level = latest_dt = None
-    req = urllib.request.Request(latest_url, headers={
-        "User-Agent": "WaterWatch/1.0 (criticalto.ca)",
-        "Accept": "application/json",
-    })
-    try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            item = json.loads(resp.read())
-        props = item.get("properties", {})
-        latest_flow  = props.get("DISCHARGE")
-        latest_level = props.get("LEVEL")
-        latest_dt    = props.get("DATETIME")
-        print(f"  ✓ {station_id} latest: flow={latest_flow} m³/s, level={latest_level} m")
-    except Exception as e:
-        print(f"  ✗ {station_id} latest: {e}")
+    if not raw:
         return {}
 
-    # Step 2: history — fetch large batch, filter to this station
-    history_url = (
-        f"{OGC_API_BASE}?f=json&limit={HISTORY_ROWS * 6}"
-        f"&sortby=DATETIME&PROV_TERR_STATE_LOC=AB"
-    )
+    lines = raw.strip().splitlines()
+    if len(lines) < 2:
+        print(f"  ✗ {station_id}: empty response")
+        return {}
+
+    header = lines[0].split(",")
+
+    def col_idx(candidates):
+        for c in candidates:
+            for i, h in enumerate(header):
+                if c.lower() in h.lower():
+                    return i
+        return None
+
+    dt_col    = col_idx(["Date"])
+    level_col = col_idx(["Level (m)", "Water Level", "Niveau"])
+    flow_col  = col_idx(["Discharge (cms)", "Discharge", "Débit"])
+
     history = []
-    try:
-        req2 = urllib.request.Request(history_url, headers={
-            "User-Agent": "WaterWatch/1.0 (criticalto.ca)",
-            "Accept": "application/json",
-        })
-        with urllib.request.urlopen(req2, timeout=45) as resp:
-            data = json.loads(resp.read())
-        for f in data.get("features", []):
-            p = f.get("properties", {})
-            if p.get("STATION_NUMBER") == station_id and p.get("DISCHARGE") is not None:
-                history.append({
-                    "datetime": p.get("DATETIME"),
-                    "level":    p.get("LEVEL"),
-                    "flow":     p.get("DISCHARGE"),
-                })
-        history = history[-HISTORY_ROWS:]
-        print(f"  ✓ {station_id} history: {len(history)} rows")
-    except Exception as e:
-        print(f"  ⚠ {station_id} history fetch failed ({e}), using latest only")
-        history = [{"datetime": latest_dt, "level": latest_level, "flow": latest_flow}]
+    for line in lines[1:]:
+        if not line.strip():
+            continue
+        parts = line.split(",")
+        try:
+            entry = {
+                "datetime": parts[dt_col].strip() if dt_col is not None and dt_col < len(parts) else None,
+                "level":    float(parts[level_col]) if level_col is not None and level_col < len(parts) and parts[level_col].strip() else None,
+                "flow":     float(parts[flow_col])  if flow_col  is not None and flow_col  < len(parts) and parts[flow_col].strip()  else None,
+            }
+            history.append(entry)
+        except (ValueError, IndexError):
+            continue
+
+    if not history:
+        print(f"  ✗ {station_id}: no valid rows parsed")
+        return {}
+
+    history = history[-HISTORY_ROWS:]
+    latest = history[-1]
+    print(f"  ✓ {station_id}: {len(history)} rows, latest flow={latest.get('flow')} m³/s, level={latest.get('level')} m")
 
     return {
-        "latest_flow":  latest_flow,
-        "latest_level": latest_level,
-        "latest_dt":    latest_dt,
+        "latest_flow":  latest.get("flow"),
+        "latest_level": latest.get("level"),
+        "latest_dt":    latest.get("datetime"),
         "history":      history,
     }
 
