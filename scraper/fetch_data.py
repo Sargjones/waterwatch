@@ -123,20 +123,91 @@ CITIES = {
 }
 
 
+# Water Office real-time API — more reliable than Datamart for AB stations
+WATEROFFICE_BASE = "https://wateroffice.ec.gc.ca/services/real_time_data/csv/inline/"
+
 def fetch_station(station: dict) -> dict:
-    """Fetch latest hourly reading from Environment Canada Datamart."""
+    """Fetch latest reading from WSC Water Office real-time API.
+    
+    Uses wateroffice.ec.gc.ca for AB stations (Datamart times out from Actions).
+    Falls back to Datamart for BC stations which work reliably there.
+    Parameters: 46=water level, 47=discharge
+    """
     sid = station["id"]
     prov = station["province"]
-    url = f"{DATAMART_BASE}/{prov}/hourly/{prov}_{sid}_hourly_hydrometric.csv"
     result = {
         "station_id": sid,
         "station_name": station["name"],
-        "url": url,
         "level_m": None,
         "discharge_cms": None,
         "timestamp": None,
         "status": "unknown",
     }
+
+    if prov == "AB":
+        return _fetch_wateroffice(sid, result)
+    else:
+        return _fetch_datamart(sid, prov, result)
+
+
+def _fetch_wateroffice(sid: str, result: dict, days: int = 1) -> dict:
+    """Fetch from WSC Water Office real-time CSV API.
+    
+    days=1  → latest reading only (for Canmore display cards)
+    days=7  → 7-day history (for Calgary flow profile chart)
+    Parameters: 46=water level, 47=discharge
+    """
+    from datetime import timedelta
+    start = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
+    end   = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    params = f"stations[]={sid}&parameters[]=46,47&start_date={start}&end_date={end}"
+    url = f"{WATEROFFICE_BASE}?{params}"
+    result["url"] = url
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "waterwatch-criticalto/1.0"})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            raw = resp.read().decode("utf-8", errors="replace")
+        rows = [r for r in csv.reader(io.StringIO(raw)) if r and r[0].strip()]
+        # Water Office CSV columns: Date, Station, Parameter, Value, Unit, Grade, Approval, Symbol
+        level_rows = [r for r in rows[1:] if len(r) >= 4 and r[2].strip() == "46"]
+        flow_rows  = [r for r in rows[1:] if len(r) >= 4 and r[2].strip() == "47"]
+
+        # Latest values
+        if level_rows:
+            result["level_m"]   = float(level_rows[-1][3]) if level_rows[-1][3].strip() else None
+            result["timestamp"] = level_rows[-1][0].strip()
+        if flow_rows:
+            result["discharge_cms"] = float(flow_rows[-1][3]) if flow_rows[-1][3].strip() else None
+            if not result["timestamp"]:
+                result["timestamp"] = flow_rows[-1][0].strip()
+
+        # Build history by joining level and flow rows on timestamp
+        if days > 1:
+            level_by_dt = {r[0].strip(): r[3].strip() for r in level_rows if len(r) >= 4}
+            flow_by_dt  = {r[0].strip(): r[3].strip() for r in flow_rows  if len(r) >= 4}
+            all_dts = sorted(set(level_by_dt) | set(flow_by_dt))
+            result["history"] = [
+                {
+                    "datetime": dt,
+                    "level":    float(level_by_dt[dt]) if level_by_dt.get(dt) else None,
+                    "flow":     float(flow_by_dt[dt])  if flow_by_dt.get(dt)  else None,
+                }
+                for dt in all_dts
+                if flow_by_dt.get(dt)  # only rows with flow data
+            ]
+
+        result["status"] = "ok" if (result["level_m"] or result["discharge_cms"]) else "no_data"
+    except urllib.error.HTTPError as e:
+        result["status"] = f"http_error_{e.code}"
+    except Exception as e:
+        result["status"] = f"error: {str(e)[:80]}"
+    return result
+
+
+def _fetch_datamart(sid: str, prov: str, result: dict) -> dict:
+    """Fetch from MSC Datamart hourly CSV (works reliably for BC)."""
+    url = f"{DATAMART_BASE}/{prov}/hourly/{prov}_{sid}_hourly_hydrometric.csv"
+    result["url"] = url
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "waterwatch-criticalto/1.0"})
         with urllib.request.urlopen(req, timeout=20) as resp:
@@ -147,8 +218,8 @@ def fetch_station(station: dict) -> dict:
             result["status"] = "no_data"
             return result
         latest = data_rows[-1]
-        result["timestamp"] = latest[1].strip()
-        result["level_m"] = float(latest[2]) if latest[2].strip() else None
+        result["timestamp"]     = latest[1].strip()
+        result["level_m"]       = float(latest[2]) if latest[2].strip() else None
         result["discharge_cms"] = float(latest[6]) if latest[6].strip() else None
         result["status"] = "ok"
     except urllib.error.HTTPError as e:
@@ -310,14 +381,18 @@ def build_calgary_payload() -> dict:
     station_data = {}
     for key, station in CALGARY["stations"].items():
         print(f"    {station['name']} ({station['id']})...")
-        raw = fetch_station(station)
-        # Remap to the format calgary.html expects
+        raw = {
+            "station_id": station["id"], "station_name": station["name"],
+            "level_m": None, "discharge_cms": None, "timestamp": None,
+            "status": "unknown",
+        }
+        raw = _fetch_wateroffice(station["id"], raw, days=7)
         station_data[station["id"]] = {
             "name":         raw["station_name"],
             "latest_flow":  raw["discharge_cms"],
             "latest_level": raw["level_m"],
             "latest_dt":    raw["timestamp"],
-            "history":      [],   # today-only endpoint; no history array
+            "history":      raw.get("history", []),
             "status":       raw["status"],
         }
 
