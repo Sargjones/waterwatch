@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WaterWatch — Edmonton</title>
+  <meta name="description" content="Live water supply intelligence for Edmonton. North Saskatchewan River flow, EPCOR water system, single-source vulnerability.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --ink: #1a1200;
+      --ink-mid: #3d2e00;
+      --ink-muted: #6b5a2a;
+      --paper: #f4f0e6;
+      --paper-warm: #ede8d8;
+      --paper-card: #f9f6ee;
+      --accent: #7a5c00;       /* North Saskatchewan amber */
+      --accent-light: #b08020;
+      --danger: #8b2020;
+      --danger-light: #c0392b;
+      --nsr: #7a5c00;          /* NSR main — deep amber */
+      --nsr-upper: #b08020;    /* upstream — lighter gold */
+      --risk-bg: #fff8ec;
+      --border: rgba(26,18,0,0.12);
+      --border-strong: rgba(26,18,0,0.25);
+      --mono: 'DM Mono', monospace;
+      --serif: 'Fraunces', serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--paper); color: var(--ink); font-family: var(--mono); font-size: 14px; line-height: 1.6; min-height: 100vh; }
+
+    .site-header { border-bottom: 1px solid var(--border-strong); padding: 1.25rem 2rem; display: flex; align-items: center; justify-content: space-between; background: var(--paper); position: sticky; top: 0; z-index: 100; }
+    .logo { display: flex; align-items: baseline; gap: 0.5rem; }
+    .logo-mark { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
+    .logo-region { font-size: 11px; font-weight: 500; color: var(--ink-muted); letter-spacing: 0.08em; text-transform: uppercase; }
+    .header-meta { font-size: 11px; color: var(--ink-muted); text-align: right; }
+    .header-meta span { display: block; }
+    .live-dot { display: inline-block; width: 6px; height: 6px; background: var(--accent-light); border-radius: 50%; margin-right: 5px; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    .alert-banner { background: var(--risk-bg); border-bottom: 2px solid var(--accent); padding: 0.75rem 2rem; display: flex; align-items: flex-start; gap: 1rem; font-size: 13px; color: var(--accent); }
+    .alert-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .alert-text { flex: 1; line-height: 1.5; color: var(--ink-muted); }
+    .alert-text strong { color: var(--accent); }
+    .alert-text a { color: var(--nsr); text-decoration: none; }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+    .city-nav { display: flex; gap: 1.5rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); font-size: 12px; flex-wrap: wrap; }
+    .city-nav a { color: var(--ink-muted); text-decoration: none; }
+    .city-nav a:hover { color: var(--ink); }
+    .city-nav a.active { color: var(--ink); font-weight: 500; border-bottom: 2px solid var(--accent); padding-bottom: 2px; }
+
+    .section-label { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+
+    .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 2rem; }
+    .summary-card { background: var(--paper-card); padding: 1.25rem 1.5rem; }
+    .summary-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 0.4rem; }
+    .summary-value { font-family: var(--serif); font-size: 1.75rem; font-weight: 700; line-height: 1.1; color: var(--ink); }
+    .summary-value.accent { color: var(--accent); }
+    .summary-value.good { color: #2d6a35; }
+    .summary-value.warn { color: var(--accent); }
+    .summary-value.risk { color: var(--danger-light); }
+    .summary-sub { font-size: 11px; color: var(--ink-muted); margin-top: 0.25rem; }
+
+    .stations-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 2rem; }
+    .station-card { background: var(--paper-card); padding: 1.25rem 1.5rem; }
+    .station-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+    .station-name { font-size: 12px; font-weight: 500; color: var(--ink); }
+    .station-id { font-size: 10px; color: var(--ink-muted); font-family: var(--mono); margin-top: 2px; }
+    .river-badge { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 10px; letter-spacing: 0.05em; }
+    .badge-nsr { background: rgba(122,92,0,0.12); color: var(--nsr); }
+    .badge-upstream { background: rgba(176,128,32,0.12); color: var(--nsr-upper); }
+    .station-metrics { display: flex; gap: 2rem; }
+    .stn-metric-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); }
+    .stn-metric-value { font-family: var(--serif); font-size: 1.75rem; font-weight: 700; line-height: 1.1; color: var(--ink); }
+    .stn-metric-unit { font-size: 10px; color: var(--ink-muted); }
+    .station-trend { font-size: 11px; margin-top: 0.5rem; color: var(--ink-muted); }
+    .trend-up { color: var(--danger-light); }
+    .trend-down { color: #2d6a35; }
+    .trend-stable { color: var(--nsr); }
+
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+    .info-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; }
+    .info-card.nsr { border-left: 3px solid var(--nsr); }
+    .info-card.story { border-left: 4px solid var(--danger-light); }
+    .info-card h3 { font-size: 12px; font-weight: 500; color: var(--ink); margin-bottom: 0.5rem; }
+    .info-card h3.story-title { font-family: var(--serif); font-size: 1rem; font-weight: 700; color: var(--danger-light); }
+    .info-card p { font-size: 13px; color: var(--ink-muted); line-height: 1.65; margin-bottom: 0.6rem; }
+    .info-card p:last-child { margin-bottom: 0; }
+    .data-note { font-size: 11px; color: var(--ink-muted); background: var(--paper-warm); border-left: 3px solid var(--border-strong); padding: 0.5rem 0.75rem; border-radius: 0 3px 3px 0; margin-top: 0.75rem; }
+
+    .system-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; margin-bottom: 2rem; }
+    .system-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 12px; color: var(--ink-muted); padding: 0.4rem 0; }
+    .sys-node { background: var(--paper); border: 1px solid var(--border-strong); padding: 4px 10px; border-radius: 3px; color: var(--ink); font-size: 11px; }
+    .sys-node.nsr { border-color: var(--nsr); color: var(--nsr); }
+    .sys-node.risk { border-color: var(--danger-light); color: var(--danger-light); background: #fff5f5; }
+    .sys-arrow { color: var(--ink-muted); }
+
+    #map { height: 280px; border-radius: 4px; border: 1px solid var(--border); margin-bottom: 2rem; }
+
+    .chart-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; margin-bottom: 2rem; }
+    .chart-controls { display: flex; gap: 0.5rem; margin-bottom: 1rem; align-items: center; }
+    .chart-controls span { font-size: 11px; color: var(--ink-muted); }
+    .btn-toggle { font-family: var(--mono); font-size: 11px; padding: 3px 10px; border: 1px solid var(--border-strong); background: var(--paper); color: var(--ink-muted); border-radius: 3px; cursor: pointer; }
+    .btn-toggle.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+    .site-footer { border-top: 1px solid var(--border-strong); padding: 1.5rem 2rem; font-size: 11px; color: var(--ink-muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .footer-links a { color: var(--nsr); text-decoration: none; margin-right: 1rem; }
+
+    @media (max-width: 768px) {
+      main { padding: 1rem; }
+      .summary-grid { grid-template-columns: 1fr 1fr; }
+      .stations-grid { grid-template-columns: 1fr; }
+      .info-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">
+    <span class="logo-mark">WaterWatch</span>
+    <span class="logo-region">Edmonton · criticalto.ca</span>
+  </div>
+  <div class="header-meta">
+    <span><span class="live-dot"></span>Updated every 6 hours</span>
+    <span id="last-updated">Loading…</span>
+  </div>
+</header>
+
+<div class="alert-banner">
+  <span class="alert-icon">⚠</span>
+  <span class="alert-text">
+    <strong>Single-source city.</strong> Edmonton draws 100% of its drinking water from the North Saskatchewan River with no reservoir backup — approximately 72 hours of treated water storage in distribution.
+    Operated by <strong>EPCOR Water Services</strong>. <a href="https://www.epcor.com/water" target="_blank">EPCOR Water →</a>
+  </span>
+</div>
+
+<main>
+
+  <div class="city-nav">
+    <a href="/index.html">Metro Vancouver</a>
+    <a href="/victoria.html">Victoria, BC</a>
+    <a href="/calgary.html">Calgary, AB</a>
+    <a href="/edmonton.html" class="active">Edmonton, AB</a>
+    <a href="/canmore.html">Canmore, AB</a>
+  </div>
+
+  <!-- SUMMARY -->
+  <p class="section-label">System at a Glance</p>
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-label">Source Type</div>
+      <div class="summary-value accent">Surface</div>
+      <div class="summary-sub">North Saskatchewan River — sole source</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Reservoir Buffer</div>
+      <div class="summary-value risk">~72 hrs</div>
+      <div class="summary-sub">Distribution storage only — no source reservoir</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Restriction Stage</div>
+      <div class="summary-value good" id="restriction-val">—</div>
+      <div class="summary-sub" id="restriction-sub">Loading…</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Per-Capita Use</div>
+      <div class="summary-value accent">225</div>
+      <div class="summary-sub">L/person/day · EPCOR 2023</div>
+    </div>
+  </div>
+
+  <!-- STATIONS -->
+  <p class="section-label">North Saskatchewan River — Real-Time Stations</p>
+  <div class="stations-grid">
+
+    <div class="station-card">
+      <div class="station-head">
+        <div>
+          <div class="station-name">North Saskatchewan River at Edmonton</div>
+          <div class="station-id">05DF001</div>
+        </div>
+        <span class="river-badge badge-nsr">NSR · Primary</span>
+      </div>
+      <div class="station-metrics">
+        <div>
+          <div class="stn-metric-label">Discharge</div>
+          <div class="stn-metric-value" id="flow-nsr_edmonton">—</div>
+          <div class="stn-metric-unit">m³/s</div>
+        </div>
+        <div>
+          <div class="stn-metric-label">Level</div>
+          <div class="stn-metric-value" id="level-nsr_edmonton">—</div>
+          <div class="stn-metric-unit">m</div>
+        </div>
+      </div>
+      <div class="station-trend" id="trend-nsr_edmonton"></div>
+    </div>
+
+    <div class="station-card">
+      <div class="station-head">
+        <div>
+          <div class="station-name">North Saskatchewan River at Whirlpool Point</div>
+          <div class="station-id">05DA006</div>
+        </div>
+        <span class="river-badge badge-upstream">Upstream context</span>
+      </div>
+      <div class="station-metrics">
+        <div>
+          <div class="stn-metric-label">Discharge</div>
+          <div class="stn-metric-value" id="flow-nsr_upstream">—</div>
+          <div class="stn-metric-unit">m³/s</div>
+        </div>
+        <div>
+          <div class="stn-metric-label">Level</div>
+          <div class="stn-metric-value" id="level-nsr_upstream">—</div>
+          <div class="stn-metric-unit">m</div>
+        </div>
+      </div>
+      <div class="station-trend" id="trend-nsr_upstream"></div>
+    </div>
+
+  </div>
+
+  <!-- MAP -->
+  <p class="section-label">North Saskatchewan River Corridor</p>
+  <div id="map"></div>
+
+  <!-- CHART -->
+  <p class="section-label">NSR Flow Profile</p>
+  <div class="chart-card">
+    <div class="chart-controls">
+      <span>Scale:</span>
+      <button class="btn-toggle active" id="btn-linear" onclick="setScale('linear')">Linear</button>
+      <button class="btn-toggle" id="btn-log" onclick="setScale('log')">Log</button>
+    </div>
+    <canvas id="flowChart" style="max-height:240px"></canvas>
+  </div>
+
+  <!-- SYSTEM -->
+  <p class="section-label">Edmonton Water System</p>
+  <div class="system-card">
+    <div class="system-row">
+      <div class="sys-node nsr">NSR at Whirlpool Pt (05DA006)</div>
+      <span class="sys-arrow">→ ~~~~~ →</span>
+      <div class="sys-node risk">NSR at Edmonton (05DF001) · sole intake</div>
+      <span class="sys-arrow">→</span>
+      <div class="sys-node nsr">E.L. Smith WTP · 800 ML/day</div>
+      <span class="sys-arrow">+</span>
+      <div class="sys-node nsr">Rossdale WTP · 270 ML/day</div>
+      <span class="sys-arrow">→</span>
+      <div class="sys-node">~72hr storage → 1.1M people</div>
+    </div>
+    <div class="system-row" style="margin-top:0.5rem;font-size:11px;color:var(--ink-muted)">
+      Egress: Gold Bar WWTP → North Saskatchewan River (downstream). No alternative intake exists.
+    </div>
+  </div>
+
+  <!-- STORIES -->
+  <p class="section-label">Infrastructure Context</p>
+  <div class="info-grid">
+
+    <div class="info-card story">
+      <h3 class="story-title">No reservoir — Edmonton's defining vulnerability</h3>
+      <p>Edmonton is one of the largest cities in Canada with no source water reservoir. The North Saskatchewan River is the sole intake for both EPCOR treatment plants, and the city holds only approximately 72 hours of treated water in distribution reservoirs.</p>
+      <p>This means any disruption to the NSR — a contamination event, an upstream industrial spill, a prolonged low-flow drought, or a wildfire turbidity event in the headwaters — translates directly and immediately into a supply crisis with no buffer.</p>
+      <p>The NSR carries agricultural runoff, upstream municipal discharges, and drainage from the oil sands region north of Edmonton. Water quality at the intake varies significantly with season and upstream conditions.</p>
+      <div class="data-note">EPCOR does not publish real-time intake turbidity or quality data publicly.</div>
+    </div>
+
+    <div class="info-card story">
+      <h3 class="story-title">Wildfire & the North Saskatchewan headwaters</h3>
+      <p>The North Saskatchewan originates in the Columbia Icefield in Jasper National Park, flowing ~1,200 km through Rocky Mountain foothills before reaching Edmonton. The upper watershed passes through some of Alberta's most active wildfire terrain.</p>
+      <p>The 2023 wildfire season — which forced the evacuation of Yellowknife and threatened Jasper — caused turbidity spikes in Rocky Mountain rivers that required operational adjustments at treatment plants drawing from fire-affected watersheds.</p>
+      <p>Post-fire turbidity events can be severe: ash and debris loads increase dramatically with rainfall in burned areas, sometimes for years after a fire. Edmonton's no-reservoir design provides no buffer against extended high-turbidity intake conditions.</p>
+      <div class="data-note">Wildfire interface risk for NSR watershed: MODERATE-HIGH and increasing with climate change.</div>
+    </div>
+
+  </div>
+
+  <!-- WATER CYCLE -->
+  <p class="section-label">Full Water Cycle Summary</p>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-bottom:2rem">
+    <div style="background:var(--paper-card);padding:1.25rem">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-muted);margin-bottom:0.5rem">Treatment</div>
+      <div style="font-size:12px;color:var(--ink);font-weight:500">E.L. Smith + Rossdale WTPs</div>
+      <div style="font-size:11px;color:var(--ink-muted);margin-top:0.25rem">1,070 ML/day combined · Conventional + UV + Cl₂ + fluoride</div>
+    </div>
+    <div style="background:var(--paper-card);padding:1.25rem">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-muted);margin-bottom:0.5rem">Use</div>
+      <div style="font-size:12px;color:var(--ink);font-weight:500">225 L/person/day</div>
+      <div style="font-size:11px;color:var(--ink-muted);margin-top:0.25rem">Residential 55% · Industrial 25% · Commercial 20%</div>
+    </div>
+    <div style="background:var(--paper-card);padding:1.25rem">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-muted);margin-bottom:0.5rem">Egress</div>
+      <div style="font-size:12px;color:var(--ink);font-weight:500">Gold Bar WWTP</div>
+      <div style="font-size:11px;color:var(--ink-muted);margin-top:0.25rem">Secondary treatment · Discharge: North Saskatchewan River (downstream)</div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <div>WaterWatch · <a href="https://criticalto.ca" style="color:var(--nsr)">criticalto.ca</a> · Flow data: Environment Canada (Open Govt Licence) · Not affiliated with EPCOR or City of Edmonton.</div>
+  <div class="footer-links">
+    <a href="https://www.epcor.com/water" target="_blank">EPCOR Water</a>
+    <a href="https://wateroffice.ec.gc.ca" target="_blank">EC Water Office</a>
+  </div>
+</footer>
+
+<script>
+const STATION_KEYS = ['nsr_edmonton', 'nsr_upstream'];
+const COLOURS = { nsr_edmonton: '#7a5c00', nsr_upstream: '#b08020' };
+let chartInstance = null, chartScale = 'linear';
+
+async function loadData() {
+  try {
+    const r = await fetch('data/edmonton.json?t=' + Date.now());
+    if (!r.ok) throw new Error('not found');
+    const data = await r.json();
+    renderAll(data);
+  } catch(e) {
+    document.getElementById('last-updated').textContent = 'Data unavailable';
+  }
+}
+
+function renderAll(data) {
+  if (data.meta?.generated_utc) {
+    const d = new Date(data.meta.generated_utc);
+    document.getElementById('last-updated').textContent =
+      'Data: ' + d.toLocaleDateString('en-CA', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
+  }
+  const stage = data.restriction?.stage ?? 0;
+  const rEl = document.getElementById('restriction-val');
+  const rSub = document.getElementById('restriction-sub');
+  if (rEl) { rEl.textContent = stage === 0 ? 'None' : `Stage ${stage}`; rEl.className = 'summary-value ' + (stage === 0 ? 'good' : 'risk'); }
+  if (rSub) rSub.textContent = data.restriction?.stage_label || '—';
+
+  if (data.watershed_inflow) {
+    STATION_KEYS.forEach(key => {
+      const s = data.watershed_inflow[key];
+      if (!s) return;
+      const fe = document.getElementById('flow-' + key);
+      const le = document.getElementById('level-' + key);
+      const te = document.getElementById('trend-' + key);
+      if (fe && s.discharge_cms != null) fe.textContent = parseFloat(s.discharge_cms).toFixed(1);
+      if (le && s.level_m != null) le.textContent = parseFloat(s.level_m).toFixed(2);
+      if (te) te.textContent = s.status === 'ok' ? '→ Live' : s.status;
+    });
+  }
+  buildChart(data);
+}
+
+function buildChart(data) {
+  const ctx = document.getElementById('flowChart').getContext('2d');
+  if (chartInstance) chartInstance.destroy();
+  const labels = STATION_KEYS.map(k => data.watershed_inflow?.[k]?.station_name || k);
+  const values = STATION_KEYS.map(k => data.watershed_inflow?.[k]?.discharge_cms || null);
+  chartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Discharge (m³/s)',
+        data: values,
+        backgroundColor: STATION_KEYS.map(k => COLOURS[k] + '99'),
+        borderColor: STATION_KEYS.map(k => COLOURS[k]),
+        borderWidth: 2,
+        borderRadius: 3,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: { backgroundColor: '#f9f6ee', borderColor: 'rgba(26,18,0,0.25)', borderWidth: 1, titleColor: '#1a1200', bodyColor: '#6b5a2a' }
+      },
+      scales: {
+        x: { ticks: { color: '#6b5a2a', font: { size: 11 } }, grid: { color: 'rgba(26,18,0,0.07)' } },
+        y: { title: { display: true, text: 'Discharge (m³/s)', color: '#6b5a2a', font: { size: 11 } }, ticks: { color: '#6b5a2a', font: { size: 10 } }, grid: { color: 'rgba(26,18,0,0.07)' } }
+      }
+    }
+  });
+}
+
+function setScale(scale) {
+  chartScale = scale;
+  document.getElementById('btn-linear').classList.toggle('active', scale === 'linear');
+  document.getElementById('btn-log').classList.toggle('active', scale === 'log');
+}
+
+function initMap() {
+  const map = L.map('map').setView([53.55, -114.5], 9);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap contributors © CARTO', subdomains: 'abcd', maxZoom: 19
+  }).addTo(map);
+
+  const stations = [
+    { coords: [53.5333, -113.5000], id: '05DF001', name: 'NSR at Edmonton',        colour: '#7a5c00' },
+    { coords: [52.0000, -116.5000], id: '05DA006', name: 'NSR at Whirlpool Point', colour: '#b08020' },
+  ];
+  stations.forEach(s => {
+    const icon = L.divIcon({ className: '', html: `<div style="width:12px;height:12px;background:${s.colour};border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.3)"></div>`, iconSize:[12,12], iconAnchor:[6,6] });
+    L.marker(s.coords, {icon}).addTo(map).bindPopup(`<strong>${s.name}</strong><br><code>${s.id}</code>`);
+  });
+
+  const infra = [
+    { coords: [53.5490, -113.5660], label: 'E.L. Smith WTP', colour: '#7a5c00' },
+    { coords: [53.5344, -113.5012], label: 'Rossdale WTP',   colour: '#7a5c00' },
+    { coords: [53.5100, -113.4200], label: 'Gold Bar WWTP',  colour: '#4a6a35' },
+  ];
+  infra.forEach(p => {
+    const icon = L.divIcon({ className: '', html: `<div style="width:10px;height:10px;background:${p.colour};border:2px solid white;border-radius:2px;"></div>`, iconSize:[10,10], iconAnchor:[5,5] });
+    L.marker(p.coords, {icon}).addTo(map).bindPopup(`<strong>${p.label}</strong>`);
+  });
+
+  // NSR corridor line
+  L.polyline([[52.0, -116.5], [53.533, -113.5]], { color: '#7a5c00', weight: 2.5, opacity: 0.5, dashArray: '4 3' }).addTo(map);
+}
+
+initMap();
+loadData();
+</script>
+</body>
+</html>
