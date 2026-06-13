@@ -218,7 +218,13 @@ GLENMORE_MAX_DAM3 = 23502
 
 
 def fetch_glenmore() -> dict:
-    """Parse Glenmore Reservoir storage from Alberta Rivers PDF."""
+    """Parse Glenmore Reservoir storage from Alberta Rivers PDF.
+    
+    pdfminer extracts PDF columns separately, so station IDs, storage values,
+    percentages, and status appear in separate vertical blocks — not on one line.
+    We find 05BJ008's ordinal position in the ID block, then extract the same
+    position from each subsequent numeric/status block.
+    """
     try:
         req = urllib.request.Request(
             GLENMORE_PDF_URL,
@@ -232,35 +238,67 @@ def fetch_glenmore() -> dict:
     try:
         from pdfminer.high_level import extract_text
         text = extract_text(io.BytesIO(pdf_bytes))
-    except ImportError:
-        text = pdf_bytes.decode("latin-1", errors="replace")
+    except Exception as e:
+        return {"status": f"pdfminer_error: {str(e)[:80]}"}
 
-    # Match: Glenmore  05BJ008  14,477  23,502  62%  ABOVE  ...  2026-04-26
-    pattern = re.compile(
-        r"Glenmore\s+" + re.escape(GLENMORE_STATION) +
-        r"\s+([\d,]+)\s+([\d,]+)\s+(\d+)%\s+(ABOVE|NORMAL|BELOW).*?(\d{4}-\d{2}-\d{2})",
-        re.DOTALL | re.IGNORECASE
+    # Find the block of station IDs containing 05BJ008
+    id_pattern = re.compile(
+        r'((?:[\w-]+\n){1,10}' + re.escape(GLENMORE_STATION) + r'\n(?:[\w-]+\n){0,10}Total)',
+        re.MULTILINE
     )
-    m = pattern.search(text)
-    if not m:
-        # looser: just station ID
-        pattern2 = re.compile(
-            re.escape(GLENMORE_STATION) +
-            r"\s+([\d,]+)\s+([\d,]+)\s+(\d+)%\s+(ABOVE|NORMAL|BELOW).*?(\d{4}-\d{2}-\d{2})",
-            re.DOTALL | re.IGNORECASE
-        )
-        m = pattern2.search(text)
+    id_match = id_pattern.search(text)
+    if not id_match:
+        print(f"    [Glenmore] ID block not found. Text sample: {text[1000:1800]}")
+        return {"status": "id_block_not_found"}
 
-    if not m:
-        return {"status": "pattern_not_found"}
+    id_block = id_match.group(0)
+    ids = [l.strip() for l in id_block.strip().split('\n') if l.strip()]
+    try:
+        pos = ids.index(GLENMORE_STATION)
+    except ValueError:
+        return {"status": "station_not_in_block"}
 
+    n = len(ids)
+    after_ids = text[id_match.end():]
+
+    def get_nth(block_text, i):
+        vals = [l.strip() for l in block_text.strip().split('\n') if l.strip()]
+        return vals[i] if i < len(vals) else None
+
+    # Storage block (dam3 values)
+    num_pat = re.compile(r'(?:(?:[\d,]+|-)\n){%d}' % n, re.MULTILINE)
+    num_blocks = list(num_pat.finditer(after_ids))
+    if len(num_blocks) < 2:
+        return {"status": f"number_blocks_insufficient ({len(num_blocks)})"}
+
+    storage_raw = get_nth(num_blocks[0].group(), pos)
+    max_raw     = get_nth(num_blocks[1].group(), pos)
+    storage = int(storage_raw.replace(',', '')) if storage_raw and storage_raw != '-' else None
+    max_s   = int(max_raw.replace(',', ''))     if max_raw     and max_raw     != '-' else None
+
+    # Percentage block
+    pct_pat = re.compile(r'(?:(?:\d+%|-)\n){%d}' % n, re.MULTILINE)
+    pct_blocks = list(pct_pat.finditer(after_ids))
+    pct_raw = get_nth(pct_blocks[0].group(), pos) if pct_blocks else None
+    pct = int(pct_raw.replace('%', '')) if pct_raw and pct_raw != '-' else None
+
+    # Status block
+    status_pat = re.compile(r'(?:(?:ABOVE|NORMAL|BELOW|-)\n){%d}' % n, re.MULTILINE)
+    status_blocks = list(status_pat.finditer(after_ids))
+    status = get_nth(status_blocks[0].group(), pos).strip() if status_blocks else "UNKNOWN"
+
+    # Most recent date in document
+    dates = re.findall(r'\d{4}-\d{2}-\d{2}', text)
+    date = dates[0] if dates else None
+
+    print(f"    [Glenmore] {storage} dam3 / {max_s} = {pct}% ({status})  date={date}")
     return {
         "station_id":         GLENMORE_STATION,
-        "storage_dam3":       int(m.group(1).replace(",", "")),
-        "max_dam3":           int(m.group(2).replace(",", "")),
-        "pct_capacity":       int(m.group(3)),
-        "compared_to_normal": m.group(4).upper(),
-        "reading_date":       m.group(5),
+        "storage_dam3":       storage,
+        "max_dam3":           max_s,
+        "pct_capacity":       pct,
+        "compared_to_normal": status,
+        "reading_date":       date,
         "status":             "ok",
     }
 
