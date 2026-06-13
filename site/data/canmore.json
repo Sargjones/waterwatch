@@ -3,7 +3,7 @@
     "city": "Canmore",
     "province": "AB",
     "dashboard": "waterwatch.criticalto.ca/canmore",
-    "generated_utc": "2026-06-13T18:56:01.567543+00:00",
+    "generated_utc": "2026-06-13T19:02:27.834971+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -31,38 +31,38 @@
     "bow_banff": {
       "station_id": "05BB001",
       "station_name": "Bow River at Banff (25km upstream)",
-      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BB001_hourly_hydrometric.csv",
       "level_m": null,
       "discharge_cms": null,
       "timestamp": null,
-      "status": "error: <urlopen error timed out>"
+      "status": "error: <urlopen error timed out>",
+      "url": "https://wateroffice.ec.gc.ca/services/real_time_data/csv/inline/?stations[]=05BB001&parameters[]=46,47&start_date=2026-06-12&end_date=2026-06-13"
     },
     "spray_banff": {
       "station_id": "05BC001",
       "station_name": "Spray River at Banff",
-      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BC001_hourly_hydrometric.csv",
       "level_m": null,
       "discharge_cms": null,
       "timestamp": null,
-      "status": "error: <urlopen error timed out>"
+      "status": "error: <urlopen error timed out>",
+      "url": "https://wateroffice.ec.gc.ca/services/real_time_data/csv/inline/?stations[]=05BC001&parameters[]=46,47&start_date=2026-06-12&end_date=2026-06-13"
     },
     "waiparous": {
       "station_id": "05BG006",
       "station_name": "Waiparous Creek near Cochrane",
-      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BG006_hourly_hydrometric.csv",
       "level_m": null,
       "discharge_cms": null,
       "timestamp": null,
-      "status": "error: <urlopen error timed out>"
+      "status": "error: <urlopen error timed out>",
+      "url": "https://wateroffice.ec.gc.ca/services/real_time_data/csv/inline/?stations[]=05BG006&parameters[]=46,47&start_date=2026-06-12&end_date=2026-06-13"
     },
     "bow_cochrane": {
       "station_id": "05BH005",
       "station_name": "Bow River near Cochrane (downstream indicator)",
-      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BH005_hourly_hydrometric.csv",
       "level_m": null,
       "discharge_cms": null,
       "timestamp": null,
-      "status": "error: <urlopen error timed out>"
+      "status": "error: <urlopen error timed out>",
+      "url": "https://wateroffice.ec.gc.ca/services/real_time_data/csv/inline/?stations[]=05BH005&parameters[]=46,47&start_date=2026-06-12&end_date=2026-06-13"
     }
   },
   "watershed_context": {

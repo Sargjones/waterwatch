@@ -3,7 +3,7 @@
     "city": "Metro Vancouver",
     "province": "BC",
     "dashboard": "waterwatch.criticalto.ca/vancouver",
-    "generated_utc": "2026-06-13T18:55:01.336751+00:00",
+    "generated_utc": "2026-06-13T19:01:27.706046+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -35,29 +35,29 @@
     "capilano": {
       "station_id": "08GA010",
       "station_name": "Capilano River above Intake",
-      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08GA010_hourly_hydrometric.csv",
       "level_m": null,
       "discharge_cms": null,
       "timestamp": null,
-      "status": "error: <urlopen error timed out>"
+      "status": "error: <urlopen error timed out>",
+      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08GA010_hourly_hydrometric.csv"
     },
     "seymour": {
       "station_id": "08GA030",
       "station_name": "Seymour River at Seymour Falls",
-      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08GA030_hourly_hydrometric.csv",
       "level_m": null,
       "discharge_cms": null,
       "timestamp": null,
-      "status": "error: <urlopen error timed out>"
+      "status": "error: <urlopen error timed out>",
+      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08GA030_hourly_hydrometric.csv"
     },
     "coquitlam": {
       "station_id": "08MH141",
       "station_name": "Coquitlam River near Port Coquitlam",
-      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08MH141_hourly_hydrometric.csv",
       "level_m": null,
       "discharge_cms": null,
       "timestamp": null,
-      "status": "error: <urlopen error timed out>"
+      "status": "error: <urlopen error timed out>",
+      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08MH141_hourly_hydrometric.csv"
     }
   },
   "reservoirs": {
