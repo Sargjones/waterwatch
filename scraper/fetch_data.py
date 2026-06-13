@@ -204,6 +204,7 @@ def main():
     out_dir = Path(__file__).parent.parent / "site" / "data"
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    # Vancouver + Canmore
     for city_key, config in CITIES.items():
         print(f"\n  [{config['meta']['city']}]")
         payload = build_city_payload(city_key, config)
@@ -223,8 +224,119 @@ def main():
         days = payload["restriction"].get("days_remaining", 0)
         print(f"  Restriction: {stage}  ({days} days remaining)")
 
+    # Calgary (separate JSON format)
+    print(f"\n  [Calgary]")
+    calgary_payload = build_calgary_payload()
+    out_path = out_dir / "calgary.json"
+    with open(out_path, "w") as f:
+        json.dump(calgary_payload, f, indent=2)
+    print(f"  Written → {out_path}")
+    print(f"  Station status:")
+    for sid, s in calgary_payload["stations"].items():
+        flow = f"{s['latest_flow']} cms" if s["latest_flow"] is not None else "n/a"
+        print(f"    {sid}  [{s['status']:8}]  discharge={flow}")
+    g = calgary_payload.get("glenmore", {})
+    print(f"  Glenmore: {g.get('pct_capacity','—')}% ({g.get('compared_to_normal','—')})  [{g.get('status','—')}]")
+
     print("\n  Done.")
 
 
 if __name__ == "__main__":
     main()
+
+# ── CALGARY config ────────────────────────────────────────────────────────────
+CALGARY = {
+    "meta": {
+        "city": "Calgary",
+        "province": "AB",
+        "dashboard": "waterwatch.criticalto.ca/calgary",
+    },
+    "stations": {
+        "bow_calgary":    {"id": "05BH004", "province": "AB", "name": "Bow River at Calgary"},
+        "elbow_glenmore": {"id": "05BJ001", "province": "AB", "name": "Elbow River below Glenmore Dam"},
+        "elbow_bragg":    {"id": "05BJ004", "province": "AB", "name": "Elbow River at Bragg Creek"},
+    },
+}
+
+GLENMORE_PDF_URL  = "https://rivers.alberta.ca/forecasting/data/reports/Res_storage.pdf"
+GLENMORE_STATION  = "05BJ008"
+GLENMORE_MAX_DAM3 = 23502
+
+
+def fetch_glenmore() -> dict:
+    """Parse Glenmore Reservoir storage from Alberta Rivers PDF."""
+    import re, io as _io
+    try:
+        req = urllib.request.Request(
+            GLENMORE_PDF_URL,
+            headers={"User-Agent": "waterwatch-criticalto/1.0"}
+        )
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            pdf_bytes = resp.read()
+    except Exception as e:
+        return {"status": f"fetch_error: {str(e)[:80]}"}
+
+    try:
+        from pdfminer.high_level import extract_text
+        text = extract_text(_io.BytesIO(pdf_bytes))
+    except ImportError:
+        text = pdf_bytes.decode("latin-1", errors="replace")
+
+    # Match: Glenmore  05BJ008  14,477  23,502  62%  ABOVE  ...  2026-04-26
+    pattern = re.compile(
+        r"Glenmore\s+" + re.escape(GLENMORE_STATION) +
+        r"\s+([\d,]+)\s+([\d,]+)\s+(\d+)%\s+(ABOVE|NORMAL|BELOW).*?(\d{4}-\d{2}-\d{2})",
+        re.DOTALL | re.IGNORECASE
+    )
+    m = pattern.search(text)
+    if not m:
+        # looser: just station ID
+        pattern2 = re.compile(
+            re.escape(GLENMORE_STATION) +
+            r"\s+([\d,]+)\s+([\d,]+)\s+(\d+)%\s+(ABOVE|NORMAL|BELOW).*?(\d{4}-\d{2}-\d{2})",
+            re.DOTALL | re.IGNORECASE
+        )
+        m = pattern2.search(text)
+
+    if not m:
+        return {"status": "pattern_not_found"}
+
+    return {
+        "station_id":         GLENMORE_STATION,
+        "storage_dam3":       int(m.group(1).replace(",", "")),
+        "max_dam3":           int(m.group(2).replace(",", "")),
+        "pct_capacity":       int(m.group(3)),
+        "compared_to_normal": m.group(4).upper(),
+        "reading_date":       m.group(5),
+        "status":             "ok",
+    }
+
+
+def build_calgary_payload() -> dict:
+    """Build calgary.json — stations + Glenmore reservoir."""
+    now_utc = datetime.now(timezone.utc).isoformat()
+
+    station_data = {}
+    for key, station in CALGARY["stations"].items():
+        print(f"    {station['name']} ({station['id']})...")
+        raw = fetch_station(station)
+        # Remap to the format calgary.html expects
+        station_data[station["id"]] = {
+            "name":         raw["station_name"],
+            "latest_flow":  raw["discharge_cms"],
+            "latest_level": raw["level_m"],
+            "latest_dt":    raw["timestamp"],
+            "history":      [],   # today-only endpoint; no history array
+            "status":       raw["status"],
+        }
+
+    print("    Glenmore Reservoir (05BJ008)...")
+    glenmore = fetch_glenmore()
+
+    return {
+        "city":       "Calgary",
+        "fetched_at": now_utc,
+        "stations":   station_data,
+        "glenmore":   glenmore,
+        "infrastructure": CALGARY.get("infrastructure", {}),
+    }
