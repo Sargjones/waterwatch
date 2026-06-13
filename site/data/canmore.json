@@ -3,7 +3,7 @@
     "city": "Canmore",
     "province": "AB",
     "dashboard": "waterwatch.criticalto.ca/canmore",
-    "generated_utc": "2026-06-13T11:45:55.221279+00:00",
+    "generated_utc": "2026-06-13T14:05:52.048738+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -32,37 +32,37 @@
       "station_id": "05BB001",
       "station_name": "Bow River at Banff (25km upstream)",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BB001_hourly_hydrometric.csv",
-      "level_m": 2.761,
-      "discharge_cms": 114.0,
-      "timestamp": "2026-06-13T03:25:00-07:00",
-      "status": "ok"
+      "level_m": null,
+      "discharge_cms": null,
+      "timestamp": null,
+      "status": "error: <urlopen error timed out>"
     },
     "spray_banff": {
       "station_id": "05BC001",
       "station_name": "Spray River at Banff",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BC001_hourly_hydrometric.csv",
-      "level_m": 1.223,
-      "discharge_cms": 9.42,
-      "timestamp": "2026-06-13T03:25:00-07:00",
-      "status": "ok"
+      "level_m": null,
+      "discharge_cms": null,
+      "timestamp": null,
+      "status": "error: <urlopen error timed out>"
     },
     "waiparous": {
       "station_id": "05BG006",
       "station_name": "Waiparous Creek near Cochrane",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BG006_hourly_hydrometric.csv",
-      "level_m": 0.94,
-      "discharge_cms": 5.13,
-      "timestamp": "2026-06-13T04:05:00-07:00",
-      "status": "ok"
+      "level_m": null,
+      "discharge_cms": null,
+      "timestamp": null,
+      "status": "error: <urlopen error timed out>"
     },
     "bow_cochrane": {
       "station_id": "05BH005",
       "station_name": "Bow River near Cochrane (downstream indicator)",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BH005_hourly_hydrometric.csv",
-      "level_m": 17.07,
-      "discharge_cms": 248.0,
-      "timestamp": "2026-06-13T03:15:00-07:00",
-      "status": "ok"
+      "level_m": null,
+      "discharge_cms": null,
+      "timestamp": null,
+      "status": "error: <urlopen error timed out>"
     }
   },
   "watershed_context": {
