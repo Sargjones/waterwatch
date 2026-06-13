@@ -19,6 +19,7 @@ Licence: Open Government Licence - Canada (Environment and Climate Change Canada
 import json
 import csv
 import io
+import re
 import urllib.request
 import urllib.error
 from datetime import datetime, timezone
@@ -265,7 +266,6 @@ GLENMORE_MAX_DAM3 = 23502
 
 def fetch_glenmore() -> dict:
     """Parse Glenmore Reservoir storage from Alberta Rivers PDF."""
-    import re, io as _io
     try:
         req = urllib.request.Request(
             GLENMORE_PDF_URL,
@@ -278,7 +278,7 @@ def fetch_glenmore() -> dict:
 
     try:
         from pdfminer.high_level import extract_text
-        text = extract_text(_io.BytesIO(pdf_bytes))
+        text = extract_text(io.BytesIO(pdf_bytes))
     except ImportError:
         text = pdf_bytes.decode("latin-1", errors="replace")
 
