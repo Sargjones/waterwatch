@@ -3,7 +3,7 @@
     "city": "Canmore",
     "province": "AB",
     "dashboard": "waterwatch.criticalto.ca/canmore",
-    "generated_utc": "2026-06-12T20:14:04.257426+00:00",
+    "generated_utc": "2026-06-13T04:02:26.458764+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -32,36 +32,36 @@
       "station_id": "05BB001",
       "station_name": "Bow River at Banff (25km upstream)",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BB001_hourly_hydrometric.csv",
-      "level_m": 2.748,
-      "discharge_cms": 111.0,
-      "timestamp": "2026-06-12T12:25:00-07:00",
+      "level_m": 2.757,
+      "discharge_cms": 113.0,
+      "timestamp": "2026-06-12T19:25:00-07:00",
       "status": "ok"
     },
     "spray_banff": {
       "station_id": "05BC001",
       "station_name": "Spray River at Banff",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BC001_hourly_hydrometric.csv",
-      "level_m": 1.229,
-      "discharge_cms": 9.67,
-      "timestamp": "2026-06-12T12:25:00-07:00",
+      "level_m": 1.23,
+      "discharge_cms": 9.71,
+      "timestamp": "2026-06-12T19:25:00-07:00",
       "status": "ok"
     },
     "waiparous": {
       "station_id": "05BG006",
       "station_name": "Waiparous Creek near Cochrane",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BG006_hourly_hydrometric.csv",
-      "level_m": 0.93,
-      "discharge_cms": 4.9,
-      "timestamp": "2026-06-12T12:05:00-07:00",
+      "level_m": 0.941,
+      "discharge_cms": 5.16,
+      "timestamp": "2026-06-12T20:05:00-07:00",
       "status": "ok"
     },
     "bow_cochrane": {
       "station_id": "05BH005",
       "station_name": "Bow River near Cochrane (downstream indicator)",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BH005_hourly_hydrometric.csv",
-      "level_m": 17.06,
+      "level_m": 17.058,
       "discharge_cms": 244.0,
-      "timestamp": "2026-06-12T12:15:00-07:00",
+      "timestamp": "2026-06-12T18:15:00-07:00",
       "status": "ok"
     }
   },
