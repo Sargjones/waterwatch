@@ -19,7 +19,6 @@ Licence: Open Government Licence - Canada (Environment and Climate Change Canada
 import json
 import csv
 import io
-import re
 import urllib.request
 import urllib.error
 from datetime import datetime, timezone
@@ -123,91 +122,20 @@ CITIES = {
 }
 
 
-# Water Office real-time API — more reliable than Datamart for AB stations
-WATEROFFICE_BASE = "https://wateroffice.ec.gc.ca/services/real_time_data/csv/inline/"
-
 def fetch_station(station: dict) -> dict:
-    """Fetch latest reading from WSC Water Office real-time API.
-    
-    Uses wateroffice.ec.gc.ca for AB stations (Datamart times out from Actions).
-    Falls back to Datamart for BC stations which work reliably there.
-    Parameters: 46=water level, 47=discharge
-    """
+    """Fetch latest hourly reading from Environment Canada Datamart."""
     sid = station["id"]
     prov = station["province"]
+    url = f"{DATAMART_BASE}/{prov}/hourly/{prov}_{sid}_hourly_hydrometric.csv"
     result = {
         "station_id": sid,
         "station_name": station["name"],
+        "url": url,
         "level_m": None,
         "discharge_cms": None,
         "timestamp": None,
         "status": "unknown",
     }
-
-    if prov == "AB":
-        return _fetch_wateroffice(sid, result)
-    else:
-        return _fetch_datamart(sid, prov, result)
-
-
-def _fetch_wateroffice(sid: str, result: dict, days: int = 1) -> dict:
-    """Fetch from WSC Water Office real-time CSV API.
-    
-    days=1  → latest reading only (for Canmore display cards)
-    days=7  → 7-day history (for Calgary flow profile chart)
-    Parameters: 46=water level, 47=discharge
-    """
-    from datetime import timedelta
-    start = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
-    end   = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    params = f"stations[]={sid}&parameters[]=46,47&start_date={start}&end_date={end}"
-    url = f"{WATEROFFICE_BASE}?{params}"
-    result["url"] = url
-    try:
-        req = urllib.request.Request(url, headers={"User-Agent": "waterwatch-criticalto/1.0"})
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            raw = resp.read().decode("utf-8", errors="replace")
-        rows = [r for r in csv.reader(io.StringIO(raw)) if r and r[0].strip()]
-        # Water Office CSV columns: Date, Station, Parameter, Value, Unit, Grade, Approval, Symbol
-        level_rows = [r for r in rows[1:] if len(r) >= 4 and r[2].strip() == "46"]
-        flow_rows  = [r for r in rows[1:] if len(r) >= 4 and r[2].strip() == "47"]
-
-        # Latest values
-        if level_rows:
-            result["level_m"]   = float(level_rows[-1][3]) if level_rows[-1][3].strip() else None
-            result["timestamp"] = level_rows[-1][0].strip()
-        if flow_rows:
-            result["discharge_cms"] = float(flow_rows[-1][3]) if flow_rows[-1][3].strip() else None
-            if not result["timestamp"]:
-                result["timestamp"] = flow_rows[-1][0].strip()
-
-        # Build history by joining level and flow rows on timestamp
-        if days > 1:
-            level_by_dt = {r[0].strip(): r[3].strip() for r in level_rows if len(r) >= 4}
-            flow_by_dt  = {r[0].strip(): r[3].strip() for r in flow_rows  if len(r) >= 4}
-            all_dts = sorted(set(level_by_dt) | set(flow_by_dt))
-            result["history"] = [
-                {
-                    "datetime": dt,
-                    "level":    float(level_by_dt[dt]) if level_by_dt.get(dt) else None,
-                    "flow":     float(flow_by_dt[dt])  if flow_by_dt.get(dt)  else None,
-                }
-                for dt in all_dts
-                if flow_by_dt.get(dt)  # only rows with flow data
-            ]
-
-        result["status"] = "ok" if (result["level_m"] or result["discharge_cms"]) else "no_data"
-    except urllib.error.HTTPError as e:
-        result["status"] = f"http_error_{e.code}"
-    except Exception as e:
-        result["status"] = f"error: {str(e)[:80]}"
-    return result
-
-
-def _fetch_datamart(sid: str, prov: str, result: dict) -> dict:
-    """Fetch from MSC Datamart hourly CSV (works reliably for BC)."""
-    url = f"{DATAMART_BASE}/{prov}/hourly/{prov}_{sid}_hourly_hydrometric.csv"
-    result["url"] = url
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "waterwatch-criticalto/1.0"})
         with urllib.request.urlopen(req, timeout=20) as resp:
@@ -218,8 +146,8 @@ def _fetch_datamart(sid: str, prov: str, result: dict) -> dict:
             result["status"] = "no_data"
             return result
         latest = data_rows[-1]
-        result["timestamp"]     = latest[1].strip()
-        result["level_m"]       = float(latest[2]) if latest[2].strip() else None
+        result["timestamp"] = latest[1].strip()
+        result["level_m"] = float(latest[2]) if latest[2].strip() else None
         result["discharge_cms"] = float(latest[6]) if latest[6].strip() else None
         result["status"] = "ok"
     except urllib.error.HTTPError as e:
@@ -269,145 +197,6 @@ def build_city_payload(city_key: str, config: dict) -> dict:
     return payload
 
 
-# ── CALGARY config ────────────────────────────────────────────────────────────
-CALGARY = {
-    "meta": {
-        "city": "Calgary",
-        "province": "AB",
-        "dashboard": "waterwatch.criticalto.ca/calgary",
-    },
-    "stations": {
-        "bow_calgary":    {"id": "05BH004", "province": "AB", "name": "Bow River at Calgary"},
-        "elbow_glenmore": {"id": "05BJ001", "province": "AB", "name": "Elbow River below Glenmore Dam"},
-        "elbow_bragg":    {"id": "05BJ004", "province": "AB", "name": "Elbow River at Bragg Creek"},
-    },
-}
-
-GLENMORE_PDF_URL  = "https://rivers.alberta.ca/forecasting/data/reports/Res_storage.pdf"
-GLENMORE_STATION  = "05BJ008"
-GLENMORE_MAX_DAM3 = 23502
-
-
-def fetch_glenmore() -> dict:
-    """Parse Glenmore Reservoir storage from Alberta Rivers PDF.
-    
-    pdfminer extracts PDF columns separately, so station IDs, storage values,
-    percentages, and status appear in separate vertical blocks — not on one line.
-    We find 05BJ008's ordinal position in the ID block, then extract the same
-    position from each subsequent numeric/status block.
-    """
-    try:
-        req = urllib.request.Request(
-            GLENMORE_PDF_URL,
-            headers={"User-Agent": "waterwatch-criticalto/1.0"}
-        )
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            pdf_bytes = resp.read()
-    except Exception as e:
-        return {"status": f"fetch_error: {str(e)[:80]}"}
-
-    try:
-        from pdfminer.high_level import extract_text
-        text = extract_text(io.BytesIO(pdf_bytes))
-    except Exception as e:
-        return {"status": f"pdfminer_error: {str(e)[:80]}"}
-
-    # Find the block of station IDs containing 05BJ008
-    id_pattern = re.compile(
-        r'((?:[\w-]+\n){1,10}' + re.escape(GLENMORE_STATION) + r'\n(?:[\w-]+\n){0,10}Total)',
-        re.MULTILINE
-    )
-    id_match = id_pattern.search(text)
-    if not id_match:
-        print(f"    [Glenmore] ID block not found. Text sample: {text[1000:1800]}")
-        return {"status": "id_block_not_found"}
-
-    id_block = id_match.group(0)
-    ids = [l.strip() for l in id_block.strip().split('\n') if l.strip()]
-    try:
-        pos = ids.index(GLENMORE_STATION)
-    except ValueError:
-        return {"status": "station_not_in_block"}
-
-    n = len(ids)
-    after_ids = text[id_match.end():]
-
-    def get_nth(block_text, i):
-        vals = [l.strip() for l in block_text.strip().split('\n') if l.strip()]
-        return vals[i] if i < len(vals) else None
-
-    # Storage block (dam3 values)
-    num_pat = re.compile(r'(?:(?:[\d,]+|-)\n){%d}' % n, re.MULTILINE)
-    num_blocks = list(num_pat.finditer(after_ids))
-    if len(num_blocks) < 2:
-        return {"status": f"number_blocks_insufficient ({len(num_blocks)})"}
-
-    storage_raw = get_nth(num_blocks[0].group(), pos)
-    max_raw     = get_nth(num_blocks[1].group(), pos)
-    storage = int(storage_raw.replace(',', '')) if storage_raw and storage_raw != '-' else None
-    max_s   = int(max_raw.replace(',', ''))     if max_raw     and max_raw     != '-' else None
-
-    # Percentage block
-    pct_pat = re.compile(r'(?:(?:\d+%|-)\n){%d}' % n, re.MULTILINE)
-    pct_blocks = list(pct_pat.finditer(after_ids))
-    pct_raw = get_nth(pct_blocks[0].group(), pos) if pct_blocks else None
-    pct = int(pct_raw.replace('%', '')) if pct_raw and pct_raw != '-' else None
-
-    # Status block
-    status_pat = re.compile(r'(?:(?:ABOVE|NORMAL|BELOW|-)\n){%d}' % n, re.MULTILINE)
-    status_blocks = list(status_pat.finditer(after_ids))
-    status = get_nth(status_blocks[0].group(), pos).strip() if status_blocks else "UNKNOWN"
-
-    # Most recent date in document
-    dates = re.findall(r'\d{4}-\d{2}-\d{2}', text)
-    date = dates[0] if dates else None
-
-    print(f"    [Glenmore] {storage} dam3 / {max_s} = {pct}% ({status})  date={date}")
-    return {
-        "station_id":         GLENMORE_STATION,
-        "storage_dam3":       storage,
-        "max_dam3":           max_s,
-        "pct_capacity":       pct,
-        "compared_to_normal": status,
-        "reading_date":       date,
-        "status":             "ok",
-    }
-
-
-def build_calgary_payload() -> dict:
-    """Build calgary.json — stations + Glenmore reservoir."""
-    now_utc = datetime.now(timezone.utc).isoformat()
-
-    station_data = {}
-    for key, station in CALGARY["stations"].items():
-        print(f"    {station['name']} ({station['id']})...")
-        raw = {
-            "station_id": station["id"], "station_name": station["name"],
-            "level_m": None, "discharge_cms": None, "timestamp": None,
-            "status": "unknown",
-        }
-        raw = _fetch_wateroffice(station["id"], raw, days=7)
-        station_data[station["id"]] = {
-            "name":         raw["station_name"],
-            "latest_flow":  raw["discharge_cms"],
-            "latest_level": raw["level_m"],
-            "latest_dt":    raw["timestamp"],
-            "history":      raw.get("history", []),
-            "status":       raw["status"],
-        }
-
-    print("    Glenmore Reservoir (05BJ008)...")
-    glenmore = fetch_glenmore()
-
-    return {
-        "city":       "Calgary",
-        "fetched_at": now_utc,
-        "stations":   station_data,
-        "glenmore":   glenmore,
-        "infrastructure": CALGARY.get("infrastructure", {}),
-    }
-
-
 def main():
     print(f"waterwatch.criticalto.ca — data fetch starting")
     print(f"  Time (UTC): {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')}")
@@ -415,7 +204,6 @@ def main():
     out_dir = Path(__file__).parent.parent / "site" / "data"
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    # Vancouver + Canmore
     for city_key, config in CITIES.items():
         print(f"\n  [{config['meta']['city']}]")
         payload = build_city_payload(city_key, config)
@@ -435,22 +223,7 @@ def main():
         days = payload["restriction"].get("days_remaining", 0)
         print(f"  Restriction: {stage}  ({days} days remaining)")
 
-    # Calgary (separate JSON format)
-    print(f"\n  [Calgary]")
-    calgary_payload = build_calgary_payload()
-    out_path = out_dir / "calgary.json"
-    with open(out_path, "w") as f:
-        json.dump(calgary_payload, f, indent=2)
-    print(f"  Written → {out_path}")
-    print(f"  Station status:")
-    for sid, s in calgary_payload["stations"].items():
-        flow = f"{s['latest_flow']} cms" if s["latest_flow"] is not None else "n/a"
-        print(f"    {sid}  [{s['status']:8}]  discharge={flow}")
-    g = calgary_payload.get("glenmore", {})
-    print(f"  Glenmore: {g.get('pct_capacity','—')}% ({g.get('compared_to_normal','—')})  [{g.get('status','—')}]")
-
     print("\n  Done.")
-
 
 
 if __name__ == "__main__":
