@@ -3,7 +3,7 @@
     "city": "Metro Vancouver",
     "province": "BC",
     "dashboard": "waterwatch.criticalto.ca/vancouver",
-    "generated_utc": "2026-06-13T19:01:27.706046+00:00",
+    "generated_utc": "2026-06-13T19:36:33.300412+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -35,29 +35,29 @@
     "capilano": {
       "station_id": "08GA010",
       "station_name": "Capilano River above Intake",
-      "level_m": null,
-      "discharge_cms": null,
-      "timestamp": null,
-      "status": "error: <urlopen error timed out>",
-      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08GA010_hourly_hydrometric.csv"
+      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08GA010_hourly_hydrometric.csv",
+      "level_m": 0.983,
+      "discharge_cms": 4.11,
+      "timestamp": "2026-06-13T11:10:00-08:00",
+      "status": "ok"
     },
     "seymour": {
       "station_id": "08GA030",
       "station_name": "Seymour River at Seymour Falls",
-      "level_m": null,
-      "discharge_cms": null,
-      "timestamp": null,
-      "status": "error: <urlopen error timed out>",
-      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08GA030_hourly_hydrometric.csv"
+      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08GA030_hourly_hydrometric.csv",
+      "level_m": 0.905,
+      "discharge_cms": 3.69,
+      "timestamp": "2026-06-13T11:05:00-08:00",
+      "status": "ok"
     },
     "coquitlam": {
       "station_id": "08MH141",
       "station_name": "Coquitlam River near Port Coquitlam",
-      "level_m": null,
-      "discharge_cms": null,
-      "timestamp": null,
-      "status": "error: <urlopen error timed out>",
-      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08MH141_hourly_hydrometric.csv"
+      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08MH141_hourly_hydrometric.csv",
+      "level_m": 1.818,
+      "discharge_cms": 3.77,
+      "timestamp": "2026-06-13T11:15:00-08:00",
+      "status": "ok"
     }
   },
   "reservoirs": {
