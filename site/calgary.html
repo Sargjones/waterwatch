@@ -444,8 +444,9 @@ const STATIONS = [
   { id: '05BJ001', river: 'elbow' },
   { id: '05BJ004', river: 'elbow' },
 ];
-const BOW_COLOR   = '#2d6a35';
-const ELBOW_COLOR = '#5a4200';
+const BOW_COLOR            = '#2d6a35';  // Bow — forest green
+const ELBOW_COLOR          = '#5a4200';  // Elbow below dam — warm brown
+const ELBOW_UPSTREAM_COLOR = '#9b3a2a';  // Elbow at Bragg Creek — terracotta/rust
 
 let chartInstance = null;
 let chartScale = 'linear';
@@ -473,7 +474,7 @@ function renderAll(data) {
       const s = data.stations[stn.id];
       if (s) {
         updateCard(stn.id, s.latest_flow, s.latest_level, s.history);
-        allSeries[stn.id] = { data: s.history || [], river: stn.river, name: s.name || stn.id };
+        allSeries[stn.id] = { data: s.history || [], river: stn.river, name: s.name || stn.id, id: stn.id };
       }
     });
   }
@@ -531,7 +532,7 @@ function buildChart() {
   let labelsSet = false;
   for (const [id, series] of Object.entries(allSeries)) {
     if (!series.data || !series.data.length) continue;
-    const colour = series.river === 'bow' ? BOW_COLOR : ELBOW_COLOR;
+    const colour = series.id === '05BH004' ? BOW_COLOR : series.id === '05BJ001' ? ELBOW_COLOR : ELBOW_UPSTREAM_COLOR;
     const values = series.data.map(d => parseFloat(d.flow));
     if (!labelsSet) {
       labels = series.data.map(d => (d.datetime || '').slice(0, 16));
@@ -574,7 +575,7 @@ function initMap() {
   const stations = [
     { id: '05BH004', name: 'Bow River at Calgary', coords: [51.0447, -114.0719], colour: BOW_COLOR },
     { id: '05BJ001', name: 'Elbow below Glenmore Dam', coords: [50.9950, -114.0800], colour: ELBOW_COLOR },
-    { id: '05BJ004', name: 'Elbow at Bragg Creek', coords: [50.9503, -114.5700], colour: ELBOW_COLOR },
+    { id: '05BJ004', name: 'Elbow at Bragg Creek', coords: [50.9503, -114.5700], colour: ELBOW_UPSTREAM_COLOR },
   ];
   stations.forEach(s => {
     const icon = L.divIcon({ className: '', html: `<div style="width:12px;height:12px;background:${s.colour};border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.3)"></div>`, iconSize: [12,12], iconAnchor: [6,6] });
@@ -591,8 +592,6 @@ function initMap() {
     L.marker(p.coords, { icon }).addTo(map).bindPopup(`<strong>${p.label}</strong>`);
   });
 
-  L.polyline([[51.19, -114.55], [51.044, -114.07]], { color: BOW_COLOR, weight: 2, opacity: 0.4, dashArray: '4 3' }).addTo(map);
-  L.polyline([[50.95, -114.57], [51.00, -114.08]], { color: ELBOW_COLOR, weight: 2, opacity: 0.4, dashArray: '4 3' }).addTo(map);
 }
 
 initMap();
