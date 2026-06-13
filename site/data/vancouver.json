@@ -2,25 +2,86 @@
   "meta": {
     "city": "Metro Vancouver",
     "province": "BC",
+    "operator": "Metro Vancouver Regional District",
+    "population_served": 2700000,
+    "per_capita_lpd": 490,
+    "per_capita_lpd_source": "Metro Vancouver 2023 Annual Water Report",
     "dashboard": "waterwatch.criticalto.ca/vancouver",
-    "generated_utc": "2026-06-13T19:40:40.527774+00:00",
+    "generated_utc": "2026-06-13T20:26:36.158542+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
   },
+  "source": {
+    "type": "surface",
+    "groundwater_pct": 0,
+    "primary": "Capilano, Seymour, and Coquitlam watersheds (closed)",
+    "watershed_protected": true,
+    "wfi_risk": "low_moderate",
+    "wfi_note": "Closed watersheds with active management; no public access"
+  },
+  "storage": {
+    "reservoirs": {
+      "capilano": {
+        "name": "Capilano Reservoir",
+        "max_dam3": null,
+        "pct_of_target": 68,
+        "data_note": "Max capacity not publicly published; target % from Metro Van reports"
+      },
+      "seymour": {
+        "name": "Seymour Reservoir",
+        "max_dam3": null,
+        "pct_of_target": 65,
+        "data_note": "Max capacity not publicly published"
+      },
+      "coquitlam": {
+        "name": "Coquitlam Reservoir",
+        "max_dam3": null,
+        "pct_of_target": 72,
+        "data_note": "Max capacity not publicly published"
+      }
+    },
+    "per_capita_dam3": null,
+    "data_note": "Metro Vancouver does not publish reservoir volumes \u2014 only % of seasonal target",
+    "last_updated": "2026-06-01",
+    "source_url": "https://metrovancouver.org/services/water/reservoir-levels-water-use"
+  },
+  "treatment": {
+    "plants": [
+      {
+        "name": "Seymour-Capilano Filtration Plant",
+        "capacity_ml_day": 1800,
+        "process": "membrane filtration, UV, chlorination"
+      },
+      {
+        "name": "Coquitlam WTP",
+        "capacity_ml_day": 600,
+        "process": "conventional, UV, chlorination"
+      }
+    ],
+    "fluoridation": false,
+    "fluoride_note": "Fluoride never added to Metro Vancouver water supply",
+    "data_note": null
+  },
   "restriction": {
+    "system": "formal",
+    "system_url": "https://metrovancouver.org/services/water/water-restrictions",
     "stage": 3,
+    "stage_label": "Stage 3",
     "start_date": "2026-06-08",
     "end_date": "2026-10-15",
     "fine_cad": 500,
-    "lawn_watering": false,
-    "tree_shrub_watering": false,
-    "vegetable_garden": true,
-    "vehicle_washing": false,
-    "pressure_washing": false,
-    "pools_hot_tubs": false,
-    "stanley_park_tunnel": true,
-    "source_url": "https://metrovancouver.org/services/water/water-restrictions",
+    "prohibitions": [
+      "lawn watering",
+      "tree/shrub irrigation",
+      "vehicle washing",
+      "pressure washing",
+      "pools/hot tubs"
+    ],
+    "permitted": [
+      "vegetable gardens",
+      "hand watering"
+    ],
     "last_verified": "2026-06-08",
     "days_remaining": 123
   },
@@ -31,32 +92,63 @@
     "note": "2026 reading \u2014 one of the lowest on record",
     "last_updated": "2026-05-01"
   },
+  "risk": {
+    "wfi_risk": "low_moderate",
+    "infrastructure_risk": "low",
+    "single_point_of_failure": null,
+    "groundwater_dependency": false,
+    "climate_note": "Low snowpack (53% of normal) driving Stage 3 restrictions; drought risk elevated"
+  },
+  "use": {
+    "per_capita_lpd": 490,
+    "residential_pct": 55,
+    "industrial_pct": 15,
+    "commercial_pct": 30,
+    "major_industrial_users": null,
+    "data_note": "Sector split approximate from Metro Vancouver annual report"
+  },
+  "egress": {
+    "treatment_type": "secondary",
+    "plants": [
+      "Annacis Island WWTP",
+      "Iona Island WWTP",
+      "Lulu Island WWTP",
+      "Northwest Langley WWTP"
+    ],
+    "discharge_point": "Fraser River / Strait of Georgia",
+    "cso_risk": "moderate",
+    "cso_note": "Combined sewer overflow risk during heavy rain in older municipal areas",
+    "data_note": null
+  },
   "watershed_inflow": {
     "capilano": {
       "station_id": "08GA010",
       "station_name": "Capilano River above Intake",
+      "role": "primary_source",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08GA010_hourly_hydrometric.csv",
-      "level_m": 0.983,
-      "discharge_cms": 4.11,
-      "timestamp": "2026-06-13T11:10:00-08:00",
+      "level_m": 0.981,
+      "discharge_cms": 4.08,
+      "timestamp": "2026-06-13T11:40:00-08:00",
       "status": "ok"
     },
     "seymour": {
       "station_id": "08GA030",
       "station_name": "Seymour River at Seymour Falls",
+      "role": "primary_source",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08GA030_hourly_hydrometric.csv",
       "level_m": 0.905,
       "discharge_cms": 3.69,
-      "timestamp": "2026-06-13T11:05:00-08:00",
+      "timestamp": "2026-06-13T11:35:00-08:00",
       "status": "ok"
     },
     "coquitlam": {
       "station_id": "08MH141",
       "station_name": "Coquitlam River near Port Coquitlam",
+      "role": "primary_source",
       "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08MH141_hourly_hydrometric.csv",
       "level_m": 1.818,
       "discharge_cms": 3.77,
-      "timestamp": "2026-06-13T11:15:00-08:00",
+      "timestamp": "2026-06-13T11:45:00-08:00",
       "status": "ok"
     }
   },
