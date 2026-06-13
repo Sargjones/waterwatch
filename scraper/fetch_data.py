@@ -198,53 +198,6 @@ def build_city_payload(city_key: str, config: dict) -> dict:
     return payload
 
 
-def main():
-    print(f"waterwatch.criticalto.ca — data fetch starting")
-    print(f"  Time (UTC): {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')}")
-
-    out_dir = Path(__file__).parent.parent / "site" / "data"
-    out_dir.mkdir(parents=True, exist_ok=True)
-
-    # Vancouver + Canmore
-    for city_key, config in CITIES.items():
-        print(f"\n  [{config['meta']['city']}]")
-        payload = build_city_payload(city_key, config)
-
-        out_path = out_dir / f"{city_key}.json"
-        with open(out_path, "w") as f:
-            json.dump(payload, f, indent=2)
-        print(f"  Written → {out_path}")
-
-        print(f"  Station status:")
-        for key, s in payload["watershed_inflow"].items():
-            level = f"{s['level_m']}m" if s["level_m"] is not None else "n/a"
-            flow = f"{s['discharge_cms']} cms" if s["discharge_cms"] is not None else "n/a"
-            print(f"    {key:14} [{s['status']:8}]  level={level}  discharge={flow}")
-
-        stage = payload["restriction"].get("stage_label") or f"Stage {payload['restriction']['stage']}"
-        days = payload["restriction"].get("days_remaining", 0)
-        print(f"  Restriction: {stage}  ({days} days remaining)")
-
-    # Calgary (separate JSON format)
-    print(f"\n  [Calgary]")
-    calgary_payload = build_calgary_payload()
-    out_path = out_dir / "calgary.json"
-    with open(out_path, "w") as f:
-        json.dump(calgary_payload, f, indent=2)
-    print(f"  Written → {out_path}")
-    print(f"  Station status:")
-    for sid, s in calgary_payload["stations"].items():
-        flow = f"{s['latest_flow']} cms" if s["latest_flow"] is not None else "n/a"
-        print(f"    {sid}  [{s['status']:8}]  discharge={flow}")
-    g = calgary_payload.get("glenmore", {})
-    print(f"  Glenmore: {g.get('pct_capacity','—')}% ({g.get('compared_to_normal','—')})  [{g.get('status','—')}]")
-
-    print("\n  Done.")
-
-
-if __name__ == "__main__":
-    main()
-
 # ── CALGARY config ────────────────────────────────────────────────────────────
 CALGARY = {
     "meta": {
@@ -340,3 +293,52 @@ def build_calgary_payload() -> dict:
         "glenmore":   glenmore,
         "infrastructure": CALGARY.get("infrastructure", {}),
     }
+
+
+def main():
+    print(f"waterwatch.criticalto.ca — data fetch starting")
+    print(f"  Time (UTC): {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')}")
+
+    out_dir = Path(__file__).parent.parent / "site" / "data"
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    # Vancouver + Canmore
+    for city_key, config in CITIES.items():
+        print(f"\n  [{config['meta']['city']}]")
+        payload = build_city_payload(city_key, config)
+
+        out_path = out_dir / f"{city_key}.json"
+        with open(out_path, "w") as f:
+            json.dump(payload, f, indent=2)
+        print(f"  Written → {out_path}")
+
+        print(f"  Station status:")
+        for key, s in payload["watershed_inflow"].items():
+            level = f"{s['level_m']}m" if s["level_m"] is not None else "n/a"
+            flow = f"{s['discharge_cms']} cms" if s["discharge_cms"] is not None else "n/a"
+            print(f"    {key:14} [{s['status']:8}]  level={level}  discharge={flow}")
+
+        stage = payload["restriction"].get("stage_label") or f"Stage {payload['restriction']['stage']}"
+        days = payload["restriction"].get("days_remaining", 0)
+        print(f"  Restriction: {stage}  ({days} days remaining)")
+
+    # Calgary (separate JSON format)
+    print(f"\n  [Calgary]")
+    calgary_payload = build_calgary_payload()
+    out_path = out_dir / "calgary.json"
+    with open(out_path, "w") as f:
+        json.dump(calgary_payload, f, indent=2)
+    print(f"  Written → {out_path}")
+    print(f"  Station status:")
+    for sid, s in calgary_payload["stations"].items():
+        flow = f"{s['latest_flow']} cms" if s["latest_flow"] is not None else "n/a"
+        print(f"    {sid}  [{s['status']:8}]  discharge={flow}")
+    g = calgary_payload.get("glenmore", {})
+    print(f"  Glenmore: {g.get('pct_capacity','—')}% ({g.get('compared_to_normal','—')})  [{g.get('status','—')}]")
+
+    print("\n  Done.")
+
+
+
+if __name__ == "__main__":
+    main()
