@@ -32,7 +32,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--paper); color: var(--ink); font-family: var(--mono); font-size: 14px; line-height: 1.6; min-height: 100vh; }
 
-    .site-header { border-bottom: 1px solid var(--border-strong); padding: 1.25rem 2rem; background: var(--paper); display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+    .site-header { border-bottom: 1px solid var(--border-strong); padding: 1.25rem 2rem; background: var(--paper); display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; position: sticky; top: 0; z-index: 100; }
     .header-left .logo-mark { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
     .header-left .logo-region { font-size: 11px; font-weight: 500; color: var(--ink-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
     .city-nav { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 11px; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
@@ -166,26 +166,26 @@
     </div>
   </div>
 
-  <p class="section-label">Qu'Appelle River System — Real-Time Stations</p>
+  <p class="section-label">Watershed Indicators — Real-Time Stations</p>
   <div class="stations-grid">
     <div class="station-card">
       <div class="stn-head">
-        <div><div class="stn-name">Qu'Appelle R. at Buffalo Pound Lake outlet</div><div class="stn-id">05JF004</div></div>
-        <span class="river-badge badge-qu">Source</span>
+        <div><div class="stn-name">South Saskatchewan R. at Saskatoon (upstream indicator)</div><div class="stn-id">05HG001</div></div>
+        <span class="river-badge badge-qu">Regional</span>
       </div>
       <div class="stn-metrics">
-        <div><div class="m-label">Discharge</div><div class="m-value" id="flow-qu_appelle_outlet">—</div><div class="m-unit">m³/s</div></div>
-        <div><div class="m-label">Level</div><div class="m-value" id="level-qu_appelle_outlet">—</div><div class="m-unit">m</div></div>
+        <div><div class="m-label">Discharge</div><div class="m-value" id="flow-south_sask_saskatoon">—</div><div class="m-unit">m³/s</div></div>
+        <div><div class="m-label">Level</div><div class="m-value" id="level-south_sask_saskatoon">—</div><div class="m-unit">m</div></div>
       </div>
     </div>
     <div class="station-card">
       <div class="stn-head">
-        <div><div class="stn-name">Qu'Appelle River at Highway 19</div><div class="stn-id">05JE001</div></div>
+        <div><div class="stn-name">Qu'Appelle River near Lumsden</div><div class="stn-id">05JF006</div></div>
         <span class="river-badge badge-down">Downstream</span>
       </div>
       <div class="stn-metrics">
-        <div><div class="m-label">Discharge</div><div class="m-value" id="flow-qu_appelle_hwy19">—</div><div class="m-unit">m³/s</div></div>
-        <div><div class="m-label">Level</div><div class="m-value" id="level-qu_appelle_hwy19">—</div><div class="m-unit">m</div></div>
+        <div><div class="m-label">Discharge</div><div class="m-value" id="flow-qu_appelle_lumsden">—</div><div class="m-unit">m³/s</div></div>
+        <div><div class="m-label">Level</div><div class="m-value" id="level-qu_appelle_lumsden">—</div><div class="m-unit">m</div></div>
       </div>
     </div>
   </div>
@@ -265,8 +265,8 @@
 </footer>
 
 <script>
-const KEYS = ['qu_appelle_outlet','qu_appelle_hwy19'];
-const COLOURS = { qu_appelle_outlet: '#8b5e00', qu_appelle_hwy19: '#c48a00' };
+const KEYS = ['south_sask_saskatoon','qu_appelle_lumsden'];
+const COLOURS = { south_sask_saskatoon: '#8b5e00', qu_appelle_lumsden: '#c48a00' };
 let chart = null, scale = 'linear';
 
 async function loadData() {
@@ -286,8 +286,7 @@ async function loadData() {
     if (d.watershed_inflow) {
       KEYS.forEach(k => {
         const s = d.watershed_inflow[k]; if (!s) return;
-        const fe = document.getElementById('flow-'+k);
-        const le = document.getElementById('level-'+k);
+        const fe = document.getElementById('flow-'+k); const le = document.getElementById('level-'+k);
         if (fe && s.discharge_cms!=null) fe.textContent = parseFloat(s.discharge_cms).toFixed(1);
         if (le && s.level_m!=null) le.textContent = parseFloat(s.level_m).toFixed(2);
       });
@@ -310,8 +309,8 @@ function initMap() {
   const map = L.map('map').setView([50.65,-105.5],8);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
   [
-    {coords:[50.5800,-105.3700],id:'05JF004',name:'Qu\'Appelle R. at Buffalo Pound outlet',colour:'#8b5e00'},
-    {coords:[50.4500,-104.6000],id:'05JE001',name:'Qu\'Appelle R. at Hwy 19',colour:'#c48a00'},
+    {coords:[52.1300,-106.6500],id:'05HG001',name:'South Saskatchewan at Saskatoon',colour:'#8b5e00'},
+    {coords:[50.6500,-104.8700],id:'05JF006',name:'Qu\'Appelle near Lumsden',colour:'#c48a00'},
   ].forEach(s=>{
     const icon=L.divIcon({className:'',html:`<div style="width:12px;height:12px;background:${s.colour};border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.3)"></div>`,iconSize:[12,12],iconAnchor:[6,6]});
     L.marker(s.coords,{icon}).addTo(map).bindPopup(`<strong>${s.name}</strong><br><code>${s.id}</code>`);
