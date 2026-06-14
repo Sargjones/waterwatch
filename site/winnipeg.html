@@ -329,23 +329,34 @@ async function loadData() {
 }
 function buildChart(d){const ctx=document.getElementById('flowChart').getContext('2d');if(chart)chart.destroy();const labels=KEYS.map(k=>d.watershed_inflow?.[k]?.station_name||k);const values=KEYS.map(k=>d.watershed_inflow?.[k]?.discharge_cms||null);chart=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Discharge (m³/s)',data:values,backgroundColor:KEYS.map(k=>COLOURS[k]+'99'),borderColor:KEYS.map(k=>COLOURS[k]),borderWidth:2,borderRadius:3}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{backgroundColor:'#f9f6ee',borderColor:'rgba(10,21,32,.25)',borderWidth:1,titleColor:'#0a1520',bodyColor:'#3a6080'}},scales:{x:{ticks:{color:'#3a6080',font:{size:11}},grid:{color:'rgba(10,21,32,.07)'}},y:{title:{display:true,text:'Discharge (m³/s)',color:'#3a6080',font:{size:11}},ticks:{color:'#3a6080',font:{size:10}},grid:{color:'rgba(10,21,32,.07)'}}}}})}
 function setScale(s){scale=s;['linear','log'].forEach(x=>document.getElementById('btn-'+x).classList.toggle('active',x===s));buildChart({});}
+let _wpgMap = null;
 function initMap(){
-  const map=L.map('map').setView([49.8,-96.0],7);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
-  setTimeout(()=>map.invalidateSize(), 300);
-  setTimeout(()=>map.invalidateSize(), 1000);
+  if (_wpgMap) return;
+  const mapEl = document.getElementById('map');
+  if (!mapEl) return;
+  _wpgMap = L.map('map').setView([49.8,-96.0],7);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:19}).addTo(_wpgMap);
+  setTimeout(()=>_wpgMap.invalidateSize(), 300);
+  setTimeout(()=>_wpgMap.invalidateSize(), 1000);
   [{coords:[49.0047,-97.2300],id:'05OG001',name:'Red River at Emerson',colour:'#0a3060'},{coords:[49.8888,-97.1347],id:'05OJ001',name:'Red River at Winnipeg',colour:'#1a5080'},{coords:[49.9000,-97.4000],id:'05QB004',name:'Assiniboine at Headingley',colour:'#2a7ab0'}].forEach(s=>{const icon=L.divIcon({className:'',html:`<div style="width:12px;height:12px;background:${s.colour};border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.3)"></div>`,iconSize:[12,12],iconAnchor:[6,6]});L.marker(s.coords,{icon}).addTo(map).bindPopup(`<strong>${s.name}</strong><br><code>${s.id}</code>`);});
   [{coords:[49.6100,-94.4800],label:'Shoal Lake #40 First Nation',colour:'#8b2060'},{coords:[49.8800,-97.1500],label:'Deacon WTP',colour:'#1a5080'},{coords:[49.8954,-97.1385],label:'Winnipeg',colour:'#555'}].forEach(p=>{const icon=L.divIcon({className:'',html:`<div style="width:10px;height:10px;background:${p.colour};border:2px solid white;border-radius:2px;"></div>`,iconSize:[10,10],iconAnchor:[5,5]});L.marker(p.coords,{icon}).addTo(map).bindPopup(`<strong>${p.label}</strong>`);});
   // Aqueduct line schematic
-  L.polyline([[49.61,-94.48],[49.88,-97.15]],{color:'#1a5080',weight:2,opacity:0.5,dashArray:'6 3'}).addTo(map);
+  L.polyline([[49.61,-94.48],[49.88,-97.15]],{color:'#1a5080',weight:2,opacity:0.5,dashArray:'6 3'}).addTo(_wpgMap);
 }
-// Force map container to have explicit height before init
-document.addEventListener('DOMContentLoaded', function() {
-  var mapEl = document.getElementById('map');
-  if (mapEl) mapEl.style.height = '280px';
-  setTimeout(initMap, 50);
-});
 loadData();
+// Map init — use multiple strategies to ensure it renders
+function tryInitMap() {
+  var el = document.getElementById('map');
+  if (!el || !window.L) { setTimeout(tryInitMap, 100); return; }
+  if (el._leaflet_id) return; // already initialized
+  el.style.height = '280px';
+  el.style.minHeight = '280px';
+  initMap();
+}
+// Try immediately, then on DOMContentLoaded, then on load
+tryInitMap();
+document.addEventListener('DOMContentLoaded', tryInitMap);
+window.addEventListener('load', tryInitMap);
 </script>
 </body>
 </html>
