@@ -7,7 +7,7 @@
     "per_capita_lpd": 230,
     "per_capita_lpd_source": "City of Ottawa 2023 Drinking Water Quality Report",
     "dashboard": "waterwatch.criticalto.ca/ottawa",
-    "generated_utc": "2026-06-14T10:49:08.276702+00:00",
+    "generated_utc": "2026-06-14T11:29:14.581110+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -96,14 +96,24 @@
     "data_note": null
   },
   "watershed_inflow": {
+    "ottawa_upstream": {
+      "station_id": "02KF004",
+      "station_name": "Ottawa River at Arnprior (upstream)",
+      "role": "upstream_context",
+      "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02KF004_hourly_hydrometric.csv",
+      "level_m": null,
+      "discharge_cms": null,
+      "timestamp": null,
+      "status": "http_error_404"
+    },
     "ottawa_river": {
       "station_id": "02KF005",
       "station_name": "Ottawa River at Ottawa (Britannia)",
       "role": "primary_source",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02KF005_hourly_hydrometric.csv",
-      "level_m": 58.297,
-      "discharge_cms": 1200.0,
-      "timestamp": "2026-06-14T04:35:00-05:00",
+      "level_m": 58.303,
+      "discharge_cms": 1210.0,
+      "timestamp": "2026-06-14T05:35:00-05:00",
       "status": "ok"
     },
     "rideau_river": {
@@ -111,9 +121,9 @@
       "station_name": "Rideau River at Ottawa",
       "role": "secondary_source",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02LA004_hourly_hydrometric.csv",
-      "level_m": 2.81,
-      "discharge_cms": 16.1,
-      "timestamp": "2026-06-14T04:40:00-05:00",
+      "level_m": 2.815,
+      "discharge_cms": 16.4,
+      "timestamp": "2026-06-14T05:40:00-05:00",
       "status": "ok"
     }
   }

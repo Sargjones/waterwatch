@@ -7,7 +7,7 @@
     "per_capita_lpd": 200,
     "per_capita_lpd_source": "Toronto Water 2023 Annual Report",
     "dashboard": "waterwatch.criticalto.ca/toronto",
-    "generated_utc": "2026-06-14T10:49:08.049779+00:00",
+    "generated_utc": "2026-06-14T11:29:14.236561+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -111,24 +111,34 @@
     "data_note": "Toronto is one of few Canadian cities with tertiary wastewater treatment \u2014 phosphorus removal before Lake Ontario discharge."
   },
   "watershed_inflow": {
-    "don_river": {
-      "station_id": "02HC003",
-      "station_name": "Don River at Todmorden (watershed indicator)",
-      "role": "watershed_indicator",
-      "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02HC003_hourly_hydrometric.csv",
-      "level_m": 2.216,
-      "discharge_cms": 2.49,
-      "timestamp": "2026-06-14T05:10:00-05:00",
-      "status": "ok"
-    },
     "humber_river": {
       "station_id": "02HC009",
       "station_name": "Humber River at Raymore Drive",
       "role": "watershed_indicator",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02HC009_hourly_hydrometric.csv",
-      "level_m": 2.044,
-      "discharge_cms": 0.473,
-      "timestamp": "2026-06-14T04:40:00-05:00",
+      "level_m": 2.043,
+      "discharge_cms": 0.464,
+      "timestamp": "2026-06-14T05:40:00-05:00",
+      "status": "ok"
+    },
+    "don_river": {
+      "station_id": "02HC003",
+      "station_name": "Don River at Todmorden",
+      "role": "watershed_indicator",
+      "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02HC003_hourly_hydrometric.csv",
+      "level_m": 2.216,
+      "discharge_cms": 2.49,
+      "timestamp": "2026-06-14T05:40:00-05:00",
+      "status": "ok"
+    },
+    "credit_river": {
+      "station_id": "02HB008",
+      "station_name": "Credit River at Streetsville",
+      "role": "watershed_indicator",
+      "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02HB008_hourly_hydrometric.csv",
+      "level_m": 2.2,
+      "discharge_cms": 0.646,
+      "timestamp": "2026-06-14T05:35:00-05:00",
       "status": "ok"
     }
   }
