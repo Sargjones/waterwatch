@@ -190,7 +190,7 @@
 
   <!-- Watershed indicator stations -->
   <p class="section-label">Watershed Indicators — Toronto Area Rivers</p>
-  <div class="stations-grid">
+  <div class="stations-grid" style="grid-template-columns:repeat(3,1fr)">
     <div class="station-card">
       <div class="stn-head">
         <div><div class="stn-name">Don River at Todmorden</div><div class="stn-id">02HC003</div></div>
@@ -204,11 +204,31 @@
     <div class="station-card">
       <div class="stn-head">
         <div><div class="stn-name">Humber River at Raymore Drive</div><div class="stn-id">02HC009</div></div>
-        <span class="river-badge badge-indicator">Urban indicator</span>
+        <span class="river-badge badge-indicator">West watershed</span>
       </div>
       <div class="stn-metrics">
         <div><div class="m-label">Discharge</div><div class="m-value" id="flow-humber_river">—</div><div class="m-unit">m³/s</div></div>
         <div><div class="m-label">Level</div><div class="m-value" id="level-humber_river">—</div><div class="m-unit">m</div></div>
+      </div>
+    </div>
+    <div class="station-card">
+      <div class="stn-head">
+        <div><div class="stn-name">Don River at Todmorden</div><div class="stn-id">02HC003</div></div>
+        <span class="river-badge badge-indicator">Central watershed</span>
+      </div>
+      <div class="stn-metrics">
+        <div><div class="m-label">Discharge</div><div class="m-value" id="flow-don_river">—</div><div class="m-unit">m³/s</div></div>
+        <div><div class="m-label">Level</div><div class="m-value" id="level-don_river">—</div><div class="m-unit">m</div></div>
+      </div>
+    </div>
+    <div class="station-card">
+      <div class="stn-head">
+        <div><div class="stn-name">Credit River at Streetsville</div><div class="stn-id">02HB008</div></div>
+        <span class="river-badge badge-indicator">West watershed</span>
+      </div>
+      <div class="stn-metrics">
+        <div><div class="m-label">Discharge</div><div class="m-value" id="flow-credit_river">—</div><div class="m-unit">m³/s</div></div>
+        <div><div class="m-label">Level</div><div class="m-value" id="level-credit_river">—</div><div class="m-unit">m</div></div>
       </div>
     </div>
   </div>
@@ -289,8 +309,8 @@
 </footer>
 
 <script>
-const KEYS = ['don_river','humber_river'];
-const COLOURS = { don_river:'#1a3a6a', humber_river:'#2a6090' };
+const KEYS = ['humber_river','don_river','credit_river'];
+const COLOURS = { humber_river:'#1a3a6a', don_river:'#2a6090', credit_river:'#3a80a0' };
 let chart=null;
 
 async function loadData() {
