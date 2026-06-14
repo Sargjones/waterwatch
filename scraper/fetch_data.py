@@ -507,6 +507,366 @@ CANMORE = {
     },
 }
 
+
+# ── REGINA config ─────────────────────────────────────────────────────────────
+REGINA = {
+    "meta": {
+        "city": "Regina",
+        "province": "SK",
+        "operator": "Buffalo Pound Water Treatment Plant (City of Regina + City of Saskatoon)",
+        "population_served": 250000,
+        "per_capita_lpd": 330,
+        "per_capita_lpd_source": "City of Regina 2023 Water Quality Report",
+        "dashboard": "waterwatch.criticalto.ca/regina",
+    },
+    "stations": {
+        "qu_appelle_outlet": {"id": "05JF004", "province": "SK", "name": "Qu'Appelle River at Buffalo Pound Lake outlet", "role": "primary_source"},
+        "qu_appelle_hwy19":  {"id": "05JE001", "province": "SK", "name": "Qu'Appelle River at Highway 19",               "role": "downstream_context"},
+    },
+    "source": {
+        "type": "surface",
+        "groundwater_pct": 0,
+        "primary": "Buffalo Pound Lake (Qu'Appelle River system, Last Mountain Lake drainage)",
+        "watershed_protected": False,
+        "wfi_risk": "low",
+        "wfi_note": "Prairie watershed — negligible wildfire risk",
+    },
+    "storage": {
+        "reservoirs": {
+            "buffalo_pound": {
+                "name": "Buffalo Pound Lake",
+                "max_dam3": 112000,
+                "data_note": "Natural lake used as source reservoir. Levels not published in WSC real-time network.",
+            },
+        },
+        "per_capita_dam3": 0.448,
+        "per_capita_dam3_note": "Buffalo Pound Lake max capacity / Regina share of population served",
+        "data_note": "Buffalo Pound WTP serves both Regina and Saskatoon (~500,000 combined). Capacity shown is total lake volume.",
+        "last_updated": None,
+    },
+    "treatment": {
+        "plants": [
+            {"name": "Buffalo Pound WTP", "capacity_ml_day": 230, "process": "conventional coagulation/sedimentation/filtration, UV, chlorination, fluoride, PAC for taste/odour"},
+        ],
+        "fluoridation": True,
+        "fluoride_note": None,
+        "data_note": "Buffalo Pound WTP is a shared provincial asset co-owned by Regina and Saskatoon. Single plant serving two major cities is a shared vulnerability.",
+    },
+    "restriction": {
+        "system": "informal",
+        "system_url": "https://www.regina.ca/home-property/water-sewer/water-conservation/",
+        "stage": 0,
+        "stage_label": "No active restrictions",
+        "start_date": None,
+        "end_date": None,
+        "fine_cad": None,
+        "prohibitions": [],
+        "permitted": [],
+        "last_verified": "2026-06-14",
+        "hypothesized_triggers": "Regina does not have a formal staged restriction bylaw. Seasonal lawn watering advisories issued during dry periods.",
+    },
+    "snowpack": {
+        "pct_of_normal": 82,
+        "reference": "April 1 peak, Qu'Appelle Basin",
+        "source": "Saskatchewan Water Security Agency",
+        "note": "2026 reading — near normal",
+        "last_updated": "2026-05-01",
+    },
+    "risk": {
+        "wfi_risk": "low",
+        "infrastructure_risk": "moderate",
+        "single_point_of_failure": "Buffalo Pound WTP is the sole treatment plant for both Regina and Saskatoon — a single facility serving ~500,000 people with no backup treatment capacity.",
+        "groundwater_dependency": False,
+        "climate_note": "Buffalo Pound Lake experiences recurring blue-green algae (cyanobacteria) blooms driven by agricultural nutrient loading from the Qu'Appelle watershed. Blooms require activated carbon treatment and can stress plant capacity.",
+    },
+    "use": {
+        "per_capita_lpd": 330,
+        "residential_pct": 60,
+        "industrial_pct": 20,
+        "commercial_pct": 20,
+        "major_industrial_users": None,
+        "data_note": "Sector split approximate from City of Regina annual report",
+    },
+    "egress": {
+        "treatment_type": "secondary",
+        "plants": ["Regina WWTP"],
+        "discharge_point": "Wascana Creek / Qu'Appelle River system",
+        "cso_risk": "low",
+        "cso_note": None,
+        "data_note": None,
+    },
+}
+
+# ── WINNIPEG config ────────────────────────────────────────────────────────────
+WINNIPEG = {
+    "meta": {
+        "city": "Winnipeg",
+        "province": "MB",
+        "operator": "City of Winnipeg Water and Waste Department",
+        "population_served": 800000,
+        "per_capita_lpd": 280,
+        "per_capita_lpd_source": "City of Winnipeg 2023 Water Quality Report",
+        "dashboard": "waterwatch.criticalto.ca/winnipeg",
+    },
+    "stations": {
+        "shoal_lake": {"id": "05PB014", "province": "MB", "name": "Shoal Lake at outlet (level gauge)", "role": "primary_source"},
+        "assiniboine": {"id": "05QB004", "province": "MB", "name": "Assiniboine River at Headingley",    "role": "regional_context"},
+    },
+    "source": {
+        "type": "surface",
+        "groundwater_pct": 0,
+        "primary": "Shoal Lake (Lake of the Woods), Ontario/Manitoba border — conveyed 154km via Greater Winnipeg Water District Aqueduct",
+        "watershed_protected": True,
+        "wfi_risk": "low",
+        "wfi_note": "Boreal Shield source watershed; low wildfire transmission risk to intake",
+    },
+    "storage": {
+        "reservoirs": {
+            "shoal_lake": {
+                "name": "Shoal Lake (natural lake)",
+                "max_dam3": None,
+                "data_note": "Shoal Lake is a large natural lake — capacity effectively unlimited relative to Winnipeg's demand. Real-time levels not in WSC network.",
+            },
+        },
+        "per_capita_dam3": None,
+        "data_note": "Shoal Lake provides effectively unlimited storage. The constraint is aqueduct capacity (390 ML/day), not lake volume.",
+        "last_updated": None,
+    },
+    "treatment": {
+        "plants": [
+            {"name": "Deacon WTP", "capacity_ml_day": 390, "process": "UV, chlorination, fluoride, orthophosphate (corrosion control), opened 2009"},
+        ],
+        "fluoridation": True,
+        "fluoride_note": None,
+        "data_note": "The 154km gravity-fed aqueduct from Shoal Lake was built in 1919. Deacon WTP (2009) replaced the original treatment infrastructure. Orthophosphate added for lead pipe corrosion control.",
+    },
+    "restriction": {
+        "system": "formal",
+        "system_url": "https://www.winnipeg.ca/waterandwaste/water/conservation/",
+        "stage": 0,
+        "stage_label": "No active restrictions",
+        "start_date": None,
+        "end_date": None,
+        "fine_cad": None,
+        "prohibitions": [],
+        "permitted": [],
+        "last_verified": "2026-06-14",
+        "hypothesized_triggers": "Winnipeg has a seasonal odd/even outdoor watering bylaw. Full restrictions uncommon given large source volume.",
+    },
+    "snowpack": {
+        "pct_of_normal": 91,
+        "reference": "April 1 peak, Lake of the Woods Basin",
+        "source": "Manitoba Hydrological Forecast Centre",
+        "note": "2026 reading — near normal",
+        "last_updated": "2026-05-01",
+    },
+    "risk": {
+        "wfi_risk": "low",
+        "infrastructure_risk": "moderate",
+        "single_point_of_failure": "The Greater Winnipeg Water District Aqueduct (154km, built 1919) is the sole conveyance from Shoal Lake. A major aqueduct failure would cut supply with no immediate alternative.",
+        "groundwater_dependency": False,
+        "climate_note": "Source water security is excellent. The primary risk is the aging aqueduct and the justice implications of the Shoal Lake #40 First Nation situation.",
+    },
+    "use": {
+        "per_capita_lpd": 280,
+        "residential_pct": 58,
+        "industrial_pct": 22,
+        "commercial_pct": 20,
+        "major_industrial_users": None,
+        "data_note": "Sector split approximate from City of Winnipeg annual report",
+    },
+    "egress": {
+        "treatment_type": "secondary",
+        "plants": ["North End Water Pollution Control Centre", "South End Water Pollution Control Centre"],
+        "discharge_point": "Red River",
+        "cso_risk": "moderate",
+        "cso_note": "Winnipeg has combined sewers in older neighbourhoods. North End WPCC upgrades ongoing to reduce CSO events.",
+        "data_note": None,
+    },
+}
+
+# ── TORONTO config ─────────────────────────────────────────────────────────────
+TORONTO = {
+    "meta": {
+        "city": "Toronto",
+        "province": "ON",
+        "operator": "City of Toronto (Toronto Water)",
+        "population_served": 3600000,
+        "per_capita_lpd": 200,
+        "per_capita_lpd_source": "Toronto Water 2023 Annual Report",
+        "dashboard": "waterwatch.criticalto.ca/toronto",
+    },
+    "stations": {
+        "don_river":    {"id": "02HC003", "province": "ON", "name": "Don River at Todmorden (watershed indicator)", "role": "watershed_indicator"},
+        "humber_river": {"id": "02HC009", "province": "ON", "name": "Humber River at Raymore Drive",               "role": "watershed_indicator"},
+    },
+    "source": {
+        "type": "surface",
+        "groundwater_pct": 0,
+        "primary": "Lake Ontario (sole source) — intake depth 6–9m, 1–3km offshore",
+        "watershed_protected": False,
+        "wfi_risk": "negligible",
+        "wfi_note": "Great Lakes source — no wildfire interface risk",
+        "lake_ontario_note": "Lake Ontario levels managed by IJC Plan 2014. Daily mean level updated by IJC on business days. Current level: 75.37m IGLD 1985.",
+    },
+    "storage": {
+        "reservoirs": {
+            "lake_ontario": {
+                "name": "Lake Ontario (de facto reservoir)",
+                "max_dam3": 1639000000,
+                "data_note": "Lake Ontario has ~1,639 km³ of water — effectively unlimited storage. Intake conditions (turbidity, temperature, algae) are the operational variable, not volume.",
+            },
+        },
+        "per_capita_dam3": None,
+        "data_note": "Lake Ontario provides essentially unlimited supply. Toronto Water's constraint is treatment capacity and distribution infrastructure, not source volume.",
+        "last_updated": None,
+        "source_url": "https://ijc.org/en/loslrb/watershed/water-levels",
+    },
+    "treatment": {
+        "plants": [
+            {"name": "R.C. Harris WTP",    "capacity_ml_day": 950,  "process": "conventional coagulation/sedimentation/filtration, UV, chlorination, fluoride. Built 1941 — Art Deco landmark."},
+            {"name": "F.J. Horgan WTP",    "capacity_ml_day": 950,  "process": "conventional + UV + chlorination + fluoride"},
+            {"name": "R.L. Clark WTP",     "capacity_ml_day": 600,  "process": "conventional + UV + chlorination + fluoride"},
+            {"name": "Island WTP",         "capacity_ml_day": 100,  "process": "conventional + UV + chlorination + fluoride. Serves Toronto Island."},
+        ],
+        "fluoridation": True,
+        "fluoride_note": None,
+        "data_note": "Total treatment capacity ~2,600 ML/day for a city using ~700 ML/day — significant redundancy. R.C. Harris WTP (1941) is a designated heritage building.",
+    },
+    "restriction": {
+        "system": "formal",
+        "system_url": "https://www.toronto.ca/services-payments/water-environment/tap-water-in-toronto/",
+        "stage": 0,
+        "stage_label": "No active restrictions",
+        "start_date": None,
+        "end_date": None,
+        "fine_cad": None,
+        "prohibitions": [],
+        "permitted": [],
+        "last_verified": "2026-06-14",
+        "hypothesized_triggers": "Toronto has a seasonal outdoor watering bylaw (odd/even by address). Full restrictions rare given Great Lakes source.",
+    },
+    "snowpack": {
+        "pct_of_normal": None,
+        "reference": "Not applicable — Lake Ontario source",
+        "source": None,
+        "note": "Toronto's supply is from Lake Ontario, not snowmelt-dependent watersheds. IJC manages lake levels under Plan 2014.",
+        "last_updated": None,
+    },
+    "risk": {
+        "wfi_risk": "negligible",
+        "infrastructure_risk": "low_moderate",
+        "single_point_of_failure": "None at source level — Lake Ontario is effectively unlimited. Distribution network age (many pipes pre-1950) is the primary infrastructure risk.",
+        "groundwater_dependency": False,
+        "climate_note": "Lake Ontario levels are above long-term average (75.37m vs historical mean). Climate risk is increasing algae and turbidity events near intakes, not supply volume.",
+    },
+    "use": {
+        "per_capita_lpd": 200,
+        "residential_pct": 55,
+        "industrial_pct": 20,
+        "commercial_pct": 25,
+        "major_industrial_users": None,
+        "data_note": "Toronto has one of the lowest per-capita uses of any major Canadian city — result of decades of conservation programming and metering.",
+    },
+    "egress": {
+        "treatment_type": "tertiary",
+        "plants": ["Humber WWTP", "Highland Creek WWTP", "North Toronto WWTP", "Ashbridges Bay WWTP"],
+        "discharge_point": "Lake Ontario",
+        "cso_risk": "moderate",
+        "cso_note": "Combined sewers in older (pre-1950) neighbourhoods. Wet weather flow management program ongoing. Ashbridges Bay WTP receives the largest volume.",
+        "data_note": "Toronto is one of few Canadian cities with tertiary wastewater treatment — phosphorus removal before Lake Ontario discharge.",
+    },
+}
+
+# ── OTTAWA config ──────────────────────────────────────────────────────────────
+OTTAWA = {
+    "meta": {
+        "city": "Ottawa",
+        "province": "ON",
+        "operator": "City of Ottawa (Ottawa Water Services)",
+        "population_served": 1100000,
+        "per_capita_lpd": 230,
+        "per_capita_lpd_source": "City of Ottawa 2023 Drinking Water Quality Report",
+        "dashboard": "waterwatch.criticalto.ca/ottawa",
+    },
+    "stations": {
+        "ottawa_river":  {"id": "02KF005", "province": "ON", "name": "Ottawa River at Ottawa (Britannia)",  "role": "primary_source"},
+        "rideau_river":  {"id": "02LA004", "province": "ON", "name": "Rideau River at Ottawa",              "role": "secondary_source"},
+    },
+    "source": {
+        "type": "surface",
+        "groundwater_pct": 0,
+        "primary": "Ottawa River (primary, ~90% of supply via Britannia WTP) + Rideau River (secondary, ~10% via Lemieux Island WTP)",
+        "watershed_protected": False,
+        "wfi_risk": "low",
+        "wfi_note": "Ottawa and Rideau River watersheds have low wildfire interface risk",
+    },
+    "storage": {
+        "reservoirs": {
+            "direct_intake": {
+                "name": "No reservoir — direct river intakes",
+                "max_dam3": None,
+                "data_note": "Ottawa draws directly from the Ottawa and Rideau Rivers with no storage reservoir. Distribution reservoirs provide limited buffer.",
+            },
+        },
+        "per_capita_dam3": None,
+        "data_note": "No source storage — similar vulnerability to Edmonton but mitigated by dual-river sourcing and higher baseline flows.",
+        "last_updated": None,
+    },
+    "treatment": {
+        "plants": [
+            {"name": "Britannia WTP",     "capacity_ml_day": 680, "process": "conventional + UV + chlorination + fluoride. Draws from Ottawa River."},
+            {"name": "Lemieux Island WTP","capacity_ml_day": 220, "process": "conventional + UV + chlorination + fluoride. Draws from Rideau River."},
+        ],
+        "fluoridation": True,
+        "fluoride_note": None,
+        "data_note": "Dual-source design provides operational redundancy. Ottawa River carries significant runoff from the Quebec highlands; Rideau River has chronic cyanobacteria issues in late summer.",
+    },
+    "restriction": {
+        "system": "formal",
+        "system_url": "https://ottawa.ca/en/residents/water-and-environment/water-services/water-conservation",
+        "stage": 0,
+        "stage_label": "No active restrictions",
+        "start_date": None,
+        "end_date": None,
+        "fine_cad": None,
+        "prohibitions": [],
+        "permitted": [],
+        "last_verified": "2026-06-14",
+        "hypothesized_triggers": "Ottawa uses seasonal watering bylaws (odd/even). Full restrictions historically rare.",
+    },
+    "snowpack": {
+        "pct_of_normal": 88,
+        "reference": "April 1 peak, Ottawa River Basin",
+        "source": "Ottawa River Regulation Planning Board",
+        "note": "2026 reading — near normal",
+        "last_updated": "2026-05-01",
+    },
+    "risk": {
+        "wfi_risk": "low",
+        "infrastructure_risk": "low_moderate",
+        "single_point_of_failure": "Ottawa River is primary source for ~90% of supply. A contamination event upstream (Quebec industrial corridor) could force full reliance on Rideau River, which has capacity for only ~25% of demand.",
+        "groundwater_dependency": False,
+        "climate_note": "Rideau River cyanobacteria blooms are increasing in frequency with warming summers. Ottawa River carries agricultural runoff from the Quebec highlands upstream.",
+    },
+    "use": {
+        "per_capita_lpd": 230,
+        "residential_pct": 58,
+        "industrial_pct": 20,
+        "commercial_pct": 22,
+        "major_industrial_users": None,
+        "data_note": "Sector split approximate from City of Ottawa annual report",
+    },
+    "egress": {
+        "treatment_type": "secondary",
+        "plants": ["Robert O. Pickard Environmental Centre (ROPEC)"],
+        "discharge_point": "Ottawa River",
+        "cso_risk": "moderate",
+        "cso_note": "Combined sewers in older urban areas. ROPEC handles all Ottawa wastewater.",
+        "data_note": None,
+    },
+}
+
 # ── CITIES REGISTRY ───────────────────────────────────────────────────────────
 CITIES = {
     "vancouver": VANCOUVER,
@@ -514,6 +874,10 @@ CITIES = {
     "calgary":   CALGARY,
     "edmonton":  EDMONTON,
     "canmore":   CANMORE,
+    "regina":    REGINA,
+    "winnipeg":  WINNIPEG,
+    "toronto":   TORONTO,
+    "ottawa":    OTTAWA,
 }
 
 # ── GLENMORE RESERVOIR (Calgary-specific) ────────────────────────────────────
@@ -694,7 +1058,7 @@ def build_city_payload(city_key: str, config: dict) -> dict:
 def main():
     print("waterwatch.criticalto.ca — national data fetch")
     print(f"  Time (UTC): {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')}")
-    print(f"  Cities: {', '.join(CITIES.keys())}")
+    print(f"  Cities ({len(CITIES)}): {', '.join(CITIES.keys())}")
 
     out_dir = Path(__file__).parent.parent / "site" / "data"
     out_dir.mkdir(parents=True, exist_ok=True)
