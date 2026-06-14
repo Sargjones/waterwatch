@@ -1120,7 +1120,8 @@ def main():
             for key, s in payload["watershed_inflow"].items():
                 level = f"{s['level_m']}m"          if s["level_m"]       is not None else "n/a"
                 flow  = f"{s['discharge_cms']} cms"  if s["discharge_cms"] is not None else "n/a"
-                print(f"    {key:18} [{s['status']:32}]  level={level}  flow={flow}")
+                status_display = s['status'].replace('|', '/') if s['status'] else 'unknown'
+                print(f"    {key:18} [{status_display:32}]  level={level}  flow={flow}")
             stage = payload["restriction"].get("stage_label") or f"Stage {payload['restriction']['stage']}"
             days  = payload["restriction"].get("days_remaining", 0)
             print(f"  Restriction: {stage}  ({days} days remaining)")
