@@ -34,7 +34,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--paper); color: var(--ink); font-family: var(--mono); font-size: 14px; line-height: 1.6; min-height: 100vh; }
 
-    .site-header { border-bottom: 1px solid var(--border-strong); padding: 1.25rem 2rem; background: var(--paper); display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+    .site-header { border-bottom: 1px solid var(--border-strong); padding: 1.25rem 2rem; background: var(--paper); display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; position: sticky; top: 0; z-index: 100; }
     .header-left .logo-mark { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
     .header-left .logo-region { font-size: 11px; font-weight: 500; color: var(--ink-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
     .city-nav { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 11px; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
@@ -181,12 +181,12 @@
   <div class="stations-grid">
     <div class="station-card">
       <div class="stn-head">
-        <div><div class="stn-name">Shoal Lake at outlet</div><div class="stn-id">05PB014</div></div>
-        <span class="river-badge badge-shoal">Source</span>
+        <div><div class="stn-name">Red River at Winnipeg</div><div class="stn-id">05OJ001</div></div>
+        <span class="river-badge badge-shoal">Regional</span>
       </div>
       <div class="stn-metrics">
-        <div><div class="m-label">Level</div><div class="m-value" id="level-shoal_lake">—</div><div class="m-unit">m</div></div>
-        <div><div class="m-label">Flow</div><div class="m-value" id="flow-shoal_lake">—</div><div class="m-unit">m³/s</div></div>
+        <div><div class="m-label">Discharge</div><div class="m-value" id="flow-red_river">—</div><div class="m-unit">m³/s</div></div>
+        <div><div class="m-label">Level</div><div class="m-value" id="level-red_river">—</div><div class="m-unit">m</div></div>
       </div>
     </div>
     <div class="station-card">
@@ -299,8 +299,8 @@
 </footer>
 
 <script>
-const KEYS = ['shoal_lake','assiniboine'];
-const COLOURS = { shoal_lake:'#1a5080', assiniboine:'#2a7ab0' };
+const KEYS = ['red_river','assiniboine'];
+const COLOURS = { red_river:'#1a5080', assiniboine:'#2a7ab0' };
 let chart=null, scale='linear';
 async function loadData() {
   try {
@@ -312,7 +312,8 @@ async function loadData() {
     const rEl=document.getElementById('restriction-val'); const rSub=document.getElementById('restriction-sub');
     if(rEl){rEl.textContent=stage===0?'None':`Stage ${stage}`;rEl.className='s-value '+(stage===0?'good':'risk');}
     if(rSub)rSub.textContent=d.restriction?.stage_label||'—';
-    if(d.watershed_inflow){KEYS.forEach(k=>{const s=d.watershed_inflow[k];if(!s)return;const fe=document.getElementById('flow-'+k);const le=document.getElementById('level-'+k);if(fe&&s.discharge_cms!=null)fe.textContent=parseFloat(s.discharge_cms).toFixed(1);if(le&&s.level_m!=null)le.textContent=parseFloat(s.level_m).toFixed(2);});}
+    if(d.watershed_inflow){KEYS.forEach(k=>{const s=d.watershed_inflow[k];if(!s)return;const fe=document.getElementById('flow-'+k);const le=document.getElementById('level-'+k);if(fe&&s.discharge_cms!=null)fe.textContent=parseFloat(s.discharge_cms).toFixed(1);if(le&&s.level_m!=null)le.textContent=parseFloat(s.level_m).toFixed(2);})
+  // Note: Shoal Lake (source) is not in WSC real-time network — Red River at Winnipeg used as regional indicator;}
     buildChart(d);
   } catch(e){document.getElementById('last-updated').textContent='Data unavailable';}
 }
@@ -321,7 +322,7 @@ function setScale(s){scale=s;['linear','log'].forEach(x=>document.getElementById
 function initMap(){
   const map=L.map('map').setView([49.8,-96.0],7);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
-  [{coords:[49.6000,-94.5000],id:'05PB014',name:'Shoal Lake outlet',colour:'#1a5080'},{coords:[49.9000,-97.4000],id:'05QB004',name:'Assiniboine at Headingley',colour:'#2a7ab0'}].forEach(s=>{const icon=L.divIcon({className:'',html:`<div style="width:12px;height:12px;background:${s.colour};border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.3)"></div>`,iconSize:[12,12],iconAnchor:[6,6]});L.marker(s.coords,{icon}).addTo(map).bindPopup(`<strong>${s.name}</strong><br><code>${s.id}</code>`);});
+  [{coords:[49.8888,-97.1347],id:'05OJ001',name:'Red River at Winnipeg',colour:'#1a5080'},{coords:[49.9000,-97.4000],id:'05QB004',name:'Assiniboine at Headingley',colour:'#2a7ab0'}].forEach(s=>{const icon=L.divIcon({className:'',html:`<div style="width:12px;height:12px;background:${s.colour};border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.3)"></div>`,iconSize:[12,12],iconAnchor:[6,6]});L.marker(s.coords,{icon}).addTo(map).bindPopup(`<strong>${s.name}</strong><br><code>${s.id}</code>`);});
   [{coords:[49.6100,-94.4800],label:'Shoal Lake #40 First Nation',colour:'#8b2060'},{coords:[49.8800,-97.1500],label:'Deacon WTP',colour:'#1a5080'},{coords:[49.8954,-97.1385],label:'Winnipeg',colour:'#555'}].forEach(p=>{const icon=L.divIcon({className:'',html:`<div style="width:10px;height:10px;background:${p.colour};border:2px solid white;border-radius:2px;"></div>`,iconSize:[10,10],iconAnchor:[5,5]});L.marker(p.coords,{icon}).addTo(map).bindPopup(`<strong>${p.label}</strong>`);});
   // Aqueduct line schematic
   L.polyline([[49.61,-94.48],[49.88,-97.15]],{color:'#1a5080',weight:2,opacity:0.5,dashArray:'6 3'}).addTo(map);
