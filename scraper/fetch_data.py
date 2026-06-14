@@ -36,6 +36,7 @@ import io
 import json
 import re
 import urllib.error
+import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
@@ -1456,9 +1457,6 @@ def fetch_nyc_opendata_wq() -> dict:
 
 # ── PAYLOAD BUILDER ───────────────────────────────────────────────────────────
 
-import urllib.parse  # needed for WaterOffice URL encoding
-
-
 def build_city_payload(city_key: str, config: dict) -> dict:
     """Build the full JSON payload for one city."""
     now_utc = datetime.now(timezone.utc).isoformat()
@@ -1540,18 +1538,19 @@ def main():
             with open(out_path, "w") as f:
                 json.dump(payload, f, indent=2)
             print(f"  Written -> {out_path}")
-            ok    = sum(1 for s in payload["watershed_inflow"].values() if s["status"].startswith("ok"))
+            ok    = sum(1 for s in payload["watershed_inflow"].values() if str(s.get("status","")).startswith("ok"))
             total = len(payload["watershed_inflow"])
             print(f"  Stations: {ok}/{total} ok")
             for key, s in payload["watershed_inflow"].items():
-                level  = f"{s['level_m']}m"         if s["level_m"]       is not None else "n/a"
-                flow   = f"{s['discharge_cms']} cms" if s["discharge_cms"] is not None else "n/a"
-                # FIX: sanitize status string before using as format argument
-                # (pipe character | in exception messages causes Python format spec crash)
-                status_display = (s["status"] or "unknown").replace("|", "/")
+                level  = f"{s['level_m']}m"         if s.get("level_m")       is not None else "n/a"
+                flow   = f"{s['discharge_cms']} cms" if s.get("discharge_cms") is not None else "n/a"
+                # FIX: sanitize status string — pipe character | in exception messages
+                # causes Python format spec crash; also guard against None
+                status_display = str(s.get("status") or "unknown").replace("|", "/")
                 print(f"    {key:20} [{status_display:36}]  level={level}  flow={flow}")
-            stage = payload["restriction"].get("stage_label") or f"Stage {payload['restriction']['stage']}"
-            days  = payload["restriction"].get("days_remaining", 0)
+            restriction = payload.get("restriction", {})
+            stage = restriction.get("stage_label") or f"Stage {restriction.get('stage', 0)}"
+            days  = restriction.get("days_remaining", 0)
             print(f"  Restriction: {stage}  ({days} days remaining)")
             results[city_key] = f"ok ({ok}/{total} stations)"
         except Exception as e:
