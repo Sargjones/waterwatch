@@ -328,8 +328,9 @@ EDMONTON = {
         "dashboard": "waterwatch.criticalto.ca/edmonton",
     },
     "stations": {
-        "nsr_edmonton": {"id": "05DF001", "province": "AB", "name": "North Saskatchewan River at Edmonton",        "role": "primary_source"},
-        "nsr_upstream": {"id": "05DA006", "province": "AB", "name": "North Saskatchewan River at Whirlpool Point", "role": "upstream_context"},
+        "nsr_upstream":  {"id": "05DA006", "province": "AB", "name": "North Saskatchewan R. at Whirlpool Point (headwaters)", "role": "upstream_context"},
+        "nsr_drayton":   {"id": "05DC001", "province": "AB", "name": "North Saskatchewan R. at Drayton Valley",               "role": "upstream_context"},
+        "nsr_edmonton":  {"id": "05DF001", "province": "AB", "name": "North Saskatchewan River at Edmonton (intake)",          "role": "primary_source"},
     },
     "source": {
         "type": "surface",
@@ -609,8 +610,9 @@ WINNIPEG = {
         "dashboard": "waterwatch.criticalto.ca/winnipeg",
     },
     "stations": {
-        "red_river":   {"id": "05OJ001", "province": "MB", "name": "Red River at Winnipeg",              "role": "regional_context"},
-        "assiniboine": {"id": "05QB004", "province": "MB", "name": "Assiniboine River at Headingley",    "role": "regional_context"},
+        "red_emerson":  {"id": "05OG001", "province": "MB", "name": "Red River at Emerson (US border crossing)", "role": "upstream_context"},
+        "red_river":    {"id": "05OJ001", "province": "MB", "name": "Red River at Winnipeg",                     "role": "primary_context"},
+        "assiniboine":  {"id": "05QB004", "province": "MB", "name": "Assiniboine River at Headingley",           "role": "regional_context"},
     },
     "source": {
         "type": "surface",
@@ -697,8 +699,9 @@ TORONTO = {
         "dashboard": "waterwatch.criticalto.ca/toronto",
     },
     "stations": {
-        "don_river":    {"id": "02HC003", "province": "ON", "name": "Don River at Todmorden (watershed indicator)", "role": "watershed_indicator"},
         "humber_river": {"id": "02HC009", "province": "ON", "name": "Humber River at Raymore Drive",               "role": "watershed_indicator"},
+        "don_river":    {"id": "02HC003", "province": "ON", "name": "Don River at Todmorden",                       "role": "watershed_indicator"},
+        "credit_river": {"id": "02HB008", "province": "ON", "name": "Credit River at Streetsville",                "role": "watershed_indicator"},
     },
     "source": {
         "type": "surface",
@@ -790,8 +793,9 @@ OTTAWA = {
         "dashboard": "waterwatch.criticalto.ca/ottawa",
     },
     "stations": {
-        "ottawa_river":  {"id": "02KF005", "province": "ON", "name": "Ottawa River at Ottawa (Britannia)",  "role": "primary_source"},
-        "rideau_river":  {"id": "02LA004", "province": "ON", "name": "Rideau River at Ottawa",              "role": "secondary_source"},
+        "ottawa_upstream": {"id": "02KF004", "province": "ON", "name": "Ottawa River at Arnprior (upstream)",  "role": "upstream_context"},
+        "ottawa_river":    {"id": "02KF005", "province": "ON", "name": "Ottawa River at Ottawa (Britannia)",   "role": "primary_source"},
+        "rideau_river":    {"id": "02LA004", "province": "ON", "name": "Rideau River at Ottawa",               "role": "secondary_source"},
     },
     "source": {
         "type": "surface",
@@ -885,6 +889,37 @@ GLENMORE_PDF_URL = "https://rivers.alberta.ca/forecasting/data/reports/Res_stora
 GLENMORE_STATION = "05BJ008"
 
 
+
+def fetch_glenmore_html() -> dict:
+    """Fallback: scrape Glenmore data from Alberta Rivers HTML table."""
+    try:
+        url = "https://rivers.alberta.ca/forecasting/reservoirs.html"
+        req = urllib.request.Request(url, headers={"User-Agent": "waterwatch-criticalto/1.0"})
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            html = resp.read().decode("utf-8", errors="replace")
+    except Exception as e:
+        return {"status": f"html_fetch_error: {str(e)[:80]}"}
+
+    # Look for Glenmore row in HTML table
+    # Pattern: Glenmore ... 05BJ008 ... storage ... max ... pct%
+    m = re.search(
+        r'Glenmore[^<]*</td>.*?05BJ008[^<]*</td>.*?([\d,]+)[^<]*</td>.*?([\d,]+)[^<]*</td>.*?(\d+)%[^<]*</td>.*?(ABOVE|NORMAL|BELOW)[^<]*</td>.*?(\d{4}-\d{2}-\d{2})',
+        html, re.DOTALL | re.IGNORECASE
+    )
+    if not m:
+        return {"status": "html_pattern_not_found"}
+
+    return {
+        "station_id":         GLENMORE_STATION,
+        "storage_dam3":       int(m.group(1).replace(",", "")),
+        "max_dam3":           int(m.group(2).replace(",", "")),
+        "pct_capacity":       int(m.group(3)),
+        "compared_to_normal": m.group(4).upper(),
+        "reading_date":       m.group(5),
+        "status":             "ok_html_fallback",
+    }
+
+
 def fetch_glenmore() -> dict:
     """Parse Glenmore Reservoir storage from Alberta Rivers PDF.
 
@@ -950,6 +985,11 @@ def fetch_glenmore() -> dict:
 
     dates = re.findall(r'\d{4}-\d{2}-\d{2}', text)
     date  = dates[0] if dates else None
+
+    # Validate results
+    if storage is None and pct is None:
+        print(f"    [Glenmore] WARNING: parsed None values — falling back to HTML scrape")
+        return fetch_glenmore_html()
 
     print(f"    [Glenmore] {storage} dam3 / {max_s} = {pct}% ({status})  date={date}")
     return {
@@ -1042,7 +1082,9 @@ def build_city_payload(city_key: str, config: dict) -> dict:
 
     if config.get("_fetch_glenmore"):
         print(f"    Glenmore Reservoir ({GLENMORE_STATION})...")
-        payload["glenmore"] = fetch_glenmore()
+        glenmore_result = fetch_glenmore()
+        payload["glenmore"] = glenmore_result
+        print(f"    [Glenmore] status={glenmore_result.get('status')} pct={glenmore_result.get('pct_capacity')}")
 
     # Legacy compatibility keys
     if "watershed_context" in config:
