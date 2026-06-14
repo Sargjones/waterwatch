@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WaterWatch — New York City</title>
+  <meta name="description" content="Live water supply intelligence for New York City. Catskill/Delaware watershed inflows, DEP reservoir system (98%+ storage), Delaware Aqueduct infrastructure story, CSO egress context.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --ink: #0d1520;
+      --ink-mid: #1e3a5f;
+      --ink-muted: #4a6580;
+      --paper: #f0f4f8;
+      --paper-warm: #e5edf4;
+      --paper-card: #f7fafd;
+      --accent: #1a4d7a;
+      --accent-light: #2e7ab8;
+      --danger: #8b2020;
+      --danger-light: #c0392b;
+      --amber: #7a4f00;
+      --amber-bg: #fdf3dc;
+      --catskill: #1a4d7a;     /* deep Atlantic navy — Catskill/Delaware */
+      --delaware: #2e6b9e;     /* mid blue — Delaware system */
+      --croton: #3a7d6b;       /* teal — Croton system */
+      --harbour: #0e5c8a;      /* harbour blue — egress */
+      --border: rgba(13,21,32,0.12);
+      --border-strong: rgba(13,21,32,0.25);
+      --mono: 'DM Mono', monospace;
+      --serif: 'Fraunces', serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .site-header { border-bottom: 1px solid var(--border-strong); padding: 1.25rem 2rem; display: flex; align-items: center; justify-content: space-between; background: var(--paper); position: sticky; top: 0; z-index: 1001; flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+    .header-top { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+    .logo { display: flex; align-items: baseline; gap: 0.5rem; }
+    .logo-mark { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
+    .logo-region { font-size: 11px; font-weight: 500; color: var(--ink-muted); letter-spacing: 0.08em; text-transform: uppercase; }
+    .header-meta { font-size: 11px; color: var(--ink-muted); text-align: right; }
+    .header-meta span { display: block; }
+    .live-dot { display: inline-block; width: 6px; height: 6px; background: var(--accent-light); border-radius: 50%; margin-right: 5px; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* ── Alert banner ── */
+    .alert-banner { background: var(--amber-bg); border-bottom: 2px solid var(--amber); padding: 0.75rem 2rem; display: flex; align-items: flex-start; gap: 1rem; font-size: 13px; color: var(--amber); }
+    .alert-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .alert-text { flex: 1; line-height: 1.5; }
+    .alert-text strong { color: var(--amber); }
+    .alert-text a { color: var(--accent); text-decoration: none; }
+    .alert-text a:hover { text-decoration: underline; }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+    /* ── Section labels ── */
+    .section-label { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+
+    /* ── Station cards ── */
+    .stations-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 2rem; }
+    .station-card { background: var(--paper-card); padding: 1.25rem 1.5rem; }
+    .station-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+    .station-name { font-size: 12px; font-weight: 500; color: var(--ink); }
+    .station-id { font-size: 10px; color: var(--ink-muted); font-family: var(--mono); margin-top: 2px; }
+    .station-system { font-size: 10px; color: var(--ink-muted); margin-top: 2px; font-style: italic; }
+    .river-badge { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 10px; letter-spacing: 0.05em; }
+    .badge-catskill  { background: rgba(26,77,122,0.12); color: var(--catskill); }
+    .badge-delaware  { background: rgba(46,107,158,0.12); color: var(--delaware); }
+    .badge-croton    { background: rgba(58,125,107,0.12); color: var(--croton); }
+    .station-metrics { display: flex; gap: 2rem; }
+    .stn-metric-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); }
+    .stn-metric-value { font-family: var(--serif); font-size: 1.75rem; font-weight: 700; line-height: 1.1; color: var(--ink); }
+    .stn-metric-unit { font-size: 10px; color: var(--ink-muted); }
+    .station-trend { font-size: 11px; margin-top: 0.5rem; color: var(--ink-muted); }
+    .trend-up { color: var(--danger-light); }
+    .trend-down { color: var(--catskill); }
+    .trend-stable { color: var(--accent); }
+
+    /* ── USGS note ── */
+    .usgs-note { font-size: 11px; color: var(--ink-muted); margin-bottom: 2rem; padding: 0.6rem 1rem; background: var(--paper-warm); border-left: 3px solid var(--border-strong); border-radius: 2px; }
+
+    /* ── Reservoir system ── */
+    .reservoir-system { margin-bottom: 2rem; }
+    .reservoir-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1rem; }
+    .system-pct-big { font-family: var(--serif); font-size: 3rem; font-weight: 700; color: var(--catskill); line-height: 1; }
+    .system-pct-label { font-size: 11px; color: var(--ink-muted); margin-top: 0.25rem; }
+    .system-consumption { text-align: right; }
+    .consumption-val { font-family: var(--serif); font-size: 1.75rem; font-weight: 700; color: var(--ink); }
+    .consumption-label { font-size: 10px; color: var(--ink-muted); }
+
+    .res-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+    .res-cell { background: var(--paper-card); padding: 1rem 1.25rem; }
+    .res-cell-name { font-size: 11px; font-weight: 500; color: var(--ink); margin-bottom: 0.25rem; }
+    .res-cell-system { font-size: 10px; color: var(--ink-muted); margin-bottom: 0.5rem; }
+    .res-cell-pct { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; color: var(--catskill); }
+    .res-cell-avail { font-size: 10px; color: var(--ink-muted); margin-top: 0.2rem; }
+    .bar-track { height: 5px; background: var(--paper-warm); border-radius: 2px; overflow: hidden; margin: 0.4rem 0; }
+    .bar-fill { height: 100%; border-radius: 2px; background: var(--catskill); transition: width 0.8s ease; }
+    .bar-fill.croton { background: var(--croton); }
+
+    /* ── WQ distribution panel ── */
+    .wq-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 2rem; }
+    .wq-cell { background: var(--paper-card); padding: 1rem 1.25rem; }
+    .wq-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 0.25rem; }
+    .wq-value { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; color: var(--ink); }
+    .wq-unit { font-size: 10px; color: var(--ink-muted); }
+    .wq-note { font-size: 10px; color: var(--ink-muted); margin-top: 0.25rem; }
+
+    /* ── Map ── */
+    #map { height: 320px; border-radius: 4px; border: 1px solid var(--border); margin-bottom: 2rem; position: relative; z-index: 1; }
+
+    /* ── Chart ── */
+    .chart-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; margin-bottom: 2rem; }
+    .chart-controls { display: flex; gap: 0.5rem; margin-bottom: 1rem; align-items: center; }
+    .chart-controls span { font-size: 11px; color: var(--ink-muted); margin-right: 0.25rem; }
+    .btn-toggle { font-family: var(--mono); font-size: 11px; padding: 3px 10px; border: 1px solid var(--border-strong); background: var(--paper); color: var(--ink-muted); border-radius: 3px; cursor: pointer; }
+    .btn-toggle.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+    /* ── System diagram ── */
+    .system-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; margin-bottom: 2rem; }
+    .system-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 12px; color: var(--ink-muted); padding: 0.4rem 0; }
+    .sys-node { background: var(--paper); border: 1px solid var(--border-strong); padding: 4px 10px; border-radius: 3px; color: var(--ink); font-size: 11px; }
+    .sys-node.cat { border-color: var(--catskill); color: var(--catskill); }
+    .sys-node.del { border-color: var(--delaware); color: var(--delaware); }
+    .sys-node.cro { border-color: var(--croton); color: var(--croton); }
+    .sys-node.risk { border-color: var(--amber); color: var(--amber); background: var(--amber-bg); }
+    .sys-node.harbour { border-color: var(--harbour); color: var(--harbour); }
+    .sys-arrow { color: var(--ink-muted); }
+    .system-divider { border: none; border-top: 1px dashed var(--border); margin: 0.5rem 0; }
+
+    /* ── Story cards ── */
+    .story-card { background: var(--paper-card); border: 1px solid var(--border); border-left: 4px solid var(--amber); border-radius: 4px; padding: 1.5rem; margin-bottom: 2rem; }
+    .story-card.blue { border-left-color: var(--catskill); }
+    .story-card.teal { border-left-color: var(--croton); }
+    .story-card h3 { font-family: var(--serif); font-size: 1.1rem; font-weight: 700; color: var(--amber); margin-bottom: 0.75rem; line-height: 1.3; }
+    .story-card.blue h3 { color: var(--catskill); }
+    .story-card.teal h3 { color: var(--croton); }
+    .story-card p { font-size: 13px; color: var(--ink-mid); margin-bottom: 0.75rem; line-height: 1.65; }
+    .story-card p:last-child { margin-bottom: 0; }
+    .story-card a { color: var(--accent); text-decoration: none; }
+    .story-card a:hover { text-decoration: underline; }
+    .timeline { margin: 1rem 0; border-left: 2px solid var(--border-strong); padding-left: 1.25rem; }
+    .tl-item { margin-bottom: 0.9rem; position: relative; }
+    .tl-item::before { content: ''; position: absolute; left: -1.45rem; top: 5px; width: 8px; height: 8px; border-radius: 50%; background: var(--amber); border: 2px solid var(--paper-card); }
+    .tl-item.resolved::before { background: var(--catskill); }
+    .tl-item.active-now::before { background: var(--danger-light); }
+    .tl-date { font-size: 10px; font-weight: 500; color: var(--ink-muted); letter-spacing: 0.06em; text-transform: uppercase; }
+    .tl-text { font-size: 13px; color: var(--ink-mid); line-height: 1.5; }
+
+    /* ── Stat row ── */
+    .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 2rem; }
+    .stat-cell { background: var(--paper-card); padding: 1.25rem 1.5rem; }
+    .stat-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 0.25rem; }
+    .stat-value { font-family: var(--serif); font-size: 1.75rem; font-weight: 700; color: var(--ink); line-height: 1.1; }
+    .stat-unit { font-size: 10px; color: var(--ink-muted); margin-top: 2px; }
+
+    /* ── Footer ── */
+    .site-footer { border-top: 1px solid var(--border-strong); padding: 1.5rem 2rem; font-size: 11px; color: var(--ink-muted); display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center; }
+    .footer-links a { color: var(--accent); text-decoration: none; margin-right: 1rem; }
+    .footer-links a:hover { text-decoration: underline; }
+
+    @media (max-width: 768px) {
+      main { padding: 1rem; }
+      .stations-grid { grid-template-columns: 1fr; }
+      .res-grid { grid-template-columns: 1fr 1fr; }
+      .wq-grid { grid-template-columns: 1fr 1fr; }
+      .stat-row { grid-template-columns: 1fr 1fr; }
+      .site-footer { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-top">
+    <div class="logo">
+      <span class="logo-mark">WaterWatch</span>
+      <span class="logo-region">New York City · criticalto.ca</span>
+    </div>
+    <div class="header-meta">
+      <span><span class="live-dot"></span>Updated every 6 hours</span>
+      <span id="last-updated">Loading…</span>
+    </div>
+  </div>
+  <nav style="display:flex;gap:1rem;flex-wrap:wrap;font-size:11px;padding-top:0.5rem;border-top:1px solid var(--border);width:100%">
+    <a href="/" style="color:var(--ink-muted);text-decoration:none">← National</a>
+    <a href="/vancouver.html" style="color:var(--ink-muted);text-decoration:none">Metro Vancouver</a>
+    <a href="/victoria.html" style="color:var(--ink-muted);text-decoration:none">Victoria, BC</a>
+    <a href="/calgary.html" style="color:var(--ink-muted);text-decoration:none">Calgary, AB</a>
+    <a href="/edmonton.html" style="color:var(--ink-muted);text-decoration:none">Edmonton, AB</a>
+    <a href="/canmore.html" style="color:var(--ink-muted);text-decoration:none">Canmore, AB</a>
+    <a href="/regina.html" style="color:var(--ink-muted);text-decoration:none">Regina, SK</a>
+    <a href="/winnipeg.html" style="color:var(--ink-muted);text-decoration:none">Winnipeg, MB</a>
+    <a href="/toronto.html" style="color:var(--ink-muted);text-decoration:none">Toronto, ON</a>
+    <a href="/ottawa.html" style="color:var(--ink-muted);text-decoration:none">Ottawa, ON</a>
+    <a href="/nyc.html" style="color:var(--ink);font-weight:500;border-bottom:2px solid var(--ink);padding-bottom:1px;text-decoration:none">New York City</a>
+  </nav>
+</header>
+
+<div class="alert-banner">
+  <span class="alert-icon">⚠</span>
+  <span class="alert-text">
+    <strong>Delaware Aqueduct — active leaks, bypass tunnel under construction.</strong>
+    The world's longest tunnel (~137 miles) carries ~50% of NYC's water and is leaking an estimated 20–35 million gallons/day near the Hudson River crossing.
+    Bypass tunnel completion expected 2026. System storage and watershed flows remain strong.
+    <a href="https://www.nyc.gov/site/dep/water/delaware-aqueduct.page" target="_blank">DEP update →</a>
+  </span>
+</div>
+
+<main>
+
+  <!-- KEY STATS ROW -->
+  <div class="stat-row" style="margin-bottom:2rem">
+    <div class="stat-cell">
+      <div class="stat-label">System Storage</div>
+      <div class="stat-value" id="stat-system-pct">—</div>
+      <div class="stat-unit">% of usable capacity</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">Daily Consumption</div>
+      <div class="stat-value" id="stat-consumption">—</div>
+      <div class="stat-unit">billion gallons / day</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">Per Capita Use</div>
+      <div class="stat-value">~110</div>
+      <div class="stat-unit">gallons / person / day</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">Population Served</div>
+      <div class="stat-value">9.5M</div>
+      <div class="stat-unit">NYC metro area</div>
+    </div>
+  </div>
+
+  <!-- WATERSHED INFLOW STATIONS (USGS) -->
+  <p class="section-label">Watershed Inflows — USGS Real-Time Stations</p>
+  <div class="stations-grid">
+
+    <div class="station-card">
+      <div class="station-head">
+        <div>
+          <div class="station-name">Esopus Creek at Coldbrook</div>
+          <div class="station-id">USGS 01362500</div>
+          <div class="station-system">Catskill system → Ashokan Reservoir</div>
+        </div>
+        <span class="river-badge badge-catskill">Catskill</span>
+      </div>
+      <div class="station-metrics">
+        <div>
+          <div class="stn-metric-label">Discharge</div>
+          <div class="stn-metric-value" id="flow-01362500">—</div>
+          <div class="stn-metric-unit">m³/s</div>
+        </div>
+        <div>
+          <div class="stn-metric-label">Level</div>
+          <div class="stn-metric-value" id="level-01362500">—</div>
+          <div class="stn-metric-unit">m</div>
+        </div>
+      </div>
+      <div class="station-trend" id="trend-01362500"></div>
+    </div>
+
+    <div class="station-card">
+      <div class="station-head">
+        <div>
+          <div class="station-name">W. Branch Delaware at Walton</div>
+          <div class="station-id">USGS 01417500</div>
+          <div class="station-system">Delaware system → Cannonsville Reservoir</div>
+        </div>
+        <span class="river-badge badge-delaware">Delaware</span>
+      </div>
+      <div class="station-metrics">
+        <div>
+          <div class="stn-metric-label">Discharge</div>
+          <div class="stn-metric-value" id="flow-01417500">—</div>
+          <div class="stn-metric-unit">m³/s</div>
+        </div>
+        <div>
+          <div class="stn-metric-label">Level</div>
+          <div class="stn-metric-value" id="level-01417500">—</div>
+          <div class="stn-metric-unit">m</div>
+        </div>
+      </div>
+      <div class="station-trend" id="trend-01417500"></div>
+    </div>
+
+    <div class="station-card">
+      <div class="station-head">
+        <div>
+          <div class="station-name">Bronx River at Bronxville</div>
+          <div class="station-id">USGS 01302000</div>
+          <div class="station-system">Croton watershed indicator</div>
+        </div>
+        <span class="river-badge badge-croton">Croton</span>
+      </div>
+      <div class="station-metrics">
+        <div>
+          <div class="stn-metric-label">Discharge</div>
+          <div class="stn-metric-value" id="flow-01302000">—</div>
+          <div class="stn-metric-unit">m³/s</div>
+        </div>
+        <div>
+          <div class="stn-metric-label">Level</div>
+          <div class="stn-metric-value" id="level-01302000">—</div>
+          <div class="stn-metric-unit">m</div>
+        </div>
+      </div>
+      <div class="station-trend" id="trend-01302000"></div>
+    </div>
+
+  </div>
+  <div class="usgs-note">
+    Discharge converted from cfs to m³/s (÷35.315) for cross-platform comparability.
+    Data: <a href="https://waterdata.usgs.gov/nwis/iv" target="_blank">USGS NWIS Instantaneous Values</a> — public domain, US federal government.
+    Note: USGS stations report watershed inflow conditions; NYC draws from the reservoir system, not directly from these rivers.
+  </div>
+
+  <!-- DEP RESERVOIR SYSTEM -->
+  <p class="section-label">NYC DEP Reservoir System — Daily Storage</p>
+  <div class="reservoir-system">
+    <div class="reservoir-header">
+      <div>
+        <div class="system-pct-big" id="dep-system-pct">—</div>
+        <div class="system-pct-label">Total system · % of usable storage</div>
+        <div style="font-size:11px;color:var(--ink-muted);margin-top:0.25rem;" id="dep-report-date"></div>
+      </div>
+      <div class="system-consumption">
+        <div class="consumption-val" id="dep-consumption">—</div>
+        <div class="consumption-label">billion gallons / day</div>
+        <div style="font-size:10px;color:var(--ink-muted);margin-top:0.25rem;" id="dep-consumption-date"></div>
+      </div>
+    </div>
+
+    <div class="res-grid">
+      <!-- Catskill/Delaware reservoirs -->
+      <div class="res-cell">
+        <div class="res-cell-name">Ashokan Reservoir</div>
+        <div class="res-cell-system">Catskill system</div>
+        <div class="res-cell-pct" id="res-ashokan-pct">—</div>
+        <div class="bar-track"><div class="bar-fill" id="res-ashokan-bar" style="width:0%"></div></div>
+        <div class="res-cell-avail" id="res-ashokan-avail"></div>
+      </div>
+      <div class="res-cell">
+        <div class="res-cell-name">Schoharie Reservoir</div>
+        <div class="res-cell-system">Catskill system</div>
+        <div class="res-cell-pct" id="res-schoharie-pct">—</div>
+        <div class="bar-track"><div class="bar-fill" id="res-schoharie-bar" style="width:0%"></div></div>
+        <div class="res-cell-avail" id="res-schoharie-avail"></div>
+      </div>
+      <div class="res-cell">
+        <div class="res-cell-name">Pepacton Reservoir</div>
+        <div class="res-cell-system">Delaware system</div>
+        <div class="res-cell-pct" id="res-pepacton-pct">—</div>
+        <div class="bar-track"><div class="bar-fill" id="res-pepacton-bar" style="width:0%"></div></div>
+        <div class="res-cell-avail" id="res-pepacton-avail"></div>
+      </div>
+      <div class="res-cell">
+        <div class="res-cell-name">Cannonsville Reservoir</div>
+        <div class="res-cell-system">Delaware system</div>
+        <div class="res-cell-pct" id="res-cannonsville-pct">—</div>
+        <div class="bar-track"><div class="bar-fill" id="res-cannonsville-bar" style="width:0%"></div></div>
+        <div class="res-cell-avail" id="res-cannonsville-avail"></div>
+      </div>
+      <div class="res-cell">
+        <div class="res-cell-name">Neversink Reservoir</div>
+        <div class="res-cell-system">Delaware system</div>
+        <div class="res-cell-pct" id="res-neversink-pct">—</div>
+        <div class="bar-track"><div class="bar-fill" id="res-neversink-bar" style="width:0%"></div></div>
+        <div class="res-cell-avail" id="res-neversink-avail"></div>
+      </div>
+      <div class="res-cell">
+        <div class="res-cell-name">Rondout Reservoir</div>
+        <div class="res-cell-system">Delaware system (connector)</div>
+        <div class="res-cell-pct" id="res-rondout-pct">—</div>
+        <div class="bar-track"><div class="bar-fill" id="res-rondout-bar" style="width:0%"></div></div>
+        <div class="res-cell-avail" id="res-rondout-avail"></div>
+      </div>
+      <div class="res-cell" style="grid-column: span 3; border-left: 3px solid var(--croton);">
+        <div class="res-cell-name">Croton System</div>
+        <div class="res-cell-system">12 reservoirs + 3 controlled lakes · Westchester &amp; Putnam Counties · ~10% of NYC supply</div>
+        <div class="res-cell-pct" id="res-croton-pct" style="color:var(--croton)">—</div>
+        <div class="bar-track"><div class="bar-fill croton" id="res-croton-bar" style="width:0%"></div></div>
+        <div class="res-cell-avail" id="res-croton-avail"></div>
+      </div>
+    </div>
+    <div style="font-size:10px;color:var(--ink-muted);margin-top:0.75rem;">
+      Source: <a href="https://www.nyc.gov/site/dep/water/reservoir-levels.page" target="_blank">NYC DEP Reservoir Levels</a> — updated daily.
+    </div>
+  </div>
+
+  <!-- MAP -->
+  <p class="section-label">Watershed &amp; Infrastructure Map</p>
+  <div id="map"></div>
+
+  <!-- FLOW CHART -->
+  <p class="section-label">Watershed Inflow — USGS Station Readings</p>
+  <div class="chart-card">
+    <div class="chart-controls">
+      <span>Scale:</span>
+      <button class="btn-toggle active" id="btn-linear" onclick="setScale('linear')">Linear</button>
+      <button class="btn-toggle" id="btn-log" onclick="setScale('log')">Log</button>
+    </div>
+    <canvas id="flowChart" style="max-height:260px"></canvas>
+    <div style="font-size:11px;color:var(--ink-muted);margin-top:0.75rem;">
+      Note: A single USGS snapshot reading is shown per station (no 7-day history available in current scraper config).
+      Chart will populate as history accumulates across runs.
+    </div>
+  </div>
+
+  <!-- DISTRIBUTION WATER QUALITY -->
+  <p class="section-label">Distribution Water Quality — NYC Open Data</p>
+  <div class="wq-grid">
+    <div class="wq-cell">
+      <div class="wq-label">Turbidity</div>
+      <div class="wq-value" id="wq-turbidity">—</div>
+      <div class="wq-unit">NTU</div>
+      <div class="wq-note">Target: &lt;1 NTU at tap</div>
+    </div>
+    <div class="wq-cell">
+      <div class="wq-label">Residual Chlorine</div>
+      <div class="wq-value" id="wq-chlorine">—</div>
+      <div class="wq-unit">mg/L</div>
+      <div class="wq-note">Min: 0.2 mg/L at tap</div>
+    </div>
+    <div class="wq-cell">
+      <div class="wq-label">Fluoride</div>
+      <div class="wq-value" id="wq-fluoride">—</div>
+      <div class="wq-unit">mg/L</div>
+      <div class="wq-note">Target: 0.7 mg/L</div>
+    </div>
+    <div class="wq-cell">
+      <div class="wq-label">Total Coliform</div>
+      <div class="wq-value" id="wq-coliform">—</div>
+      <div class="wq-unit">per 100 mL</div>
+      <div class="wq-note">Target: 0 (absent)</div>
+    </div>
+  </div>
+  <div style="font-size:10px;color:var(--ink-muted);margin-top:-1.5rem;margin-bottom:2rem;">
+    Monthly distribution monitoring data via <a href="https://data.cityofnewyork.us/Environment/Drinking-Water-Quality-Distribution-Monitoring-Dat/bkwf-xfky" target="_blank">NYC Open Data (bkwf-xfky)</a>.
+    Sample site: <span id="wq-site">—</span> · Date: <span id="wq-date">—</span>
+  </div>
+
+  <!-- SYSTEM DIAGRAM -->
+  <p class="section-label">NYC Dual Watershed Water System</p>
+  <div class="system-card">
+    <div style="font-size:11px;color:var(--ink-muted);margin-bottom:0.75rem;font-weight:500">CATSKILL / DELAWARE SYSTEM — ~90% of supply · unfiltered (Filtration Avoidance Determination)</div>
+    <div class="system-row">
+      <div class="sys-node cat">Esopus Creek (01362500)</div>
+      <span class="sys-arrow">→</span>
+      <div class="sys-node cat">Ashokan Reservoir</div>
+      <span class="sys-arrow">→</span>
+      <div class="sys-node risk">⚠ Catskill Aqueduct (1915)</div>
+      <span class="sys-arrow">→</span>
+      <div class="sys-node">Kensico Reservoir</div>
+      <span class="sys-arrow">→</span>
+      <div class="sys-node cat">UV + Chloramine</div>
+      <span class="sys-arrow">→</span>
+      <div class="sys-node">Distribution</div>
+    </div>
+    <div class="system-row">
+      <div class="sys-node del">W. Branch Delaware (01417500)</div>
+      <span class="sys-arrow">→</span>
+      <div class="sys-node del">Cannonsville / Delaware Reservoirs</div>
+      <span class="sys-arrow">→</span>
+      <div class="sys-node risk">⚠ Delaware Aqueduct (leaking)</div>
+      <span class="sys-arrow">→</span>
+      <div class="sys-node del">Rondout Reservoir</div>
+      <span class="sys-arrow">→</span>
+      <div class="sys-node">Kensico Reservoir</div>
+    </div>
+    <hr class="system-divider" style="margin:1rem 0">
+    <div style="font-size:11px;color:var(--ink-muted);margin-bottom:0.75rem;font-weight:500">CROTON SYSTEM — ~10% of supply · filtered at Jerome Park WFP, Bronx</div>
+    <div class="system-row">
+      <div class="sys-node cro">Bronx River (01302000)</div>
+      <span class="sys-arrow">→</span>
+      <div class="sys-node cro">12 Croton Reservoirs</div>
+      <span class="sys-arrow">→</span>
+      <div class="sys-node cro">Jerome Park WFP (Bronx)</div>
+      <span class="sys-arrow">→</span>
+      <div class="sys-node">Distribution</div>
+    </div>
+    <hr class="system-divider" style="margin:1rem 0">
+    <div style="font-size:11px;color:var(--ink-muted);margin-bottom:0.75rem;font-weight:500">EGRESS — 14 WRRFs · ~1.3 billion gallons/day</div>
+    <div class="system-row">
+      <div class="sys-node">NYC Distribution (~9.5M people)</div>
+      <span class="sys-arrow">→</span>
+      <div class="sys-node">Sewage (~1.3 BGD)</div>
+      <span class="sys-arrow">→</span>
+      <div class="sys-node risk">⚠ CSO Events (700+ outfalls)</div>
+      <span class="sys-arrow">+</span>
+      <div class="sys-node harbour">14 WRRFs (secondary treatment)</div>
+      <span class="sys-arrow">→</span>
+      <div class="sys-node harbour">NY Harbour / Atlantic</div>
+    </div>
+  </div>
+
+  <!-- INFRASTRUCTURE STORY: Delaware Aqueduct -->
+  <p class="section-label">Infrastructure Context — Delaware Aqueduct</p>
+  <div class="story-card blue">
+    <h3>The world's longest tunnel is leaking — and the fix requires cutting NYC's water in half</h3>
+    <p>
+      The Delaware Aqueduct is a 137-mile continuous concrete pressure tunnel bored through bedrock between 1939 and 1944 — at the time, the largest public works project in the world. It carries approximately 50% of New York City's daily water supply from the Rondout Reservoir in the Catskills to the Kensico Reservoir in Westchester. For over 80 years, it has operated without interruption. It is now leaking.
+    </p>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-date">1937–1945</div>
+        <div class="tl-text">Delaware Aqueduct bored and completed. A 13.5-foot diameter tunnel through 85 miles of Hudson Valley and Westchester bedrock — the largest continuous rock tunnel in the world at the time.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">1990s</div>
+        <div class="tl-text">DEP first identifies leakage at two locations: near Roseton (Hudson River crossing, Ulster County) and Wawarsing. Leaks estimated at 15–35 million gallons per day.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">2010</div>
+        <div class="tl-text">DEP begins planning a bypass tunnel — a new parallel segment around the two leak zones, avoiding a full shutdown of the main aqueduct.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">2013–2021</div>
+        <div class="tl-text">Bypass tunnel construction. The 2.5-mile bypass at Roseton and the 1-mile bypass at Wawarsing are bored through bedrock in parallel to the live aqueduct.</div>
+      </div>
+      <div class="tl-item active-now">
+        <div class="tl-date">2026 — Active</div>
+        <div class="tl-text">Delaware Aqueduct planned shutdown for bypass connection. NYC must operate on Catskill system + Croton system alone (~50% normal supply) during the repair window. Full reservoir storage (99%+) and conservation protocols are critical to this operation.</div>
+      </div>
+      <div class="tl-item resolved">
+        <div class="tl-date">Post-repair</div>
+        <div class="tl-text">Estimated 35 million gallons/day of leak eliminated. Delaware Aqueduct expected to operate for another 50+ years without major intervention.</div>
+      </div>
+    </div>
+    <p>
+      The reservoir system's current near-capacity status (98.9%) is not a coincidence — DEP has been managing storage levels in anticipation of the shutdown, when the city will depend entirely on the Catskill Aqueduct and Croton system. The Esopus Creek (01362500) and West Branch Delaware (01417500) flow readings are therefore operationally critical during this period.
+    </p>
+    <p><a href="https://www.nyc.gov/site/dep/water/delaware-aqueduct.page" target="_blank">NYC DEP — Delaware Aqueduct Bypass →</a></p>
+  </div>
+
+  <!-- STORY: Filtration Avoidance -->
+  <div class="story-card blue">
+    <h3>No filter. 9.5 million people. The most consequential water science decision in American history.</h3>
+    <p>
+      The Catskill/Delaware system — which provides 88–90% of New York City's drinking water — is not filtered. Water flows from the Catskill Mountains through 137 miles of tunnel directly to UV treatment and chloramine disinfection, then into the taps of 9.5 million people. This is only possible because of the Filtration Avoidance Determination (FAD), a regulatory status granted by the New York State Department of Health that recognises the Catskill/Delaware watershed is clean enough that filtration is unnecessary.
+    </p>
+    <p>
+      The FAD is renewed approximately every 10 years and requires NYC to meet strict watershed protection commitments: limits on development, agricultural practices, and septic systems across a 2,000-square-mile area; monitoring at hundreds of stations; rapid response to contamination events. The estimated cost of building a filtration plant for the Catskill/Delaware system — should the FAD ever be lost — is conservatively estimated at $10–15 billion, plus hundreds of millions annually to operate.
+    </p>
+    <p>
+      Only two large US cities hold Filtration Avoidance Determinations: New York City and Seattle. For NYC, it represents the most consequential water science decision in American municipal history — and one of the most successful examples of watershed protection as infrastructure investment anywhere in the world.
+    </p>
+  </div>
+
+  <!-- STORY: CSO / Harbour -->
+  <div class="story-card teal">
+    <h3>The other side of the water cycle: 700 outfalls, 1.3 billion gallons a day, and a harbour that came back from the dead</h3>
+    <p>
+      Approximately 60% of New York City is served by a combined sewer system, where a single pipe carries both wastewater and stormwater runoff. On a dry day, this all flows to one of NYC's 14 Wastewater Resource Recovery Facilities (WRRFs), which together treat approximately 1.3 billion gallons of wastewater daily before discharging to New York Harbour and the Atlantic Ocean. On a wet day — when rainfall overwhelms the system — combined sewer overflows (CSOs) discharge a mixture of stormwater and untreated sewage directly to the harbour through over 700 outfall pipes.
+    </p>
+    <p>
+      This is the part of the water cycle that connects conservation to the ocean. When New Yorkers use less water, sewage flows drop, reducing wet-weather overflow risk. When they overuse or when pavement prevents infiltration, the overflow burden grows. NYC has reduced CSO volumes by more than 80% since 1986 through billions in plant upgrades, real-time sewer controls, and green infrastructure. New York Harbour is measurably cleaner than at any point in the past century — striped bass, blue crabs, and bottlenose dolphins now inhabit waters that were effectively dead in the 1960s.
+    </p>
+    <p>
+      NYC DEP samples 85 stations across the harbour. Wastewater plant performance data (monthly, all 14 facilities) and harbour water quality data are publicly available via NYC Open Data.
+    </p>
+    <p>
+      <a href="https://data.cityofnewyork.us/Environment/Harbor-Water-Quality/5uug-f49n" target="_blank">NYC Open Data — Harbour Water Quality →</a> &nbsp;·&nbsp;
+      <a href="https://data.cityofnewyork.us/Environment/Wastewater-Treatment-Plant-Performance-Data/hgue-hj96" target="_blank">WRRF Performance Data →</a>
+    </p>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <div>
+    <strong>WaterWatch</strong> is a public intelligence tool built by
+    <a href="https://criticalto.ca" style="color:var(--accent)">CriticalTO</a>.
+    Not affiliated with NYC DEP or the City of New York.
+    Watershed flow data: USGS NWIS (public domain, US federal government).
+    Reservoir levels: NYC DEP (public domain, City of New York).
+    Distribution quality: NYC Open Data / Socrata (public domain).
+  </div>
+  <div class="footer-links">
+    <a href="https://www.nyc.gov/site/dep/water/reservoir-levels.page" target="_blank">DEP Reservoirs</a>
+    <a href="https://waterdata.usgs.gov/nwis" target="_blank">USGS NWIS</a>
+    <a href="https://data.cityofnewyork.us" target="_blank">NYC Open Data</a>
+    <a href="https://criticalto.ca" target="_blank">CriticalTO</a>
+  </div>
+</footer>
+
+<script>
+// ── NYC station config ───────────────────────────────────────────────────────
+const STATIONS = [
+  { id: '01362500', system: 'catskill', label: 'Catskill' },
+  { id: '01417500', system: 'delaware', label: 'Delaware' },
+  { id: '01302000', system: 'croton',   label: 'Croton' },
+];
+
+const SYSTEM_COLORS = {
+  catskill: '#1a4d7a',
+  delaware: '#2e6b9e',
+  croton:   '#3a7d6b',
+};
+
+// Reservoir key → element ID prefix mapping
+// Keys must match what fetch_nyc_dep_reservoirs() writes to the JSON
+// (regex-derived from the DEP page, lowercased + underscored)
+const RES_MAP = {
+  'ashokan_reservoir':     'ashokan',
+  'schoharie_reservoir':   'schoharie',
+  'pepacton_reservoir':    'pepacton',
+  'cannonsville_reservoir':'cannonsville',
+  'neversink_reservoir':   'neversink',
+  'rondout_reservoir':     'rondout',
+  'croton_system':         'croton',
+};
+
+let chartInstance = null;
+let chartScale = 'linear';
+let chartData = {};
+
+// ── Load data ────────────────────────────────────────────────────────────────
+async function loadData() {
+  try {
+    const resp = await fetch('data/nyc.json?t=' + Date.now());
+    if (!resp.ok) throw new Error('nyc.json not found');
+    const data = await resp.json();
+    renderAll(data);
+  } catch(e) {
+    console.warn('NYC data load error:', e);
+    document.getElementById('last-updated').textContent = 'Data unavailable';
+  }
+}
+
+function renderAll(data) {
+  // Header timestamp
+  if (data.meta?.generated_utc) {
+    const d = new Date(data.meta.generated_utc);
+    document.getElementById('last-updated').textContent =
+      'Data: ' + d.toLocaleDateString('en-CA', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
+
+  // USGS watershed inflow stations
+  if (data.watershed_inflow) {
+    STATIONS.forEach(stn => {
+      const s = data.watershed_inflow[
+        // Match by station key name in JSON (esopus_creek, w_branch_delaware, bronx_river)
+        Object.keys(data.watershed_inflow).find(k => data.watershed_inflow[k].station_id === stn.id)
+      ];
+      if (s) {
+        renderStationCard(stn.id, s);
+        chartData[stn.id] = { system: stn.system, name: s.station_name, flow: s.discharge_cms };
+      }
+    });
+  }
+
+  // DEP reservoirs
+  if (data.dep_reservoirs) renderDEPReservoirs(data.dep_reservoirs);
+
+  // Distribution WQ
+  if (data.distribution_quality) renderWQ(data.distribution_quality);
+
+  // Key stats
+  const dep = data.dep_reservoirs;
+  if (dep) {
+    if (dep.total_pct_usable != null)
+      document.getElementById('stat-system-pct').textContent = dep.total_pct_usable.toFixed(1) + '%';
+    if (dep.consumption_bg != null)
+      document.getElementById('stat-consumption').textContent = dep.consumption_bg.toFixed(2);
+  }
+
+  buildChart();
+  initMap(data.watershed_inflow);
+}
+
+function renderStationCard(siteNo, s) {
+  const flowEl  = document.getElementById('flow-'  + siteNo);
+  const levelEl = document.getElementById('level-' + siteNo);
+  const trendEl = document.getElementById('trend-' + siteNo);
+  if (flowEl  && s.discharge_cms != null) flowEl.textContent  = parseFloat(s.discharge_cms).toFixed(1);
+  if (levelEl && s.level_m != null)       levelEl.textContent = parseFloat(s.level_m).toFixed(2);
+  if (trendEl) {
+    if (s.status && s.status.startsWith('ok')) {
+      trendEl.className = 'station-trend trend-stable';
+      trendEl.textContent = '✓ ' + (s.timestamp ? s.timestamp.slice(0, 16) + ' UTC' : 'Data received');
+    } else {
+      trendEl.className = 'station-trend';
+      trendEl.textContent = s.status || 'unknown';
+    }
+  }
+}
+
+function renderDEPReservoirs(dep) {
+  // System total
+  const pctEl = document.getElementById('dep-system-pct');
+  if (pctEl && dep.total_pct_usable != null) pctEl.textContent = dep.total_pct_usable.toFixed(1) + '%';
+
+  const dateEl = document.getElementById('dep-report-date');
+  if (dateEl && dep.report_date) dateEl.textContent = 'As of ' + dep.report_date;
+
+  const consEl = document.getElementById('dep-consumption');
+  if (consEl && dep.consumption_bg != null) consEl.textContent = dep.consumption_bg.toFixed(2) + ' BG';
+
+  const consDEl = document.getElementById('dep-consumption-date');
+  if (consDEl && dep.consumption_date) consDEl.textContent = dep.consumption_date;
+
+  // Per-reservoir cells
+  if (!dep.reservoirs) return;
+  for (const [jsonKey, prefix] of Object.entries(RES_MAP)) {
+    const res = dep.reservoirs[jsonKey];
+    if (!res) continue;
+    const pct  = res.pct_usable;
+    const avail = res.available_bg;
+    const pctEl  = document.getElementById('res-' + prefix + '-pct');
+    const barEl  = document.getElementById('res-' + prefix + '-bar');
+    const availEl = document.getElementById('res-' + prefix + '-avail');
+    if (pctEl)   pctEl.textContent   = pct != null ? pct.toFixed(1) + '%' : '—';
+    if (barEl)   barEl.style.width   = (Math.min(pct || 0, 100)) + '%';
+    if (availEl) availEl.textContent = avail != null ? avail.toFixed(1) + ' BG available' : '';
+  }
+}
+
+function renderWQ(wq) {
+  const set = (id, val, decimals=2) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val != null ? parseFloat(val).toFixed(decimals) : '—';
+  };
+  set('wq-turbidity', wq.turbidity_ntu, 2);
+  set('wq-chlorine',  wq.residual_chlorine_mgl, 2);
+  set('wq-fluoride',  wq.fluoride_mgl, 2);
+  set('wq-coliform',  wq.coliform_per_100ml, 0);
+  const siteEl = document.getElementById('wq-site');
+  if (siteEl) siteEl.textContent = wq.latest_sample_site || '—';
+  const dateEl = document.getElementById('wq-date');
+  if (dateEl && wq.latest_sample_date) dateEl.textContent = wq.latest_sample_date.slice(0, 10);
+}
+
+// ── Chart ────────────────────────────────────────────────────────────────────
+function buildChart() {
+  const ctx = document.getElementById('flowChart').getContext('2d');
+  if (chartInstance) chartInstance.destroy();
+
+  const datasets = [];
+  const labels   = ['Current reading'];
+
+  for (const [siteNo, info] of Object.entries(chartData)) {
+    if (info.flow == null) continue;
+    datasets.push({
+      label:           info.name,
+      data:            [info.flow],
+      borderColor:     SYSTEM_COLORS[info.system],
+      backgroundColor: SYSTEM_COLORS[info.system] + '28',
+      borderWidth:     2,
+      pointRadius:     5,
+      fill:            false,
+    });
+  }
+
+  if (!datasets.length) return;
+  chartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: '#4a6580', font: { size: 11, family: 'DM Mono' } } },
+        tooltip: { backgroundColor: '#f7fafd', borderColor: 'rgba(13,21,32,0.25)', borderWidth: 1, titleColor: '#0d1520', bodyColor: '#4a6580' }
+      },
+      scales: {
+        x: { ticks: { color: '#4a6580', font: { size: 10 } }, grid: { color: 'rgba(13,21,32,0.07)' } },
+        y: { type: chartScale, title: { display: true, text: 'Discharge (m³/s)', color: '#4a6580', font: { size: 11 } }, ticks: { color: '#4a6580', font: { size: 10 } }, grid: { color: 'rgba(13,21,32,0.07)' } }
+      }
+    }
+  });
+}
+
+function setScale(scale) {
+  chartScale = scale;
+  document.getElementById('btn-linear').classList.toggle('active', scale === 'linear');
+  document.getElementById('btn-log').classList.toggle('active', scale === 'log');
+  buildChart();
+}
+
+// ── Map ───────────────────────────────────────────────────────────────────────
+function initMap(stationData) {
+  const map = L.map('map', { zoomControl: true }).setView([41.8, -74.5], 7);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap contributors © CARTO', subdomains: 'abcd', maxZoom: 19
+  }).addTo(map);
+
+  // USGS gauge stations
+  const gauges = [
+    { id: '01362500', name: 'Esopus Creek at Coldbrook', coords: [42.0487, -74.4754], colour: '#1a4d7a', system: 'Catskill → Ashokan' },
+    { id: '01417500', name: 'W. Branch Delaware at Walton', coords: [42.1665, -75.1313], colour: '#2e6b9e', system: 'Delaware → Cannonsville' },
+    { id: '01302000', name: 'Bronx River at Bronxville', coords: [40.9376, -73.8340], colour: '#3a7d6b', system: 'Croton watershed' },
+  ];
+  gauges.forEach(g => {
+    const s = stationData ? Object.values(stationData).find(v => v.station_id === g.id) : null;
+    const flowText = s && s.discharge_cms != null ? `${parseFloat(s.discharge_cms).toFixed(1)} m³/s` : 'no data';
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="width:13px;height:13px;background:${g.colour};border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,0.3)"></div>`,
+      iconSize: [13,13], iconAnchor: [6,6]
+    });
+    L.marker(g.coords, { icon }).addTo(map)
+      .bindPopup(`<strong>${g.name}</strong><br><code>${g.id}</code><br>${g.system}<br>Flow: ${flowText}`);
+  });
+
+  // Major reservoirs (approximate centroids)
+  const reservoirs = [
+    { name: 'Ashokan Reservoir',     coords: [41.9900, -74.2100], system: 'Catskill' },
+    { name: 'Schoharie Reservoir',   coords: [42.3600, -74.3800], system: 'Catskill' },
+    { name: 'Pepacton Reservoir',    coords: [42.0800, -74.9200], system: 'Delaware' },
+    { name: 'Cannonsville Reservoir',coords: [42.0600, -75.3700], system: 'Delaware' },
+    { name: 'Neversink Reservoir',   coords: [41.8300, -74.6300], system: 'Delaware' },
+    { name: 'Rondout Reservoir',     coords: [41.8700, -74.4400], system: 'Delaware (connector)' },
+    { name: 'New Croton Reservoir',  coords: [41.3200, -73.8700], system: 'Croton' },
+  ];
+  reservoirs.forEach(r => {
+    const colour = r.system.startsWith('Catskill') ? '#1a4d7a' : r.system.startsWith('Delaware') ? '#2e6b9e' : '#3a7d6b';
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="width:10px;height:10px;background:${colour};border:2px solid white;border-radius:2px;opacity:0.8"></div>`,
+      iconSize: [10,10], iconAnchor: [5,5]
+    });
+    L.marker(r.coords, { icon }).addTo(map)
+      .bindPopup(`<strong>${r.name}</strong><br>${r.system} system`);
+  });
+
+  // Infrastructure points
+  const infra = [
+    { coords: [41.5100, -74.0200], label: '⚠ Delaware Aqueduct — Roseton leak zone', colour: '#7a4f00' },
+    { coords: [41.7400, -74.3800], label: '⚠ Delaware Aqueduct — Wawarsing leak zone', colour: '#7a4f00' },
+    { coords: [40.8700, -73.8900], label: 'Jerome Park WFP (Croton treatment, Bronx)', colour: '#3a7d6b' },
+    { coords: [40.7400, -74.0100], label: 'Newtown Creek WRRF (largest WWTP)', colour: '#0e5c8a' },
+    { coords: [40.7900, -73.9400], label: 'Wards Island WRRF (Manhattan)', colour: '#0e5c8a' },
+    { coords: [40.5900, -73.9800], label: 'Coney Island WRRF', colour: '#0e5c8a' },
+  ];
+  infra.forEach(p => {
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="width:9px;height:9px;background:${p.colour};border:2px solid white;border-radius:1px;"></div>`,
+      iconSize: [9,9], iconAnchor: [4,4]
+    });
+    L.marker(p.coords, { icon }).addTo(map).bindPopup(`<strong>${p.label}</strong>`);
+  });
+
+  // NYC bounding box reference
+  L.rectangle([[40.48, -74.26], [40.92, -73.70]], {
+    color: '#1a4d7a', weight: 1, fill: false, dashArray: '4 4', opacity: 0.4
+  }).addTo(map).bindPopup('New York City (5 boroughs)');
+}
+
+loadData();
+</script>
+</body>
+</html>
