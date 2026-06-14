@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WaterWatch — Toronto</title>
+  <meta name="description" content="Live water supply intelligence for Toronto. Lake Ontario, four water treatment plants, RC Harris WTP, IJC-managed levels.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --ink: #0a0f1a;
+      --ink-mid: #1a2540;
+      --ink-muted: #3a5070;
+      --paper: #f4f0e6;
+      --paper-warm: #ede8d8;
+      --paper-card: #f9f6ee;
+      --accent: #1a3a6a;       /* Lake Ontario deep blue */
+      --accent-light: #2a5090;
+      --danger: #8b2020;
+      --danger-light: #c0392b;
+      --amber: #7a4f00;
+      --amber-bg: #fdf3dc;
+      --lake: #1a3a6a;
+      --river: #2a6090;
+      --border: rgba(10,15,26,0.12);
+      --border-strong: rgba(10,15,26,0.25);
+      --mono: 'DM Mono', monospace;
+      --serif: 'Fraunces', serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--paper); color: var(--ink); font-family: var(--mono); font-size: 14px; line-height: 1.6; min-height: 100vh; }
+
+    .site-header { border-bottom: 1px solid var(--border-strong); padding: 1.25rem 2rem; background: var(--paper); display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+    .header-left .logo-mark { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
+    .header-left .logo-region { font-size: 11px; font-weight: 500; color: var(--ink-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
+    .city-nav { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 11px; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+    .city-nav a { color: var(--ink-muted); text-decoration: none; white-space: nowrap; }
+    .city-nav a:hover { color: var(--ink); }
+    .city-nav a.active { color: var(--ink); font-weight: 500; border-bottom: 2px solid var(--accent); padding-bottom: 1px; }
+    .header-meta { font-size: 11px; color: var(--ink-muted); text-align: right; flex-shrink: 0; }
+    .header-meta span { display: block; }
+    .live-dot { display: inline-block; width: 6px; height: 6px; background: var(--accent-light); border-radius: 50%; margin-right: 5px; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
+
+    .info-banner { background: rgba(26,58,106,0.07); border-bottom: 2px solid var(--accent); padding: 0.75rem 2rem; font-size: 13px; color: var(--ink-muted); display:flex; gap:1rem; align-items:flex-start; }
+    .info-banner strong { color: var(--accent); }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+    .section-label { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+
+    .summary-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 2rem; }
+    .summary-card { background: var(--paper-card); padding: 1.25rem 1.5rem; }
+    .s-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 0.4rem; }
+    .s-value { font-family: var(--serif); font-size: 1.75rem; font-weight: 700; line-height: 1.1; color: var(--ink); }
+    .s-value.accent { color: var(--accent); }
+    .s-value.good { color: #2d6a35; }
+    .s-sub { font-size: 11px; color: var(--ink-muted); margin-top: 0.25rem; }
+
+    /* Lake Ontario level display */
+    .lake-level-card { background: var(--paper-card); border: 1px solid var(--border); border-left: 4px solid var(--lake); border-radius: 4px; padding: 1.5rem; margin-bottom: 2rem; display: grid; grid-template-columns: auto 1fr auto; gap: 1.5rem; align-items: center; }
+    .lake-level-main { font-family: var(--serif); font-size: 3rem; font-weight: 700; color: var(--lake); line-height: 1; }
+    .lake-level-unit { font-size: 13px; color: var(--ink-muted); margin-top: 4px; }
+    .lake-level-meta { font-size: 12px; color: var(--ink-muted); line-height: 1.7; }
+    .lake-level-meta strong { color: var(--ink); display: block; margin-bottom: 2px; }
+    .lake-status { text-align: right; }
+    .lake-status-val { font-size: 13px; font-weight: 500; }
+    .lake-status-val.above { color: #2d6a35; }
+    .lake-status-note { font-size: 11px; color: var(--ink-muted); margin-top: 4px; }
+
+    .stations-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 2rem; }
+    .station-card { background: var(--paper-card); padding: 1.25rem 1.5rem; }
+    .stn-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+    .stn-name { font-size: 12px; font-weight: 500; color: var(--ink); }
+    .stn-id { font-size: 10px; color: var(--ink-muted); margin-top: 2px; }
+    .river-badge { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 10px; }
+    .badge-indicator { background: rgba(26,58,106,0.1); color: var(--lake); }
+    .stn-metrics { display: flex; gap: 2rem; }
+    .m-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); }
+    .m-value { font-family: var(--serif); font-size: 1.75rem; font-weight: 700; line-height: 1.1; color: var(--ink); }
+    .m-unit { font-size: 10px; color: var(--ink-muted); }
+
+    /* WTP grid */
+    .wtp-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 2rem; }
+    .wtp-card { background: var(--paper-card); padding: 1.25rem 1.5rem; }
+    .wtp-name { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+    .wtp-capacity { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+    .wtp-unit { font-size: 10px; color: var(--ink-muted); }
+    .wtp-process { font-size: 11px; color: var(--ink-muted); margin-top: 6px; line-height: 1.5; }
+    .wtp-badge { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 3px; background: var(--amber-bg); color: var(--amber); margin-top: 4px; }
+
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+    .info-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; }
+    .info-card.lake { border-left: 3px solid var(--lake); }
+    .info-card.story { border-left: 4px solid var(--amber); }
+    .info-card h3 { font-size: 12px; font-weight: 500; color: var(--ink); margin-bottom: 0.5rem; }
+    .info-card h3.story-title { font-family: var(--serif); font-size: 1rem; font-weight: 700; color: var(--amber); }
+    .info-card p { font-size: 13px; color: var(--ink-muted); line-height: 1.65; margin-bottom: 0.6rem; }
+    .info-card p:last-child { margin-bottom: 0; }
+    .data-note { font-size: 11px; color: var(--ink-muted); background: var(--paper-warm); border-left: 3px solid var(--border-strong); padding: 0.5rem 0.75rem; border-radius: 0 3px 3px 0; margin-top: 0.75rem; }
+
+    #map { height: 280px; border-radius: 4px; border: 1px solid var(--border); margin-bottom: 2rem; }
+    .cycle-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 2rem; }
+    .cycle-cell { background: var(--paper-card); padding: 1.25rem; }
+    .cycle-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-muted); margin-bottom: 0.4rem; }
+    .cycle-value { font-size: 12px; font-weight: 500; color: var(--ink); }
+    .cycle-sub { font-size: 11px; color: var(--ink-muted); margin-top: 0.25rem; line-height: 1.5; }
+    .site-footer { border-top: 1px solid var(--border-strong); padding: 1.5rem 2rem; font-size: 11px; color: var(--ink-muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .site-footer a { color: var(--accent); text-decoration: none; }
+    @media (max-width:768px) { main{padding:1rem} .summary-grid,.stations-grid,.wtp-grid,.info-grid,.cycle-grid{grid-template-columns:1fr} .lake-level-card{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-left">
+    <div class="logo-mark">WaterWatch</div>
+    <div class="logo-region">Toronto · Ontario · criticalto.ca</div>
+    <nav class="city-nav">
+      <a href="/">← National</a>
+      <a href="/vancouver.html">Metro Vancouver</a>
+      <a href="/victoria.html">Victoria, BC</a>
+      <a href="/calgary.html">Calgary, AB</a>
+      <a href="/edmonton.html">Edmonton, AB</a>
+      <a href="/canmore.html">Canmore, AB</a>
+      <a href="/regina.html">Regina, SK</a>
+      <a href="/winnipeg.html">Winnipeg, MB</a>
+      <a href="/toronto.html" class="active">Toronto, ON</a>
+      <a href="/ottawa.html">Ottawa, ON</a>
+    </nav>
+  </div>
+  <div class="header-meta">
+    <span><span class="live-dot"></span>Updated every 6 hours</span>
+    <span id="last-updated">Loading…</span>
+  </div>
+</header>
+
+<div class="info-banner">
+  <span>💧</span>
+  <span><strong>Lake Ontario source.</strong> Toronto draws 100% of its drinking water from Lake Ontario. Levels managed internationally by the IJC under Plan 2014. Current lake level: <strong id="lake-level-banner">75.37 m</strong> IGLD 1985 — above long-term average.</span>
+</div>
+
+<main>
+
+  <p class="section-label">System at a Glance</p>
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="s-label">Source Type</div>
+      <div class="s-value accent">Lake Ontario</div>
+      <div class="s-sub">Sole source · IJC Plan 2014</div>
+    </div>
+    <div class="summary-card">
+      <div class="s-label">Treatment Capacity</div>
+      <div class="s-value accent">2,600</div>
+      <div class="s-sub">ML/day across 4 WTPs · demand ~700 ML/day</div>
+    </div>
+    <div class="summary-card">
+      <div class="s-label">Restriction Stage</div>
+      <div class="s-value good" id="restriction-val">—</div>
+      <div class="s-sub" id="restriction-sub">Loading…</div>
+    </div>
+    <div class="summary-card">
+      <div class="s-label">Per-Capita Use</div>
+      <div class="s-value accent">200</div>
+      <div class="s-sub">L/person/day — lowest of major Canadian cities</div>
+    </div>
+  </div>
+
+  <!-- Lake Ontario Level -->
+  <p class="section-label">Lake Ontario — Current Level</p>
+  <div class="lake-level-card">
+    <div>
+      <div class="lake-level-main" id="lake-level">75.37</div>
+      <div class="lake-level-unit">metres IGLD 1985</div>
+    </div>
+    <div class="lake-level-meta">
+      <strong>Lake Ontario daily mean level</strong>
+      Source: International Joint Commission (IJC) — Plan 2014<br>
+      Updated on business days using 6 gauging stations around the lake<br>
+      (Oswego NY, Rochester NY, Olcott NY, Port Weller ON, Toronto ON, Cobourg ON)
+    </div>
+    <div class="lake-status">
+      <div class="lake-status-val above" id="lake-status">Above average</div>
+      <div class="lake-status-note" id="lake-status-note">Above long-term mean<br>Well below 2017 record high</div>
+    </div>
+  </div>
+
+  <!-- Watershed indicator stations -->
+  <p class="section-label">Watershed Indicators — Toronto Area Rivers</p>
+  <div class="stations-grid">
+    <div class="station-card">
+      <div class="stn-head">
+        <div><div class="stn-name">Don River at Todmorden</div><div class="stn-id">02HC003</div></div>
+        <span class="river-badge badge-indicator">Urban indicator</span>
+      </div>
+      <div class="stn-metrics">
+        <div><div class="m-label">Discharge</div><div class="m-value" id="flow-don_river">—</div><div class="m-unit">m³/s</div></div>
+        <div><div class="m-label">Level</div><div class="m-value" id="level-don_river">—</div><div class="m-unit">m</div></div>
+      </div>
+    </div>
+    <div class="station-card">
+      <div class="stn-head">
+        <div><div class="stn-name">Humber River at Raymore Drive</div><div class="stn-id">02HC009</div></div>
+        <span class="river-badge badge-indicator">Urban indicator</span>
+      </div>
+      <div class="stn-metrics">
+        <div><div class="m-label">Discharge</div><div class="m-value" id="flow-humber_river">—</div><div class="m-unit">m³/s</div></div>
+        <div><div class="m-label">Level</div><div class="m-value" id="level-humber_river">—</div><div class="m-unit">m</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WTPs -->
+  <p class="section-label">Water Treatment Plants — Four Facilities</p>
+  <div class="wtp-grid">
+    <div class="wtp-card">
+      <div class="wtp-name">R.C. Harris Water Treatment Plant</div>
+      <div><span class="wtp-capacity">950</span><span class="wtp-unit"> ML/day</span></div>
+      <div class="wtp-process">Conventional coagulation/sedimentation/filtration · UV · Cl₂ · Fluoride · Intake: 3km offshore at 9m depth</div>
+      <div class="wtp-badge">🏛 Heritage building — opened 1941</div>
+    </div>
+    <div class="wtp-card">
+      <div class="wtp-name">F.J. Horgan Water Treatment Plant</div>
+      <div><span class="wtp-capacity">950</span><span class="wtp-unit"> ML/day</span></div>
+      <div class="wtp-process">Conventional + UV + Cl₂ + Fluoride · Scarborough Bluffs intake</div>
+    </div>
+    <div class="wtp-card">
+      <div class="wtp-name">R.L. Clark Water Treatment Plant</div>
+      <div><span class="wtp-capacity">600</span><span class="wtp-unit"> ML/day</span></div>
+      <div class="wtp-process">Conventional + UV + Cl₂ + Fluoride · Serves western Toronto</div>
+    </div>
+    <div class="wtp-card">
+      <div class="wtp-name">Island Water Treatment Plant</div>
+      <div><span class="wtp-capacity">100</span><span class="wtp-unit"> ML/day</span></div>
+      <div class="wtp-process">Conventional + UV + Cl₂ + Fluoride · Serves Toronto Island</div>
+    </div>
+  </div>
+
+  <!-- Stories -->
+  <p class="section-label">Infrastructure Context</p>
+  <div class="info-grid">
+    <div class="info-card story">
+      <h3 class="story-title">R.C. Harris — the most beautiful waterworks in the world</h3>
+      <p>The R.C. Harris Water Treatment Plant, opened in 1941 after a decade of construction through the Depression, is widely regarded as one of the finest examples of Art Deco public architecture in Canada. Its marble interiors, terrazzo floors, and lakefront setting led writer Michael Ondaatje to call it "the Palace of Purification" in his novel <em>In the Skin of a Lion</em>.</p>
+      <p>Harris was controversial in its time — critics argued that a water treatment plant didn't need marble floors during the Depression. The city's commissioner of works, Rowland Caldwell Harris, disagreed: he believed public infrastructure should be beautiful, durable, and built to last centuries.</p>
+      <p>At 85 years old, R.C. Harris is a designated heritage building still treating 950 ML/day — almost exactly as designed. It is one of the few civic infrastructure buildings in Canada where the architecture is as significant as the engineering.</p>
+    </div>
+    <div class="info-card lake">
+      <h3>Lake Ontario — unlimited supply, managed internationally</h3>
+      <p>Lake Ontario contains approximately 1,640 km³ of water — effectively unlimited supply for Toronto's purposes. Toronto Water's constraint is treatment capacity and distribution infrastructure, not source volume.</p>
+      <p>Lake levels are managed by the International Joint Commission under Plan 2014, which balances the interests of 8 million people who live along Lake Ontario and the St. Lawrence River — recreational users, shoreline property owners, commercial navigation, hydropower, and municipal water supply.</p>
+      <p>The lake is currently <strong>above its long-term average</strong> at 75.37 m IGLD 1985. The 2017 record high (75.88 m) caused significant shoreline flooding across the Great Lakes region and prompted review of the IJC regulation plan.</p>
+      <div class="data-note">Lake Ontario level is a daily mean updated by IJC on business days only. WaterWatch displays the most recent published value — not a real-time sensor reading.</div>
+    </div>
+  </div>
+
+  <!-- Map -->
+  <p class="section-label">Toronto Water System Map</p>
+  <div id="map"></div>
+
+  <!-- Cycle -->
+  <p class="section-label">Full Water Cycle</p>
+  <div class="cycle-grid">
+    <div class="cycle-cell">
+      <div class="cycle-label">Treatment</div>
+      <div class="cycle-value">4 WTPs · 2,600 ML/day total</div>
+      <div class="cycle-sub">Conventional + UV + Cl₂ + fluoride · Demand ~700 ML/day · ~4× redundancy</div>
+    </div>
+    <div class="cycle-cell">
+      <div class="cycle-label">Use</div>
+      <div class="cycle-value">200 L/person/day</div>
+      <div class="cycle-sub">Among lowest in Canada · Residential 55% · Industrial 20% · Commercial 25%</div>
+    </div>
+    <div class="cycle-cell">
+      <div class="cycle-label">Egress</div>
+      <div class="cycle-value">4 WWTPs incl. Ashbridges Bay</div>
+      <div class="cycle-sub">Tertiary treatment (phosphorus removal) · Discharge: Lake Ontario · CSO risk in older areas</div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <div>WaterWatch · <a href="https://criticalto.ca">criticalto.ca</a> · Flow data: Environment Canada · Lake level: IJC · Not affiliated with City of Toronto or Toronto Water.</div>
+  <div><a href="https://www.toronto.ca/services-payments/water-environment/tap-water-in-toronto/">Toronto Water</a> &nbsp; <a href="https://ijc.org/en/loslrb/watershed/water-levels">IJC Lake Ontario</a> &nbsp; <a href="https://wateroffice.ec.gc.ca">EC Water Office</a></div>
+</footer>
+
+<script>
+const KEYS = ['don_river','humber_river'];
+const COLOURS = { don_river:'#1a3a6a', humber_river:'#2a6090' };
+let chart=null;
+
+async function loadData() {
+  try {
+    const r = await fetch('data/toronto.json?t='+Date.now());
+    if (!r.ok) throw new Error();
+    const d = await r.json();
+    if (d.meta?.generated_utc) { const dt=new Date(d.meta.generated_utc); document.getElementById('last-updated').textContent='Data: '+dt.toLocaleDateString('en-CA',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+    const stage=d.restriction?.stage??0;
+    const rEl=document.getElementById('restriction-val'); const rSub=document.getElementById('restriction-sub');
+    if(rEl){rEl.textContent=stage===0?'None':`Stage ${stage}`;rEl.className='s-value '+(stage===0?'good':'risk');}
+    if(rSub)rSub.textContent=d.restriction?.stage_label||'—';
+    if(d.watershed_inflow){KEYS.forEach(k=>{const s=d.watershed_inflow[k];if(!s)return;const fe=document.getElementById('flow-'+k);const le=document.getElementById('level-'+k);if(fe&&s.discharge_cms!=null)fe.textContent=parseFloat(s.discharge_cms).toFixed(1);if(le&&s.level_m!=null)le.textContent=parseFloat(s.level_m).toFixed(2);});}
+    buildChart(d);
+  } catch(e){document.getElementById('last-updated').textContent='Data unavailable';}
+}
+
+function buildChart(d){
+  const ctx=document.getElementById('flowChart');if(!ctx)return;
+  if(chart)chart.destroy();
+  const labels=KEYS.map(k=>d.watershed_inflow?.[k]?.station_name||k);
+  const values=KEYS.map(k=>d.watershed_inflow?.[k]?.discharge_cms||null);
+  chart=new Chart(ctx.getContext('2d'),{type:'bar',data:{labels,datasets:[{label:'Discharge (m³/s)',data:values,backgroundColor:KEYS.map(k=>COLOURS[k]+'99'),borderColor:KEYS.map(k=>COLOURS[k]),borderWidth:2,borderRadius:3}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{backgroundColor:'#f9f6ee',borderColor:'rgba(10,15,26,.25)',borderWidth:1,titleColor:'#0a0f1a',bodyColor:'#3a5070'}},scales:{x:{ticks:{color:'#3a5070',font:{size:11}},grid:{color:'rgba(10,15,26,.07)'}},y:{title:{display:true,text:'Discharge (m³/s)',color:'#3a5070',font:{size:11}},ticks:{color:'#3a5070',font:{size:10}},grid:{color:'rgba(10,15,26,.07)'}}}}});
+}
+
+function initMap(){
+  const map=L.map('map').setView([43.68,-79.38],11);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
+  // WSC stations
+  [{coords:[43.685,-79.352],id:'02HC003',name:'Don River at Todmorden',colour:'#1a3a6a'},{coords:[43.660,-79.490],id:'02HC009',name:'Humber River at Raymore',colour:'#2a6090'}].forEach(s=>{
+    const icon=L.divIcon({className:'',html:`<div style="width:12px;height:12px;background:${s.colour};border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.3)"></div>`,iconSize:[12,12],iconAnchor:[6,6]});
+    L.marker(s.coords,{icon}).addTo(map).bindPopup(`<strong>${s.name}</strong><br><code>${s.id}</code>`);
+  });
+  // WTPs
+  [{coords:[43.679,-79.280],label:'R.C. Harris WTP (1941)'},{coords:[43.770,-79.185],label:'F.J. Horgan WTP'},{coords:[43.628,-79.498],label:'R.L. Clark WTP'},{coords:[43.627,-79.381],label:'Island WTP'}].forEach(p=>{
+    const icon=L.divIcon({className:'',html:`<div style="width:10px;height:10px;background:#1a3a6a;border:2px solid white;border-radius:2px;"></div>`,iconSize:[10,10],iconAnchor:[5,5]});
+    L.marker(p.coords,{icon}).addTo(map).bindPopup(`<strong>${p.label}</strong>`);
+  });
+  // Lake Ontario schematic
+  L.polyline([[43.64,-79.50],[43.64,-79.18]],{color:'#1a3a6a',weight:3,opacity:0.2}).addTo(map);
+}
+initMap(); loadData();
+</script>
+</body>
+</html>

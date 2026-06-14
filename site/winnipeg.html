@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WaterWatch — Winnipeg</title>
+  <meta name="description" content="Live water supply intelligence for Winnipeg. Shoal Lake aqueduct, Shoal Lake 40 First Nation justice story, Deacon WTP.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --ink: #0a1520;
+      --ink-mid: #1a3040;
+      --ink-muted: #3a6080;
+      --paper: #f4f0e6;
+      --paper-warm: #ede8d8;
+      --paper-card: #f9f6ee;
+      --accent: #1a5080;       /* Red River deep blue */
+      --accent-light: #2a7ab0;
+      --danger: #8b2020;
+      --danger-light: #c0392b;
+      --amber: #7a4f00;
+      --amber-bg: #fdf3dc;
+      --shoal: #1a5080;
+      --assini: #2a7ab0;
+      --border: rgba(10,21,32,0.12);
+      --border-strong: rgba(10,21,32,0.25);
+      --mono: 'DM Mono', monospace;
+      --serif: 'Fraunces', serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--paper); color: var(--ink); font-family: var(--mono); font-size: 14px; line-height: 1.6; min-height: 100vh; }
+
+    .site-header { border-bottom: 1px solid var(--border-strong); padding: 1.25rem 2rem; background: var(--paper); display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+    .header-left .logo-mark { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
+    .header-left .logo-region { font-size: 11px; font-weight: 500; color: var(--ink-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
+    .city-nav { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 11px; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+    .city-nav a { color: var(--ink-muted); text-decoration: none; white-space: nowrap; }
+    .city-nav a:hover { color: var(--ink); }
+    .city-nav a.active { color: var(--ink); font-weight: 500; border-bottom: 2px solid var(--accent); padding-bottom: 1px; }
+    .header-meta { font-size: 11px; color: var(--ink-muted); text-align: right; flex-shrink: 0; }
+    .header-meta span { display: block; }
+    .live-dot { display: inline-block; width: 6px; height: 6px; background: var(--accent-light); border-radius: 50%; margin-right: 5px; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
+
+    .justice-banner { background: #1a1a2e; border-bottom: 3px solid var(--accent); padding: 1rem 2rem; display: flex; gap: 1rem; align-items: flex-start; }
+    .justice-banner .icon { font-size: 1.5rem; flex-shrink: 0; }
+    .justice-banner .text { font-size: 13px; color: #c8d8e8; line-height: 1.6; }
+    .justice-banner strong { color: #e8f0f8; }
+    .justice-banner a { color: #6ab0e0; text-decoration: none; }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+    .section-label { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+
+    .summary-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 2rem; }
+    .summary-card { background: var(--paper-card); padding: 1.25rem 1.5rem; }
+    .s-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 0.4rem; }
+    .s-value { font-family: var(--serif); font-size: 1.75rem; font-weight: 700; line-height: 1.1; color: var(--ink); }
+    .s-value.accent { color: var(--accent); }
+    .s-value.good { color: #2d6a35; }
+    .s-value.warn { color: var(--amber); }
+    .s-value.risk { color: var(--danger-light); }
+    .s-sub { font-size: 11px; color: var(--ink-muted); margin-top: 0.25rem; }
+
+    .stations-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 2rem; }
+    .station-card { background: var(--paper-card); padding: 1.25rem 1.5rem; }
+    .stn-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+    .stn-name { font-size: 12px; font-weight: 500; color: var(--ink); }
+    .stn-id { font-size: 10px; color: var(--ink-muted); margin-top: 2px; }
+    .river-badge { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 10px; }
+    .badge-shoal { background: rgba(26,80,128,0.12); color: var(--shoal); }
+    .badge-assini { background: rgba(42,122,176,0.12); color: var(--assini); }
+    .stn-metrics { display: flex; gap: 2rem; }
+    .m-label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); }
+    .m-value { font-family: var(--serif); font-size: 1.75rem; font-weight: 700; line-height: 1.1; color: var(--ink); }
+    .m-unit { font-size: 10px; color: var(--ink-muted); }
+
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+    .info-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; }
+    .info-card.shoal { border-left: 3px solid var(--shoal); }
+    .info-card.justice { border-left: 4px solid #8b2060; background: #fef8fc; }
+    .info-card h3 { font-size: 12px; font-weight: 500; color: var(--ink); margin-bottom: 0.5rem; }
+    .info-card h3.justice-title { font-family: var(--serif); font-size: 1rem; font-weight: 700; color: #8b2060; }
+    .info-card p { font-size: 13px; color: var(--ink-muted); line-height: 1.65; margin-bottom: 0.6rem; }
+    .info-card p:last-child { margin-bottom: 0; }
+    .info-card a { color: var(--accent); text-decoration: none; }
+    .info-card a:hover { text-decoration: underline; }
+    .data-note { font-size: 11px; color: var(--ink-muted); background: var(--paper-warm); border-left: 3px solid var(--border-strong); padding: 0.5rem 0.75rem; border-radius: 0 3px 3px 0; margin-top: 0.75rem; }
+    .timeline { margin: 1rem 0; border-left: 2px solid var(--border-strong); padding-left: 1.25rem; }
+    .tl-item { margin-bottom: 0.75rem; position: relative; }
+    .tl-item::before { content:''; position:absolute; left:-1.45rem; top:5px; width:8px; height:8px; border-radius:50%; background:#8b2060; border:2px solid var(--paper-card); }
+    .tl-item.resolved::before { background: #2d6a35; }
+    .tl-date { font-size: 10px; font-weight: 500; color: var(--ink-muted); letter-spacing: 0.06em; text-transform: uppercase; }
+    .tl-text { font-size: 13px; color: var(--ink-mid); line-height: 1.5; }
+
+    .system-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; margin-bottom: 2rem; }
+    .system-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 12px; color: var(--ink-muted); padding: 0.4rem 0; }
+    .sys-node { background: var(--paper); border: 1px solid var(--border-strong); padding: 4px 10px; border-radius: 3px; color: var(--ink); font-size: 11px; }
+    .sys-node.primary { border-color: var(--shoal); color: var(--shoal); }
+    .sys-node.warn { border-color: var(--amber); color: var(--amber); background: var(--amber-bg); }
+    .sys-arrow { color: var(--ink-muted); }
+
+    #map { height: 280px; border-radius: 4px; border: 1px solid var(--border); margin-bottom: 2rem; }
+    .chart-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; margin-bottom: 2rem; }
+    .chart-controls { display: flex; gap: 0.5rem; margin-bottom: 1rem; align-items: center; }
+    .chart-controls span { font-size: 11px; color: var(--ink-muted); }
+    .btn-toggle { font-family: var(--mono); font-size: 11px; padding: 3px 10px; border: 1px solid var(--border-strong); background: var(--paper); color: var(--ink-muted); border-radius: 3px; cursor: pointer; }
+    .btn-toggle.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+    .cycle-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 2rem; }
+    .cycle-cell { background: var(--paper-card); padding: 1.25rem; }
+    .cycle-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-muted); margin-bottom: 0.4rem; }
+    .cycle-value { font-size: 12px; font-weight: 500; color: var(--ink); }
+    .cycle-sub { font-size: 11px; color: var(--ink-muted); margin-top: 0.25rem; line-height: 1.5; }
+    .site-footer { border-top: 1px solid var(--border-strong); padding: 1.5rem 2rem; font-size: 11px; color: var(--ink-muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .site-footer a { color: var(--accent); text-decoration: none; }
+    @media (max-width:768px) { main{padding:1rem} .summary-grid,.stations-grid,.info-grid,.cycle-grid{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-left">
+    <div class="logo-mark">WaterWatch</div>
+    <div class="logo-region">Winnipeg · Manitoba · criticalto.ca</div>
+    <nav class="city-nav">
+      <a href="/">← National</a>
+      <a href="/vancouver.html">Metro Vancouver</a>
+      <a href="/victoria.html">Victoria, BC</a>
+      <a href="/calgary.html">Calgary, AB</a>
+      <a href="/edmonton.html">Edmonton, AB</a>
+      <a href="/canmore.html">Canmore, AB</a>
+      <a href="/regina.html">Regina, SK</a>
+      <a href="/winnipeg.html" class="active">Winnipeg, MB</a>
+      <a href="/toronto.html">Toronto, ON</a>
+      <a href="/ottawa.html">Ottawa, ON</a>
+    </nav>
+  </div>
+  <div class="header-meta">
+    <span><span class="live-dot"></span>Updated every 6 hours</span>
+    <span id="last-updated">Loading…</span>
+  </div>
+</header>
+
+<div class="justice-banner">
+  <span class="icon">⚖️</span>
+  <div class="text">
+    <strong>Shoal Lake #40 First Nation</strong> was cut off from road access and effectively isolated by the construction of Winnipeg's water aqueduct in 1919. The community was under a boil water advisory from <strong>1997 to 2021</strong> — 24 years — while providing the source of Winnipeg's drinking water. Freedom Road, completed in 2019, ended the isolation but not the broader reconciliation work. <a href="https://shoallake40.ca" target="_blank">Shoal Lake #40 Nation →</a>
+  </div>
+</div>
+
+<main>
+
+  <p class="section-label">System at a Glance</p>
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="s-label">Source Type</div>
+      <div class="s-value accent">Surface</div>
+      <div class="s-sub">Shoal Lake, ON/MB border · 154km aqueduct</div>
+    </div>
+    <div class="summary-card">
+      <div class="s-label">Aqueduct</div>
+      <div class="s-value accent">154 km</div>
+      <div class="s-sub">Gravity-fed · Built 1919 · 390 ML/day capacity</div>
+    </div>
+    <div class="summary-card">
+      <div class="s-label">Restriction Stage</div>
+      <div class="s-value good" id="restriction-val">—</div>
+      <div class="s-sub" id="restriction-sub">Loading…</div>
+    </div>
+    <div class="summary-card">
+      <div class="s-label">Per-Capita Use</div>
+      <div class="s-value accent">280</div>
+      <div class="s-sub">L/person/day · City of Winnipeg 2023</div>
+    </div>
+  </div>
+
+  <p class="section-label">Live Water Stations</p>
+  <div class="stations-grid">
+    <div class="station-card">
+      <div class="stn-head">
+        <div><div class="stn-name">Shoal Lake at outlet</div><div class="stn-id">05PB014</div></div>
+        <span class="river-badge badge-shoal">Source</span>
+      </div>
+      <div class="stn-metrics">
+        <div><div class="m-label">Level</div><div class="m-value" id="level-shoal_lake">—</div><div class="m-unit">m</div></div>
+        <div><div class="m-label">Flow</div><div class="m-value" id="flow-shoal_lake">—</div><div class="m-unit">m³/s</div></div>
+      </div>
+    </div>
+    <div class="station-card">
+      <div class="stn-head">
+        <div><div class="stn-name">Assiniboine River at Headingley</div><div class="stn-id">05QB004</div></div>
+        <span class="river-badge badge-assini">Regional context</span>
+      </div>
+      <div class="stn-metrics">
+        <div><div class="m-label">Discharge</div><div class="m-value" id="flow-assiniboine">—</div><div class="m-unit">m³/s</div></div>
+        <div><div class="m-label">Level</div><div class="m-value" id="level-assiniboine">—</div><div class="m-unit">m</div></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="section-label">Infrastructure & Justice Context</p>
+  <div class="info-grid">
+
+    <div class="info-card shoal">
+      <h3>The Greater Winnipeg Water District Aqueduct</h3>
+      <p>Built between 1915 and 1919, the Greater Winnipeg Water District Aqueduct is one of the great engineering achievements of early 20th century Canada. At 154 km, it is one of the longest gravity-fed municipal water aqueducts in North America, moving water from Shoal Lake (Lake of the Woods) entirely by gravity — no pumps — to Winnipeg's Deacon Water Treatment Plant.</p>
+      <p>The aqueduct was designed by city engineers at a time when Winnipeg was the fastest-growing city in Canada, and when waterborne typhoid had killed hundreds. It worked exactly as designed for over 100 years before the Deacon WTP (2009) replaced the original treatment infrastructure built alongside it.</p>
+      <p>The aqueduct is the single most critical piece of infrastructure in Winnipeg's water system — a failure of the aqueduct would cut supply with no alternative conveyance at scale.</p>
+      <div class="data-note">Aqueduct condition assessments are conducted periodically by the City of Winnipeg. Condition data is not publicly available in real-time.</div>
+    </div>
+
+    <div class="info-card justice">
+      <h3 class="justice-title">Shoal Lake #40 — a century of injustice at the source</h3>
+      <p>When Winnipeg built its aqueduct in 1919, the city constructed an artificial channel that turned the Shoal Lake #40 First Nation's peninsula into an island, cutting the community off from road access to the mainland for 100 years.</p>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-date">1919</div>
+          <div class="tl-text">Aqueduct construction isolates Shoal Lake #40 community on artificial island. Community's land and water expropriated.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">1997</div>
+          <div class="tl-text">Shoal Lake #40 placed under boil water advisory. Winnipeg continues drawing drinking water from Shoal Lake.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">2015</div>
+          <div class="tl-text">"Museum of Canadian Human Rights Violations" sign erected at community entrance — a direct response to the Canadian Museum for Human Rights opening in Winnipeg.</div>
+        </div>
+        <div class="tl-item resolved">
+          <div class="tl-date">2019</div>
+          <div class="tl-text">Freedom Road completed — a 24km all-season road connecting Shoal Lake #40 to the mainland, ending 100 years of isolation. Funded jointly by federal, provincial, and municipal governments after years of advocacy.</div>
+        </div>
+        <div class="tl-item resolved">
+          <div class="tl-date">2021</div>
+          <div class="tl-text">Boil water advisory lifted after 24 years. New water treatment infrastructure finally built for the community.</div>
+        </div>
+      </div>
+      <p>The Shoal Lake #40 story is inseparable from Winnipeg's water supply story. For over a century, a First Nation community was isolated and denied clean water while providing the source of drinking water for Canada's seventh-largest city.</p>
+      <p><a href="https://shoallake40.ca" target="_blank">Shoal Lake #40 First Nation →</a> · <a href="https://www.winnipeg.ca/waterandwaste/water/shoal-lake.stm" target="_blank">City of Winnipeg — Shoal Lake →</a></p>
+    </div>
+
+  </div>
+
+  <p class="section-label">Winnipeg Water System</p>
+  <div class="system-card">
+    <div class="system-row">
+      <div class="sys-node primary">Shoal Lake (Lake of the Woods)</div>
+      <span class="sys-arrow">→</span>
+      <div class="sys-node warn">154km Aqueduct (built 1919)</div>
+      <span class="sys-arrow">→</span>
+      <div class="sys-node primary">Deacon WTP (390 ML/day)</div>
+      <span class="sys-arrow">→</span>
+      <div class="sys-node">Distribution · 800K people</div>
+    </div>
+    <div class="system-row" style="margin-top:.5rem;font-size:11px;color:var(--ink-muted)">
+      Egress: North End WPCC + South End WPCC → Red River · Shoal Lake level gauge: 05PB014
+    </div>
+  </div>
+
+  <p class="section-label">Station Map</p>
+  <div id="map"></div>
+
+  <p class="section-label">Flow Profile</p>
+  <div class="chart-card">
+    <div class="chart-controls">
+      <span>Scale:</span>
+      <button class="btn-toggle active" id="btn-linear" onclick="setScale('linear')">Linear</button>
+      <button class="btn-toggle" id="btn-log" onclick="setScale('log')">Log</button>
+    </div>
+    <canvas id="flowChart" style="max-height:240px"></canvas>
+  </div>
+
+  <p class="section-label">Full Water Cycle</p>
+  <div class="cycle-grid">
+    <div class="cycle-cell">
+      <div class="cycle-label">Treatment</div>
+      <div class="cycle-value">Deacon WTP</div>
+      <div class="cycle-sub">390 ML/day · UV + Cl₂ + fluoride + orthophosphate · Opened 2009</div>
+    </div>
+    <div class="cycle-cell">
+      <div class="cycle-label">Use</div>
+      <div class="cycle-value">280 L/person/day</div>
+      <div class="cycle-sub">Residential 58% · Industrial 22% · Commercial 20%</div>
+    </div>
+    <div class="cycle-cell">
+      <div class="cycle-label">Egress</div>
+      <div class="cycle-value">North End + South End WPCC</div>
+      <div class="cycle-sub">Secondary treatment · Discharge: Red River · North End upgrades ongoing</div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <div>WaterWatch · <a href="https://criticalto.ca">criticalto.ca</a> · Flow data: Environment Canada (Open Govt Licence) · Not affiliated with City of Winnipeg.</div>
+  <div><a href="https://shoallake40.ca" target="_blank">Shoal Lake #40</a> &nbsp; <a href="https://www.winnipeg.ca/waterandwaste/">Winnipeg Water</a> &nbsp; <a href="https://wateroffice.ec.gc.ca">EC Water Office</a></div>
+</footer>
+
+<script>
+const KEYS = ['shoal_lake','assiniboine'];
+const COLOURS = { shoal_lake:'#1a5080', assiniboine:'#2a7ab0' };
+let chart=null, scale='linear';
+async function loadData() {
+  try {
+    const r = await fetch('data/winnipeg.json?t='+Date.now());
+    if (!r.ok) throw new Error();
+    const d = await r.json();
+    if (d.meta?.generated_utc) { const dt=new Date(d.meta.generated_utc); document.getElementById('last-updated').textContent='Data: '+dt.toLocaleDateString('en-CA',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+    const stage=d.restriction?.stage??0;
+    const rEl=document.getElementById('restriction-val'); const rSub=document.getElementById('restriction-sub');
+    if(rEl){rEl.textContent=stage===0?'None':`Stage ${stage}`;rEl.className='s-value '+(stage===0?'good':'risk');}
+    if(rSub)rSub.textContent=d.restriction?.stage_label||'—';
+    if(d.watershed_inflow){KEYS.forEach(k=>{const s=d.watershed_inflow[k];if(!s)return;const fe=document.getElementById('flow-'+k);const le=document.getElementById('level-'+k);if(fe&&s.discharge_cms!=null)fe.textContent=parseFloat(s.discharge_cms).toFixed(1);if(le&&s.level_m!=null)le.textContent=parseFloat(s.level_m).toFixed(2);});}
+    buildChart(d);
+  } catch(e){document.getElementById('last-updated').textContent='Data unavailable';}
+}
+function buildChart(d){const ctx=document.getElementById('flowChart').getContext('2d');if(chart)chart.destroy();const labels=KEYS.map(k=>d.watershed_inflow?.[k]?.station_name||k);const values=KEYS.map(k=>d.watershed_inflow?.[k]?.discharge_cms||null);chart=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Discharge (m³/s)',data:values,backgroundColor:KEYS.map(k=>COLOURS[k]+'99'),borderColor:KEYS.map(k=>COLOURS[k]),borderWidth:2,borderRadius:3}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{backgroundColor:'#f9f6ee',borderColor:'rgba(10,21,32,.25)',borderWidth:1,titleColor:'#0a1520',bodyColor:'#3a6080'}},scales:{x:{ticks:{color:'#3a6080',font:{size:11}},grid:{color:'rgba(10,21,32,.07)'}},y:{title:{display:true,text:'Discharge (m³/s)',color:'#3a6080',font:{size:11}},ticks:{color:'#3a6080',font:{size:10}},grid:{color:'rgba(10,21,32,.07)'}}}}})}
+function setScale(s){scale=s;['linear','log'].forEach(x=>document.getElementById('btn-'+x).classList.toggle('active',x===s));buildChart({});}
+function initMap(){
+  const map=L.map('map').setView([49.8,-96.0],7);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
+  [{coords:[49.6000,-94.5000],id:'05PB014',name:'Shoal Lake outlet',colour:'#1a5080'},{coords:[49.9000,-97.4000],id:'05QB004',name:'Assiniboine at Headingley',colour:'#2a7ab0'}].forEach(s=>{const icon=L.divIcon({className:'',html:`<div style="width:12px;height:12px;background:${s.colour};border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.3)"></div>`,iconSize:[12,12],iconAnchor:[6,6]});L.marker(s.coords,{icon}).addTo(map).bindPopup(`<strong>${s.name}</strong><br><code>${s.id}</code>`);});
+  [{coords:[49.6100,-94.4800],label:'Shoal Lake #40 First Nation',colour:'#8b2060'},{coords:[49.8800,-97.1500],label:'Deacon WTP',colour:'#1a5080'},{coords:[49.8954,-97.1385],label:'Winnipeg',colour:'#555'}].forEach(p=>{const icon=L.divIcon({className:'',html:`<div style="width:10px;height:10px;background:${p.colour};border:2px solid white;border-radius:2px;"></div>`,iconSize:[10,10],iconAnchor:[5,5]});L.marker(p.coords,{icon}).addTo(map).bindPopup(`<strong>${p.label}</strong>`);});
+  // Aqueduct line schematic
+  L.polyline([[49.61,-94.48],[49.88,-97.15]],{color:'#1a5080',weight:2,opacity:0.5,dashArray:'6 3'}).addTo(map);
+}
+initMap(); loadData();
+</script>
+</body>
+</html>
