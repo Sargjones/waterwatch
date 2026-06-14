@@ -26,7 +26,10 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
-DATAMART_BASE = "https://dd.weather.gc.ca/today/hydrometric/csv"
+# Primary: HPFX mirror — more reliable from automated clients during high-demand periods
+# Fallback: dd.weather.gc.ca — same data, less reliable from GitHub Actions IPs
+DATAMART_BASE = "https://hpfx.collab.science.gc.ca/today/hydrometric/csv"
+DATAMART_FALLBACK = "https://dd.weather.gc.ca/today/hydrometric/csv"
 
 # ── CITY CONFIGS ──────────────────────────────────────────────────────────────
 
@@ -615,8 +618,15 @@ def fetch_station(station: dict) -> dict:
     }
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "waterwatch-criticalto/1.0"})
-        with urllib.request.urlopen(req, timeout=20) as resp:
-            raw = resp.read().decode("utf-8", errors="replace")
+        try:
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                raw = resp.read().decode("utf-8", errors="replace")
+        except Exception:
+            # Fallback to dd.weather.gc.ca mirror
+            fallback_url = url.replace(DATAMART_BASE, DATAMART_FALLBACK)
+            req2 = urllib.request.Request(fallback_url, headers={"User-Agent": "waterwatch-criticalto/1.0"})
+            with urllib.request.urlopen(req2, timeout=20) as resp:
+                raw = resp.read().decode("utf-8", errors="replace")
         rows      = [r for r in csv.reader(io.StringIO(raw)) if r and r[0].strip()]
         data_rows = [r for r in rows[1:] if len(r) >= 7]
         if not data_rows:
