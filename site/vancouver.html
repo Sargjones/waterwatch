@@ -43,12 +43,19 @@
     border-bottom: 1px solid var(--border-strong);
     padding: 1.25rem 2rem;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
     background: var(--paper);
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 1001;
+  }
+  .site-header .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
   }
   .logo {
     display: flex;
@@ -454,15 +461,16 @@
 <body>
 
 <header class="site-header">
-  <div class="logo">
-    <span class="logo-mark">WaterWatch</span>
-    <span class="logo-region">Metro Vancouver · criticalto.ca</span>
+  <div class="header-top">
+    <div class="logo">
+      <span class="logo-mark">WaterWatch</span>
+      <span class="logo-region">Metro Vancouver · criticalto.ca</span>
+    </div>
+    <div class="header-meta">
+      <span><span class="live-dot"></span>Updated weekly</span>
+      <span id="last-updated">Loading...</span>
+    </div>
   </div>
-  <div class="header-meta">
-    <span><span class="live-dot"></span>Updated weekly</span>
-    <span id="last-updated">Loading...</span>
-  </div>
-
   <nav style="display:flex;gap:1rem;flex-wrap:wrap;font-size:11px;padding-top:0.5rem;border-top:1px solid rgba(13,26,15,0.12);width:100%;margin-top:0.5rem">
     <a href="/" style="color:var(--ink-muted);text-decoration:none">← National</a>
     <a href="/vancouver.html" style="color:var(--ink);font-weight:500;border-bottom:2px solid var(--ink);padding-bottom:1px;text-decoration:none">Metro Vancouver</a>
