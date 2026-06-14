@@ -520,8 +520,8 @@ REGINA = {
         "dashboard": "waterwatch.criticalto.ca/regina",
     },
     "stations": {
-        "qu_appelle_outlet": {"id": "05JF004", "province": "SK", "name": "Qu'Appelle River at Buffalo Pound Lake outlet", "role": "primary_source"},
-        "qu_appelle_hwy19":  {"id": "05JE001", "province": "SK", "name": "Qu'Appelle River at Highway 19",               "role": "downstream_context"},
+        "south_sask_saskatoon": {"id": "05HG001", "province": "SK", "name": "South Saskatchewan River at Saskatoon (upstream regional indicator)", "role": "upstream_context"},
+        "qu_appelle_lumsden":   {"id": "05JF006", "province": "SK", "name": "Qu'Appelle River near Lumsden",                                      "role": "downstream_context"},
     },
     "source": {
         "type": "surface",
@@ -609,7 +609,7 @@ WINNIPEG = {
         "dashboard": "waterwatch.criticalto.ca/winnipeg",
     },
     "stations": {
-        "shoal_lake": {"id": "05PB014", "province": "MB", "name": "Shoal Lake at outlet (level gauge)", "role": "primary_source"},
+        "red_river":   {"id": "05OJ001", "province": "MB", "name": "Red River at Winnipeg",              "role": "regional_context"},
         "assiniboine": {"id": "05QB004", "province": "MB", "name": "Assiniboine River at Headingley",    "role": "regional_context"},
     },
     "source": {
