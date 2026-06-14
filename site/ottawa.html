@@ -34,7 +34,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--paper); color: var(--ink); font-family: var(--mono); font-size: 14px; line-height: 1.6; min-height: 100vh; }
 
-    .site-header { border-bottom: 1px solid var(--border-strong); padding: 1.25rem 2rem; background: var(--paper); display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; position: sticky; top: 0; z-index: 100; }
+    .site-header { border-bottom: 1px solid var(--border-strong); padding: 1.25rem 2rem; background: var(--paper); display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; position: sticky; top: 0; z-index: 1001; }
     .header-left .logo-mark { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
     .header-left .logo-region { font-size: 11px; font-weight: 500; color: var(--ink-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
     .city-nav { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 11px; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
@@ -95,7 +95,7 @@
     .sys-node.warn { border-color: var(--amber); color: var(--amber); background: var(--amber-bg); }
     .sys-arrow { color: var(--ink-muted); }
 
-    #map { height: 280px; border-radius: 4px; border: 1px solid var(--border); margin-bottom: 2rem; }
+    #map { position: relative; z-index: 1; height: 280px; border-radius: 4px; border: 1px solid var(--border); margin-bottom: 2rem; }
     .chart-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; margin-bottom: 2rem; }
     .chart-controls { display: flex; gap: 0.5rem; margin-bottom: 1rem; align-items: center; }
     .chart-controls span { font-size: 11px; color: var(--ink-muted); }
@@ -114,21 +114,21 @@
 <body>
 
 <header class="site-header">
-  <div class="header-left">
+  <div class="header-left" style="display:flex;justify-content:space-between;align-items:center;width:100%"><div>
     <div class="logo-mark">WaterWatch</div>
     <div class="logo-region">Ottawa · Ontario · criticalto.ca</div>
     <nav class="city-nav">
-      <a href="/">← National</a>
-      <a href="/vancouver.html">Metro Vancouver</a>
-      <a href="/victoria.html">Victoria, BC</a>
-      <a href="/calgary.html">Calgary, AB</a>
-      <a href="/edmonton.html">Edmonton, AB</a>
-      <a href="/canmore.html">Canmore, AB</a>
-      <a href="/regina.html">Regina, SK</a>
-      <a href="/winnipeg.html">Winnipeg, MB</a>
-      <a href="/toronto.html">Toronto, ON</a>
-      <a href="/ottawa.html" class="active">Ottawa, ON</a>
-    </nav>
+    <a href="/" style="color:var(--ink-muted);text-decoration:none">← National</a>
+    <a href="/vancouver.html" style="color:var(--ink-muted);text-decoration:none">Metro Vancouver</a>
+    <a href="/victoria.html" style="color:var(--ink-muted);text-decoration:none">Victoria, BC</a>
+    <a href="/calgary.html" style="color:var(--ink-muted);text-decoration:none">Calgary, AB</a>
+    <a href="/edmonton.html" style="color:var(--ink-muted);text-decoration:none">Edmonton, AB</a>
+    <a href="/canmore.html" style="color:var(--ink-muted);text-decoration:none">Canmore, AB</a>
+    <a href="/regina.html" style="color:var(--ink-muted);text-decoration:none">Regina, SK</a>
+    <a href="/winnipeg.html" style="color:var(--ink-muted);text-decoration:none">Winnipeg, MB</a>
+    <a href="/toronto.html" style="color:var(--ink-muted);text-decoration:none">Toronto, ON</a>
+    <a href="/ottawa.html" style="color:var(--ink);font-weight:500;border-bottom:2px solid currentColor;padding-bottom:1px;text-decoration:none">Ottawa, ON</a>
+  </nav>
   </div>
   <div class="header-meta">
     <span><span class="live-dot"></span>Updated every 6 hours</span>
@@ -168,7 +168,18 @@
   </div>
 
   <p class="section-label">River Flow — Real-Time Stations</p>
-  <div class="stations-grid">
+  <div class="stations-grid" style="grid-template-columns:repeat(3,1fr)">
+    <div class="station-card">
+      <div class="stn-head">
+        <div><div class="stn-name">Ottawa River at Arnprior (upstream)</div><div class="stn-id">02KF004</div></div>
+        <span class="river-badge badge-ottawa">Upstream</span>
+      </div>
+      <div class="stn-metrics">
+        <div><div class="m-label">Discharge</div><div class="m-value" id="flow-ottawa_upstream">—</div><div class="m-unit">m³/s</div></div>
+        <div><div class="m-label">Level</div><div class="m-value" id="level-ottawa_upstream">—</div><div class="m-unit">m</div></div>
+      </div>
+      <div class="station-trend" id="trend-ottawa_upstream"></div>
+    </div>
     <div class="station-card">
       <div class="stn-head">
         <div><div class="stn-name">Ottawa River at Ottawa (Britannia)</div><div class="stn-id">02KF005</div></div>
@@ -271,8 +282,8 @@
 </footer>
 
 <script>
-const KEYS = ['ottawa_river','rideau_river'];
-const COLOURS = { ottawa_river:'#2a5a1a', rideau_river:'#4a7a2a' };
+const KEYS = ['ottawa_upstream','ottawa_river','rideau_river'];
+const COLOURS = { ottawa_upstream:'#1a3a0a', ottawa_river:'#2a5a1a', rideau_river:'#4a7a2a' };
 let chart=null, scale='linear';
 
 async function loadData() {
@@ -302,7 +313,7 @@ function setScale(s){scale=s;['linear','log'].forEach(x=>document.getElementById
 function initMap(){
   const map=L.map('map').setView([45.40,-75.72],11);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
-  [{coords:[45.3900,-75.7900],id:'02KF005',name:'Ottawa River at Britannia',colour:'#2a5a1a'},{coords:[45.4100,-75.6800],id:'02LA004',name:'Rideau River at Ottawa',colour:'#4a7a2a'}].forEach(s=>{
+  [{coords:[45.4300,-76.3500],id:'02KF004',name:'Ottawa R. at Arnprior',colour:'#1a3a0a'},{coords:[45.3900,-75.7900],id:'02KF005',name:'Ottawa R. at Britannia',colour:'#2a5a1a'},{coords:[45.4100,-75.6800],id:'02LA004',name:'Rideau River at Ottawa',colour:'#4a7a2a'}].forEach(s=>{
     const icon=L.divIcon({className:'',html:`<div style="width:12px;height:12px;background:${s.colour};border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.3)"></div>`,iconSize:[12,12],iconAnchor:[6,6]});
     L.marker(s.coords,{icon}).addTo(map).bindPopup(`<strong>${s.name}</strong><br><code>${s.id}</code>`);
   });
