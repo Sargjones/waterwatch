@@ -34,7 +34,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--paper); color: var(--ink); font-family: var(--mono); font-size: 14px; line-height: 1.6; min-height: 100vh; }
 
-    .site-header { border-bottom: 1px solid var(--border-strong); padding: 1.25rem 2rem; background: var(--paper); display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; position: sticky; top: 0; z-index: 100; }
+    .site-header { border-bottom: 1px solid var(--border-strong); padding: 1.25rem 2rem; background: var(--paper); display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; position: sticky; top: 0; z-index: 1001; }
     .header-left .logo-mark { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
     .header-left .logo-region { font-size: 11px; font-weight: 500; color: var(--ink-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
     .city-nav { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 11px; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
@@ -103,7 +103,7 @@
     .sys-node.warn { border-color: var(--amber); color: var(--amber); background: var(--amber-bg); }
     .sys-arrow { color: var(--ink-muted); }
 
-    #map { height: 280px; border-radius: 4px; border: 1px solid var(--border); margin-bottom: 2rem; }
+    #map { position: relative; z-index: 1; height: 280px; border-radius: 4px; border: 1px solid var(--border); margin-bottom: 2rem; position: relative; z-index: 1; }
     .chart-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; margin-bottom: 2rem; }
     .chart-controls { display: flex; gap: 0.5rem; margin-bottom: 1rem; align-items: center; }
     .chart-controls span { font-size: 11px; color: var(--ink-muted); }
@@ -122,21 +122,21 @@
 <body>
 
 <header class="site-header">
-  <div class="header-left">
+  <div class="header-left" style="display:flex;justify-content:space-between;align-items:center;width:100%"><div>
     <div class="logo-mark">WaterWatch</div>
     <div class="logo-region">Winnipeg · Manitoba · criticalto.ca</div>
     <nav class="city-nav">
-      <a href="/">← National</a>
-      <a href="/vancouver.html">Metro Vancouver</a>
-      <a href="/victoria.html">Victoria, BC</a>
-      <a href="/calgary.html">Calgary, AB</a>
-      <a href="/edmonton.html">Edmonton, AB</a>
-      <a href="/canmore.html">Canmore, AB</a>
-      <a href="/regina.html">Regina, SK</a>
-      <a href="/winnipeg.html" class="active">Winnipeg, MB</a>
-      <a href="/toronto.html">Toronto, ON</a>
-      <a href="/ottawa.html">Ottawa, ON</a>
-    </nav>
+    <a href="/" style="color:var(--ink-muted);text-decoration:none">← National</a>
+    <a href="/vancouver.html" style="color:var(--ink-muted);text-decoration:none">Metro Vancouver</a>
+    <a href="/victoria.html" style="color:var(--ink-muted);text-decoration:none">Victoria, BC</a>
+    <a href="/calgary.html" style="color:var(--ink-muted);text-decoration:none">Calgary, AB</a>
+    <a href="/edmonton.html" style="color:var(--ink-muted);text-decoration:none">Edmonton, AB</a>
+    <a href="/canmore.html" style="color:var(--ink-muted);text-decoration:none">Canmore, AB</a>
+    <a href="/regina.html" style="color:var(--ink-muted);text-decoration:none">Regina, SK</a>
+    <a href="/winnipeg.html" style="color:var(--ink);font-weight:500;border-bottom:2px solid currentColor;padding-bottom:1px;text-decoration:none">Winnipeg, MB</a>
+    <a href="/toronto.html" style="color:var(--ink-muted);text-decoration:none">Toronto, ON</a>
+    <a href="/ottawa.html" style="color:var(--ink-muted);text-decoration:none">Ottawa, ON</a>
+  </nav>
   </div>
   <div class="header-meta">
     <span><span class="live-dot"></span>Updated every 6 hours</span>
@@ -327,7 +327,7 @@ function initMap(){
   // Aqueduct line schematic
   L.polyline([[49.61,-94.48],[49.88,-97.15]],{color:'#1a5080',weight:2,opacity:0.5,dashArray:'6 3'}).addTo(map);
 }
-initMap(); loadData();
+setTimeout(initMap, 100); loadData();
 </script>
 </body>
 </html>
