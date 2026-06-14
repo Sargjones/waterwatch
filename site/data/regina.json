@@ -7,7 +7,7 @@
     "per_capita_lpd": 330,
     "per_capita_lpd_source": "City of Regina 2023 Water Quality Report",
     "dashboard": "waterwatch.criticalto.ca/regina",
-    "generated_utc": "2026-06-14T10:28:16.870652+00:00",
+    "generated_utc": "2026-06-14T10:49:07.361273+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -92,25 +92,25 @@
     "data_note": null
   },
   "watershed_inflow": {
-    "qu_appelle_outlet": {
-      "station_id": "05JF004",
-      "station_name": "Qu'Appelle River at Buffalo Pound Lake outlet",
-      "role": "primary_source",
-      "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/SK/hourly/SK_05JF004_hourly_hydrometric.csv",
-      "level_m": null,
-      "discharge_cms": null,
-      "timestamp": null,
-      "status": "http_error_404"
+    "south_sask_saskatoon": {
+      "station_id": "05HG001",
+      "station_name": "South Saskatchewan River at Saskatoon (upstream regional indicator)",
+      "role": "upstream_context",
+      "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/SK/hourly/SK_05HG001_hourly_hydrometric.csv",
+      "level_m": 3.424,
+      "discharge_cms": 1560.0,
+      "timestamp": "2026-06-14T04:00:00-06:00",
+      "status": "ok"
     },
-    "qu_appelle_hwy19": {
-      "station_id": "05JE001",
-      "station_name": "Qu'Appelle River at Highway 19",
+    "qu_appelle_lumsden": {
+      "station_id": "05JF006",
+      "station_name": "Qu'Appelle River near Lumsden",
       "role": "downstream_context",
-      "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/SK/hourly/SK_05JE001_hourly_hydrometric.csv",
-      "level_m": null,
-      "discharge_cms": null,
-      "timestamp": null,
-      "status": "http_error_404"
+      "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/SK/hourly/SK_05JF006_hourly_hydrometric.csv",
+      "level_m": 1.044,
+      "discharge_cms": 0.148,
+      "timestamp": "2026-06-14T04:05:00-06:00",
+      "status": "ok"
     }
   }
 }
