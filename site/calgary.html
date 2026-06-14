@@ -53,7 +53,7 @@
       background: var(--paper);
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 1001;
     }
     .logo { display: flex; align-items: baseline; gap: 0.5rem; }
     .logo-mark { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
@@ -139,7 +139,7 @@
     .badge-below { background: rgba(139,32,32,0.1); color: var(--danger-light); }
 
     /* ── Map ── */
-    #map { height: 280px; border-radius: 4px; border: 1px solid var(--border); margin-bottom: 2rem; }
+    #map { position: relative; z-index: 1; height: 280px; border-radius: 4px; border: 1px solid var(--border); margin-bottom: 2rem; }
 
     /* ── Chart ── */
     .chart-card { background: var(--paper-card); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; margin-bottom: 2rem; }
@@ -195,15 +195,29 @@
 </head>
 <body>
 
-<header class="site-header">
-  <div class="logo">
-    <span class="logo-mark">WaterWatch</span>
-    <span class="logo-region">Calgary · criticalto.ca</span>
+<header class="site-header" style="flex-direction:column;align-items:flex-start;gap:0.5rem">
+  <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+    <div class="logo">
+      <span class="logo-mark">WaterWatch</span>
+      <span class="logo-region">Calgary · criticalto.ca</span>
+    </div>
+    <div class="header-meta">
+      <span><span class="live-dot"></span>Updated every 6 hours</span>
+      <span id="last-updated">Loading…</span>
+    </div>
   </div>
-  <div class="header-meta">
-    <span><span class="live-dot"></span>Updated every 6 hours</span>
-    <span id="last-updated">Loading…</span>
-  </div>
+  <nav style="display:flex;gap:1rem;flex-wrap:wrap;font-size:11px;padding-top:0.5rem;border-top:1px solid var(--border);width:100%">
+    <a href="/" style="color:var(--ink-muted);text-decoration:none">← National</a>
+    <a href="/vancouver.html" style="color:var(--ink-muted);text-decoration:none">Metro Vancouver</a>
+    <a href="/victoria.html" style="color:var(--ink-muted);text-decoration:none">Victoria, BC</a>
+    <a href="/calgary.html" style="color:var(--ink);font-weight:500;border-bottom:2px solid var(--ink);padding-bottom:1px;text-decoration:none">Calgary, AB</a>
+    <a href="/edmonton.html" style="color:var(--ink-muted);text-decoration:none">Edmonton, AB</a>
+    <a href="/canmore.html" style="color:var(--ink-muted);text-decoration:none">Canmore, AB</a>
+    <a href="/regina.html" style="color:var(--ink-muted);text-decoration:none">Regina, SK</a>
+    <a href="/winnipeg.html" style="color:var(--ink-muted);text-decoration:none">Winnipeg, MB</a>
+    <a href="/toronto.html" style="color:var(--ink-muted);text-decoration:none">Toronto, ON</a>
+    <a href="/ottawa.html" style="color:var(--ink-muted);text-decoration:none">Ottawa, ON</a>
+  </nav>
 </header>
 
 <div class="alert-banner">
@@ -218,18 +232,7 @@
 
 <main>
 
-  <div class="city-nav">
-    <a href="/">← National</a>
-    <a href="/vancouver.html">Metro Vancouver</a>
-    <a href="/victoria.html">Victoria, BC</a>
-    <a href="/calgary.html" class="active">Calgary, AB</a>
-    <a href="/edmonton.html">Edmonton, AB</a>
-    <a href="/canmore.html">Canmore, AB</a>
-    <a href="/regina.html">Regina, SK</a>
-    <a href="/winnipeg.html">Winnipeg, MB</a>
-    <a href="/toronto.html">Toronto, ON</a>
-    <a href="/ottawa.html">Ottawa, ON</a>
-  </div>
+
 
   <!-- STATIONS -->
   <p class="section-label">River Flow — Real-Time Stations</p>
