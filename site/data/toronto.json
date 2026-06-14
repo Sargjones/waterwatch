@@ -7,7 +7,7 @@
     "per_capita_lpd": 200,
     "per_capita_lpd_source": "Toronto Water 2023 Annual Report",
     "dashboard": "waterwatch.criticalto.ca/toronto",
-    "generated_utc": "2026-06-14T14:09:00.131812+00:00",
+    "generated_utc": "2026-06-14T17:08:08.641165+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -19,14 +19,14 @@
     "watershed_protected": false,
     "wfi_risk": "negligible",
     "wfi_note": "Great Lakes source \u2014 no wildfire interface risk",
-    "lake_ontario_note": "Lake Ontario levels managed by IJC Plan 2014. Daily mean level updated by IJC on business days. Current level: 75.37m IGLD 1985."
+    "lake_ontario_note": "Lake Ontario levels managed by IJC Plan 2014. Current level: 75.37m IGLD 1985."
   },
   "storage": {
     "reservoirs": {
       "lake_ontario": {
         "name": "Lake Ontario (de facto reservoir)",
         "max_dam3": 1639000000,
-        "data_note": "Lake Ontario has ~1,639 km\u00b3 of water \u2014 effectively unlimited storage. Intake conditions (turbidity, temperature, algae) are the operational variable, not volume."
+        "data_note": "Lake Ontario has ~1,639 km\u00b3 of water \u2014 effectively unlimited storage."
       }
     },
     "per_capita_dam3": null,
@@ -39,7 +39,7 @@
       {
         "name": "R.C. Harris WTP",
         "capacity_ml_day": 950,
-        "process": "conventional coagulation/sedimentation/filtration, UV, chlorination, fluoride. Built 1941 \u2014 Art Deco landmark."
+        "process": "conventional coagulation/sedimentation/filtration, UV, chlorination, fluoride. Built 1941."
       },
       {
         "name": "F.J. Horgan WTP",
@@ -59,7 +59,7 @@
     ],
     "fluoridation": true,
     "fluoride_note": null,
-    "data_note": "Total treatment capacity ~2,600 ML/day for a city using ~700 ML/day \u2014 significant redundancy. R.C. Harris WTP (1941) is a designated heritage building."
+    "data_note": "Total treatment capacity ~2,600 ML/day for a city using ~700 ML/day \u2014 significant redundancy."
   },
   "restriction": {
     "system": "formal",
@@ -79,7 +79,7 @@
     "pct_of_normal": null,
     "reference": "Not applicable \u2014 Lake Ontario source",
     "source": null,
-    "note": "Toronto's supply is from Lake Ontario, not snowmelt-dependent watersheds. IJC manages lake levels under Plan 2014.",
+    "note": "Toronto's supply is from Lake Ontario, not snowmelt-dependent watersheds.",
     "last_updated": null
   },
   "risk": {
@@ -87,7 +87,7 @@
     "infrastructure_risk": "low_moderate",
     "single_point_of_failure": "None at source level \u2014 Lake Ontario is effectively unlimited. Distribution network age (many pipes pre-1950) is the primary infrastructure risk.",
     "groundwater_dependency": false,
-    "climate_note": "Lake Ontario levels are above long-term average (75.37m vs historical mean). Climate risk is increasing algae and turbidity events near intakes, not supply volume."
+    "climate_note": "Lake Ontario levels are above long-term average (75.37m vs historical mean). Climate risk is increasing algae and turbidity events near intakes."
   },
   "use": {
     "per_capita_lpd": 200,
@@ -95,7 +95,7 @@
     "industrial_pct": 20,
     "commercial_pct": 25,
     "major_industrial_users": null,
-    "data_note": "Toronto has one of the lowest per-capita uses of any major Canadian city \u2014 result of decades of conservation programming and metering."
+    "data_note": "Toronto has one of the lowest per-capita uses of any major Canadian city."
   },
   "egress": {
     "treatment_type": "tertiary",
@@ -107,7 +107,7 @@
     ],
     "discharge_point": "Lake Ontario",
     "cso_risk": "moderate",
-    "cso_note": "Combined sewers in older (pre-1950) neighbourhoods. Wet weather flow management program ongoing. Ashbridges Bay WTP receives the largest volume.",
+    "cso_note": "Combined sewers in older (pre-1950) neighbourhoods. Wet weather flow management program ongoing.",
     "data_note": "Toronto is one of few Canadian cities with tertiary wastewater treatment \u2014 phosphorus removal before Lake Ontario discharge."
   },
   "watershed_inflow": {
@@ -116,9 +116,9 @@
       "station_name": "Humber River at Raymore Drive",
       "role": "watershed_indicator",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02HC009_hourly_hydrometric.csv",
-      "level_m": 2.042,
-      "discharge_cms": 0.455,
-      "timestamp": "2026-06-14T08:40:00-05:00",
+      "level_m": 2.049,
+      "discharge_cms": 0.518,
+      "timestamp": "2026-06-14T11:40:00-05:00",
       "status": "ok"
     },
     "don_river": {
@@ -126,9 +126,9 @@
       "station_name": "Don River at Todmorden",
       "role": "watershed_indicator",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02HC003_hourly_hydrometric.csv",
-      "level_m": 2.214,
-      "discharge_cms": 2.44,
-      "timestamp": "2026-06-14T08:35:00-05:00",
+      "level_m": 2.212,
+      "discharge_cms": 2.4,
+      "timestamp": "2026-06-14T11:35:00-05:00",
       "status": "ok"
     },
     "credit_river": {
@@ -136,9 +136,9 @@
       "station_name": "Credit River at Streetsville",
       "role": "watershed_indicator",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02HB008_hourly_hydrometric.csv",
-      "level_m": 2.201,
-      "discharge_cms": 0.654,
-      "timestamp": "2026-06-14T08:35:00-05:00",
+      "level_m": 2.204,
+      "discharge_cms": 0.677,
+      "timestamp": "2026-06-14T11:35:00-05:00",
       "status": "ok"
     }
   }
