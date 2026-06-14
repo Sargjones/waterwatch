@@ -1,0 +1,121 @@
+{
+  "meta": {
+    "city": "Edmonton",
+    "province": "AB",
+    "operator": "EPCOR Water Services Inc.",
+    "population_served": 1100000,
+    "per_capita_lpd": 225,
+    "per_capita_lpd_source": "EPCOR 2023 Annual Water Quality Report",
+    "dashboard": "waterwatch.criticalto.ca/edmonton",
+    "generated_utc": "2026-06-14T09:53:48.424660+00:00",
+    "data_licences": [
+      "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
+    ]
+  },
+  "source": {
+    "type": "surface",
+    "groundwater_pct": 0,
+    "primary": "North Saskatchewan River (sole source \u2014 no reservoir backup)",
+    "watershed_protected": false,
+    "wfi_risk": "moderate_high",
+    "wfi_note": "NSR headwaters in Rocky Mountain foothills. 2023 upstream fires caused turbidity spikes requiring operational response."
+  },
+  "storage": {
+    "reservoirs": {
+      "distribution_only": {
+        "name": "Distribution reservoirs only (~72-hr storage)",
+        "max_dam3": null,
+        "data_note": "No source water reservoir. Edmonton draws directly from NSR and holds ~72 hours of treated water in distribution storage."
+      }
+    },
+    "per_capita_dam3": 0.001,
+    "per_capita_dam3_note": "Effectively zero source storage \u2014 distribution reservoirs only",
+    "data_note": "Edmonton's no-reservoir design is its defining water vulnerability. Any NSR disruption is immediately critical.",
+    "last_updated": null
+  },
+  "treatment": {
+    "plants": [
+      {
+        "name": "E.L. Smith WTP",
+        "capacity_ml_day": 800,
+        "process": "conventional coagulation/sedimentation/filtration, UV, chlorination, fluoride"
+      },
+      {
+        "name": "Rossdale WTP",
+        "capacity_ml_day": 270,
+        "process": "conventional coagulation/sedimentation/filtration, UV, chlorination, fluoride"
+      }
+    ],
+    "fluoridation": true,
+    "fluoride_note": null,
+    "data_note": "Both plants draw directly from NSR. No alternative source if NSR is compromised."
+  },
+  "restriction": {
+    "system": "informal",
+    "system_url": "https://www.edmonton.ca/programs_services/water/water-conservation",
+    "stage": 0,
+    "stage_label": "No active restrictions",
+    "start_date": null,
+    "end_date": null,
+    "fine_cad": null,
+    "prohibitions": [],
+    "permitted": [],
+    "last_verified": "2026-06-08",
+    "hypothesized_triggers": "EPCOR issues conservation advisories during low-flow events or upstream contamination. No formal staged bylaw.",
+    "days_remaining": 0
+  },
+  "snowpack": {
+    "pct_of_normal": 78,
+    "reference": "April 1 peak, North Saskatchewan Basin",
+    "source": "Alberta River Forecast Centre",
+    "note": "2026 reading \u2014 near normal",
+    "last_updated": "2026-05-01"
+  },
+  "risk": {
+    "wfi_risk": "moderate_high",
+    "infrastructure_risk": "moderate",
+    "single_point_of_failure": "North Saskatchewan River is sole source \u2014 no reservoir, no alternative intake. Contamination or prolonged low-flow = immediate supply crisis.",
+    "groundwater_dependency": false,
+    "climate_note": "NSR carries agricultural runoff and upstream oil sands drainage. Wildfire turbidity events increasing. No storage buffer."
+  },
+  "use": {
+    "per_capita_lpd": 225,
+    "residential_pct": 55,
+    "industrial_pct": 25,
+    "commercial_pct": 20,
+    "major_industrial_users": null,
+    "data_note": "Sector split approximate from EPCOR annual report"
+  },
+  "egress": {
+    "treatment_type": "secondary",
+    "plants": [
+      "Gold Bar WWTP"
+    ],
+    "discharge_point": "North Saskatchewan River (downstream of city)",
+    "cso_risk": "low_moderate",
+    "cso_note": "Older combined sewer areas in river valley neighbourhoods have CSO risk during heavy rain",
+    "data_note": null
+  },
+  "watershed_inflow": {
+    "nsr_edmonton": {
+      "station_id": "05DF001",
+      "station_name": "North Saskatchewan River at Edmonton",
+      "role": "primary_source",
+      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05DF001_hourly_hydrometric.csv",
+      "level_m": null,
+      "discharge_cms": null,
+      "timestamp": null,
+      "status": "error: <urlopen error timed out>"
+    },
+    "nsr_upstream": {
+      "station_id": "05DA006",
+      "station_name": "North Saskatchewan River at Whirlpool Point",
+      "role": "upstream_context",
+      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05DA006_hourly_hydrometric.csv",
+      "level_m": null,
+      "discharge_cms": null,
+      "timestamp": null,
+      "status": "error: <urlopen error timed out>"
+    }
+  }
+}

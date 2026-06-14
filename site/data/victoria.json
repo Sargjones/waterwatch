@@ -1,0 +1,118 @@
+{
+  "meta": {
+    "city": "Greater Victoria",
+    "province": "BC",
+    "operator": "Capital Regional District (CRD) Integrated Water Services",
+    "population_served": 400000,
+    "per_capita_lpd": 330,
+    "per_capita_lpd_source": "CRD 2023 Annual Water Report",
+    "dashboard": "waterwatch.criticalto.ca/victoria",
+    "generated_utc": "2026-06-14T09:51:38.033016+00:00",
+    "data_licences": [
+      "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
+    ]
+  },
+  "source": {
+    "type": "surface",
+    "groundwater_pct": 0,
+    "primary": "Sooke Lake Reservoir (primary), Goldstream River (secondary), Thetis Lake (tertiary)",
+    "watershed_protected": true,
+    "wfi_risk": "moderate",
+    "wfi_note": "Sooke watershed adjacent to fire-prone terrain on Vancouver Island; CRD owns entire watershed"
+  },
+  "storage": {
+    "reservoirs": {
+      "sooke_lake": {
+        "name": "Sooke Lake Reservoir",
+        "max_dam3": 160320,
+        "usable_dam3": 92700,
+        "data_note": "~2-year supply at current demand; CRD owns entire watershed"
+      }
+    },
+    "per_capita_dam3": 0.401,
+    "per_capita_dam3_note": "Based on usable capacity / population served",
+    "data_note": "CRD does not publish real-time reservoir levels; values from CRD annual report",
+    "last_updated": "2026-01-01",
+    "source_url": "https://www.crd.bc.ca/service/drinking-water"
+  },
+  "treatment": {
+    "plants": [
+      {
+        "name": "CRD Drinking Water Treatment Plant",
+        "capacity_ml_day": 330,
+        "process": "UV disinfection, chlorination (no filtration \u2014 closed watershed)"
+      }
+    ],
+    "fluoridation": false,
+    "fluoride_note": "Fluoride removed in 2011 by CRD board vote",
+    "data_note": null
+  },
+  "restriction": {
+    "system": "formal",
+    "system_url": "https://www.crd.bc.ca/service/drinking-water/water-conservation/watering-restrictions",
+    "stage": 0,
+    "stage_label": "No active restrictions",
+    "start_date": null,
+    "end_date": null,
+    "fine_cad": null,
+    "prohibitions": [],
+    "permitted": [],
+    "last_verified": "2026-06-08",
+    "hypothesized_triggers": "CRD activates Stage 1 when reservoir approaches ~70% of capacity heading into summer",
+    "days_remaining": 0
+  },
+  "snowpack": {
+    "pct_of_normal": 58,
+    "reference": "April 1 peak, Vancouver Island",
+    "source": "BC River Forecast Centre",
+    "note": "2026 reading \u2014 below average",
+    "last_updated": "2026-05-01"
+  },
+  "risk": {
+    "wfi_risk": "moderate",
+    "infrastructure_risk": "low_moderate",
+    "single_point_of_failure": "Sooke Flowline (44km concrete aqueduct, built 1915) \u2014 aging primary conveyance",
+    "groundwater_dependency": false,
+    "climate_note": "Below-average snowpack; 2-year reservoir buffer provides resilience. Sooke Flowline age (~110 years) is a growing concern."
+  },
+  "use": {
+    "per_capita_lpd": 330,
+    "residential_pct": 62,
+    "industrial_pct": 8,
+    "commercial_pct": 30,
+    "major_industrial_users": null,
+    "data_note": "Sector split from CRD annual report"
+  },
+  "egress": {
+    "treatment_type": "secondary",
+    "plants": [
+      "McLoughlin Point WWTP"
+    ],
+    "discharge_point": "Strait of Juan de Fuca",
+    "cso_risk": "low",
+    "cso_note": "Victoria controversially discharged raw sewage until 2020; McLoughlin Point upgrade completed that year",
+    "data_note": null
+  },
+  "watershed_inflow": {
+    "sooke_river": {
+      "station_id": "08HA010",
+      "station_name": "Sooke River below Millar Creek",
+      "role": "watershed_inflow",
+      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08HA010_hourly_hydrometric.csv",
+      "level_m": null,
+      "discharge_cms": null,
+      "timestamp": null,
+      "status": "error: <urlopen error timed out>"
+    },
+    "sooke_upper": {
+      "station_id": "08HA059",
+      "station_name": "Sooke River upstream of Charters Creek",
+      "role": "upstream_context",
+      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/BC/hourly/BC_08HA059_hourly_hydrometric.csv",
+      "level_m": null,
+      "discharge_cms": null,
+      "timestamp": null,
+      "status": "error: <urlopen error timed out>"
+    }
+  }
+}
