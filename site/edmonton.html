@@ -425,8 +425,6 @@ function initMap() {
     L.marker(p.coords, {icon}).addTo(map).bindPopup(`<strong>${p.label}</strong>`);
   });
 
-  // NSR corridor line
-  L.polyline([[52.0, -116.5], [53.533, -113.5]], { color: '#7a5c00', weight: 2.5, opacity: 0.5, dashArray: '4 3' }).addTo(map);
 }
 
 initMap();
