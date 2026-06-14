@@ -1,0 +1,116 @@
+{
+  "meta": {
+    "city": "Winnipeg",
+    "province": "MB",
+    "operator": "City of Winnipeg Water and Waste Department",
+    "population_served": 800000,
+    "per_capita_lpd": 280,
+    "per_capita_lpd_source": "City of Winnipeg 2023 Water Quality Report",
+    "dashboard": "waterwatch.criticalto.ca/winnipeg",
+    "generated_utc": "2026-06-14T10:28:17.225949+00:00",
+    "data_licences": [
+      "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
+    ]
+  },
+  "source": {
+    "type": "surface",
+    "groundwater_pct": 0,
+    "primary": "Shoal Lake (Lake of the Woods), Ontario/Manitoba border \u2014 conveyed 154km via Greater Winnipeg Water District Aqueduct",
+    "watershed_protected": true,
+    "wfi_risk": "low",
+    "wfi_note": "Boreal Shield source watershed; low wildfire transmission risk to intake"
+  },
+  "storage": {
+    "reservoirs": {
+      "shoal_lake": {
+        "name": "Shoal Lake (natural lake)",
+        "max_dam3": null,
+        "data_note": "Shoal Lake is a large natural lake \u2014 capacity effectively unlimited relative to Winnipeg's demand. Real-time levels not in WSC network."
+      }
+    },
+    "per_capita_dam3": null,
+    "data_note": "Shoal Lake provides effectively unlimited storage. The constraint is aqueduct capacity (390 ML/day), not lake volume.",
+    "last_updated": null
+  },
+  "treatment": {
+    "plants": [
+      {
+        "name": "Deacon WTP",
+        "capacity_ml_day": 390,
+        "process": "UV, chlorination, fluoride, orthophosphate (corrosion control), opened 2009"
+      }
+    ],
+    "fluoridation": true,
+    "fluoride_note": null,
+    "data_note": "The 154km gravity-fed aqueduct from Shoal Lake was built in 1919. Deacon WTP (2009) replaced the original treatment infrastructure. Orthophosphate added for lead pipe corrosion control."
+  },
+  "restriction": {
+    "system": "formal",
+    "system_url": "https://www.winnipeg.ca/waterandwaste/water/conservation/",
+    "stage": 0,
+    "stage_label": "No active restrictions",
+    "start_date": null,
+    "end_date": null,
+    "fine_cad": null,
+    "prohibitions": [],
+    "permitted": [],
+    "last_verified": "2026-06-14",
+    "hypothesized_triggers": "Winnipeg has a seasonal odd/even outdoor watering bylaw. Full restrictions uncommon given large source volume.",
+    "days_remaining": 0
+  },
+  "snowpack": {
+    "pct_of_normal": 91,
+    "reference": "April 1 peak, Lake of the Woods Basin",
+    "source": "Manitoba Hydrological Forecast Centre",
+    "note": "2026 reading \u2014 near normal",
+    "last_updated": "2026-05-01"
+  },
+  "risk": {
+    "wfi_risk": "low",
+    "infrastructure_risk": "moderate",
+    "single_point_of_failure": "The Greater Winnipeg Water District Aqueduct (154km, built 1919) is the sole conveyance from Shoal Lake. A major aqueduct failure would cut supply with no immediate alternative.",
+    "groundwater_dependency": false,
+    "climate_note": "Source water security is excellent. The primary risk is the aging aqueduct and the justice implications of the Shoal Lake #40 First Nation situation."
+  },
+  "use": {
+    "per_capita_lpd": 280,
+    "residential_pct": 58,
+    "industrial_pct": 22,
+    "commercial_pct": 20,
+    "major_industrial_users": null,
+    "data_note": "Sector split approximate from City of Winnipeg annual report"
+  },
+  "egress": {
+    "treatment_type": "secondary",
+    "plants": [
+      "North End Water Pollution Control Centre",
+      "South End Water Pollution Control Centre"
+    ],
+    "discharge_point": "Red River",
+    "cso_risk": "moderate",
+    "cso_note": "Winnipeg has combined sewers in older neighbourhoods. North End WPCC upgrades ongoing to reduce CSO events.",
+    "data_note": null
+  },
+  "watershed_inflow": {
+    "shoal_lake": {
+      "station_id": "05PB014",
+      "station_name": "Shoal Lake at outlet (level gauge)",
+      "role": "primary_source",
+      "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/MB/hourly/MB_05PB014_hourly_hydrometric.csv",
+      "level_m": null,
+      "discharge_cms": null,
+      "timestamp": null,
+      "status": "http_error_404"
+    },
+    "assiniboine": {
+      "station_id": "05QB004",
+      "station_name": "Assiniboine River at Headingley",
+      "role": "regional_context",
+      "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/MB/hourly/MB_05QB004_hourly_hydrometric.csv",
+      "level_m": null,
+      "discharge_cms": null,
+      "timestamp": null,
+      "status": "http_error_404"
+    }
+  }
+}

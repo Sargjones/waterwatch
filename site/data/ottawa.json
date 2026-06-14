@@ -1,0 +1,120 @@
+{
+  "meta": {
+    "city": "Ottawa",
+    "province": "ON",
+    "operator": "City of Ottawa (Ottawa Water Services)",
+    "population_served": 1100000,
+    "per_capita_lpd": 230,
+    "per_capita_lpd_source": "City of Ottawa 2023 Drinking Water Quality Report",
+    "dashboard": "waterwatch.criticalto.ca/ottawa",
+    "generated_utc": "2026-06-14T10:28:17.759728+00:00",
+    "data_licences": [
+      "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
+    ]
+  },
+  "source": {
+    "type": "surface",
+    "groundwater_pct": 0,
+    "primary": "Ottawa River (primary, ~90% of supply via Britannia WTP) + Rideau River (secondary, ~10% via Lemieux Island WTP)",
+    "watershed_protected": false,
+    "wfi_risk": "low",
+    "wfi_note": "Ottawa and Rideau River watersheds have low wildfire interface risk"
+  },
+  "storage": {
+    "reservoirs": {
+      "direct_intake": {
+        "name": "No reservoir \u2014 direct river intakes",
+        "max_dam3": null,
+        "data_note": "Ottawa draws directly from the Ottawa and Rideau Rivers with no storage reservoir. Distribution reservoirs provide limited buffer."
+      }
+    },
+    "per_capita_dam3": null,
+    "data_note": "No source storage \u2014 similar vulnerability to Edmonton but mitigated by dual-river sourcing and higher baseline flows.",
+    "last_updated": null
+  },
+  "treatment": {
+    "plants": [
+      {
+        "name": "Britannia WTP",
+        "capacity_ml_day": 680,
+        "process": "conventional + UV + chlorination + fluoride. Draws from Ottawa River."
+      },
+      {
+        "name": "Lemieux Island WTP",
+        "capacity_ml_day": 220,
+        "process": "conventional + UV + chlorination + fluoride. Draws from Rideau River."
+      }
+    ],
+    "fluoridation": true,
+    "fluoride_note": null,
+    "data_note": "Dual-source design provides operational redundancy. Ottawa River carries significant runoff from the Quebec highlands; Rideau River has chronic cyanobacteria issues in late summer."
+  },
+  "restriction": {
+    "system": "formal",
+    "system_url": "https://ottawa.ca/en/residents/water-and-environment/water-services/water-conservation",
+    "stage": 0,
+    "stage_label": "No active restrictions",
+    "start_date": null,
+    "end_date": null,
+    "fine_cad": null,
+    "prohibitions": [],
+    "permitted": [],
+    "last_verified": "2026-06-14",
+    "hypothesized_triggers": "Ottawa uses seasonal watering bylaws (odd/even). Full restrictions historically rare.",
+    "days_remaining": 0
+  },
+  "snowpack": {
+    "pct_of_normal": 88,
+    "reference": "April 1 peak, Ottawa River Basin",
+    "source": "Ottawa River Regulation Planning Board",
+    "note": "2026 reading \u2014 near normal",
+    "last_updated": "2026-05-01"
+  },
+  "risk": {
+    "wfi_risk": "low",
+    "infrastructure_risk": "low_moderate",
+    "single_point_of_failure": "Ottawa River is primary source for ~90% of supply. A contamination event upstream (Quebec industrial corridor) could force full reliance on Rideau River, which has capacity for only ~25% of demand.",
+    "groundwater_dependency": false,
+    "climate_note": "Rideau River cyanobacteria blooms are increasing in frequency with warming summers. Ottawa River carries agricultural runoff from the Quebec highlands upstream."
+  },
+  "use": {
+    "per_capita_lpd": 230,
+    "residential_pct": 58,
+    "industrial_pct": 20,
+    "commercial_pct": 22,
+    "major_industrial_users": null,
+    "data_note": "Sector split approximate from City of Ottawa annual report"
+  },
+  "egress": {
+    "treatment_type": "secondary",
+    "plants": [
+      "Robert O. Pickard Environmental Centre (ROPEC)"
+    ],
+    "discharge_point": "Ottawa River",
+    "cso_risk": "moderate",
+    "cso_note": "Combined sewers in older urban areas. ROPEC handles all Ottawa wastewater.",
+    "data_note": null
+  },
+  "watershed_inflow": {
+    "ottawa_river": {
+      "station_id": "02KF005",
+      "station_name": "Ottawa River at Ottawa (Britannia)",
+      "role": "primary_source",
+      "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02KF005_hourly_hydrometric.csv",
+      "level_m": 58.297,
+      "discharge_cms": 1200.0,
+      "timestamp": "2026-06-14T04:35:00-05:00",
+      "status": "ok"
+    },
+    "rideau_river": {
+      "station_id": "02LA004",
+      "station_name": "Rideau River at Ottawa",
+      "role": "secondary_source",
+      "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02LA004_hourly_hydrometric.csv",
+      "level_m": 2.81,
+      "discharge_cms": 16.1,
+      "timestamp": "2026-06-14T04:40:00-05:00",
+      "status": "ok"
+    }
+  }
+}

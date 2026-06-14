@@ -1,0 +1,116 @@
+{
+  "meta": {
+    "city": "Regina",
+    "province": "SK",
+    "operator": "Buffalo Pound Water Treatment Plant (City of Regina + City of Saskatoon)",
+    "population_served": 250000,
+    "per_capita_lpd": 330,
+    "per_capita_lpd_source": "City of Regina 2023 Water Quality Report",
+    "dashboard": "waterwatch.criticalto.ca/regina",
+    "generated_utc": "2026-06-14T10:28:16.870652+00:00",
+    "data_licences": [
+      "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
+    ]
+  },
+  "source": {
+    "type": "surface",
+    "groundwater_pct": 0,
+    "primary": "Buffalo Pound Lake (Qu'Appelle River system, Last Mountain Lake drainage)",
+    "watershed_protected": false,
+    "wfi_risk": "low",
+    "wfi_note": "Prairie watershed \u2014 negligible wildfire risk"
+  },
+  "storage": {
+    "reservoirs": {
+      "buffalo_pound": {
+        "name": "Buffalo Pound Lake",
+        "max_dam3": 112000,
+        "data_note": "Natural lake used as source reservoir. Levels not published in WSC real-time network."
+      }
+    },
+    "per_capita_dam3": 0.448,
+    "per_capita_dam3_note": "Buffalo Pound Lake max capacity / Regina share of population served",
+    "data_note": "Buffalo Pound WTP serves both Regina and Saskatoon (~500,000 combined). Capacity shown is total lake volume.",
+    "last_updated": null
+  },
+  "treatment": {
+    "plants": [
+      {
+        "name": "Buffalo Pound WTP",
+        "capacity_ml_day": 230,
+        "process": "conventional coagulation/sedimentation/filtration, UV, chlorination, fluoride, PAC for taste/odour"
+      }
+    ],
+    "fluoridation": true,
+    "fluoride_note": null,
+    "data_note": "Buffalo Pound WTP is a shared provincial asset co-owned by Regina and Saskatoon. Single plant serving two major cities is a shared vulnerability."
+  },
+  "restriction": {
+    "system": "informal",
+    "system_url": "https://www.regina.ca/home-property/water-sewer/water-conservation/",
+    "stage": 0,
+    "stage_label": "No active restrictions",
+    "start_date": null,
+    "end_date": null,
+    "fine_cad": null,
+    "prohibitions": [],
+    "permitted": [],
+    "last_verified": "2026-06-14",
+    "hypothesized_triggers": "Regina does not have a formal staged restriction bylaw. Seasonal lawn watering advisories issued during dry periods.",
+    "days_remaining": 0
+  },
+  "snowpack": {
+    "pct_of_normal": 82,
+    "reference": "April 1 peak, Qu'Appelle Basin",
+    "source": "Saskatchewan Water Security Agency",
+    "note": "2026 reading \u2014 near normal",
+    "last_updated": "2026-05-01"
+  },
+  "risk": {
+    "wfi_risk": "low",
+    "infrastructure_risk": "moderate",
+    "single_point_of_failure": "Buffalo Pound WTP is the sole treatment plant for both Regina and Saskatoon \u2014 a single facility serving ~500,000 people with no backup treatment capacity.",
+    "groundwater_dependency": false,
+    "climate_note": "Buffalo Pound Lake experiences recurring blue-green algae (cyanobacteria) blooms driven by agricultural nutrient loading from the Qu'Appelle watershed. Blooms require activated carbon treatment and can stress plant capacity."
+  },
+  "use": {
+    "per_capita_lpd": 330,
+    "residential_pct": 60,
+    "industrial_pct": 20,
+    "commercial_pct": 20,
+    "major_industrial_users": null,
+    "data_note": "Sector split approximate from City of Regina annual report"
+  },
+  "egress": {
+    "treatment_type": "secondary",
+    "plants": [
+      "Regina WWTP"
+    ],
+    "discharge_point": "Wascana Creek / Qu'Appelle River system",
+    "cso_risk": "low",
+    "cso_note": null,
+    "data_note": null
+  },
+  "watershed_inflow": {
+    "qu_appelle_outlet": {
+      "station_id": "05JF004",
+      "station_name": "Qu'Appelle River at Buffalo Pound Lake outlet",
+      "role": "primary_source",
+      "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/SK/hourly/SK_05JF004_hourly_hydrometric.csv",
+      "level_m": null,
+      "discharge_cms": null,
+      "timestamp": null,
+      "status": "http_error_404"
+    },
+    "qu_appelle_hwy19": {
+      "station_id": "05JE001",
+      "station_name": "Qu'Appelle River at Highway 19",
+      "role": "downstream_context",
+      "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/SK/hourly/SK_05JE001_hourly_hydrometric.csv",
+      "level_m": null,
+      "discharge_cms": null,
+      "timestamp": null,
+      "status": "http_error_404"
+    }
+  }
+}

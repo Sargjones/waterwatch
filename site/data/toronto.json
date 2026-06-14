@@ -1,0 +1,135 @@
+{
+  "meta": {
+    "city": "Toronto",
+    "province": "ON",
+    "operator": "City of Toronto (Toronto Water)",
+    "population_served": 3600000,
+    "per_capita_lpd": 200,
+    "per_capita_lpd_source": "Toronto Water 2023 Annual Report",
+    "dashboard": "waterwatch.criticalto.ca/toronto",
+    "generated_utc": "2026-06-14T10:28:17.577978+00:00",
+    "data_licences": [
+      "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
+    ]
+  },
+  "source": {
+    "type": "surface",
+    "groundwater_pct": 0,
+    "primary": "Lake Ontario (sole source) \u2014 intake depth 6\u20139m, 1\u20133km offshore",
+    "watershed_protected": false,
+    "wfi_risk": "negligible",
+    "wfi_note": "Great Lakes source \u2014 no wildfire interface risk",
+    "lake_ontario_note": "Lake Ontario levels managed by IJC Plan 2014. Daily mean level updated by IJC on business days. Current level: 75.37m IGLD 1985."
+  },
+  "storage": {
+    "reservoirs": {
+      "lake_ontario": {
+        "name": "Lake Ontario (de facto reservoir)",
+        "max_dam3": 1639000000,
+        "data_note": "Lake Ontario has ~1,639 km\u00b3 of water \u2014 effectively unlimited storage. Intake conditions (turbidity, temperature, algae) are the operational variable, not volume."
+      }
+    },
+    "per_capita_dam3": null,
+    "data_note": "Lake Ontario provides essentially unlimited supply. Toronto Water's constraint is treatment capacity and distribution infrastructure, not source volume.",
+    "last_updated": null,
+    "source_url": "https://ijc.org/en/loslrb/watershed/water-levels"
+  },
+  "treatment": {
+    "plants": [
+      {
+        "name": "R.C. Harris WTP",
+        "capacity_ml_day": 950,
+        "process": "conventional coagulation/sedimentation/filtration, UV, chlorination, fluoride. Built 1941 \u2014 Art Deco landmark."
+      },
+      {
+        "name": "F.J. Horgan WTP",
+        "capacity_ml_day": 950,
+        "process": "conventional + UV + chlorination + fluoride"
+      },
+      {
+        "name": "R.L. Clark WTP",
+        "capacity_ml_day": 600,
+        "process": "conventional + UV + chlorination + fluoride"
+      },
+      {
+        "name": "Island WTP",
+        "capacity_ml_day": 100,
+        "process": "conventional + UV + chlorination + fluoride. Serves Toronto Island."
+      }
+    ],
+    "fluoridation": true,
+    "fluoride_note": null,
+    "data_note": "Total treatment capacity ~2,600 ML/day for a city using ~700 ML/day \u2014 significant redundancy. R.C. Harris WTP (1941) is a designated heritage building."
+  },
+  "restriction": {
+    "system": "formal",
+    "system_url": "https://www.toronto.ca/services-payments/water-environment/tap-water-in-toronto/",
+    "stage": 0,
+    "stage_label": "No active restrictions",
+    "start_date": null,
+    "end_date": null,
+    "fine_cad": null,
+    "prohibitions": [],
+    "permitted": [],
+    "last_verified": "2026-06-14",
+    "hypothesized_triggers": "Toronto has a seasonal outdoor watering bylaw (odd/even by address). Full restrictions rare given Great Lakes source.",
+    "days_remaining": 0
+  },
+  "snowpack": {
+    "pct_of_normal": null,
+    "reference": "Not applicable \u2014 Lake Ontario source",
+    "source": null,
+    "note": "Toronto's supply is from Lake Ontario, not snowmelt-dependent watersheds. IJC manages lake levels under Plan 2014.",
+    "last_updated": null
+  },
+  "risk": {
+    "wfi_risk": "negligible",
+    "infrastructure_risk": "low_moderate",
+    "single_point_of_failure": "None at source level \u2014 Lake Ontario is effectively unlimited. Distribution network age (many pipes pre-1950) is the primary infrastructure risk.",
+    "groundwater_dependency": false,
+    "climate_note": "Lake Ontario levels are above long-term average (75.37m vs historical mean). Climate risk is increasing algae and turbidity events near intakes, not supply volume."
+  },
+  "use": {
+    "per_capita_lpd": 200,
+    "residential_pct": 55,
+    "industrial_pct": 20,
+    "commercial_pct": 25,
+    "major_industrial_users": null,
+    "data_note": "Toronto has one of the lowest per-capita uses of any major Canadian city \u2014 result of decades of conservation programming and metering."
+  },
+  "egress": {
+    "treatment_type": "tertiary",
+    "plants": [
+      "Humber WWTP",
+      "Highland Creek WWTP",
+      "North Toronto WWTP",
+      "Ashbridges Bay WWTP"
+    ],
+    "discharge_point": "Lake Ontario",
+    "cso_risk": "moderate",
+    "cso_note": "Combined sewers in older (pre-1950) neighbourhoods. Wet weather flow management program ongoing. Ashbridges Bay WTP receives the largest volume.",
+    "data_note": "Toronto is one of few Canadian cities with tertiary wastewater treatment \u2014 phosphorus removal before Lake Ontario discharge."
+  },
+  "watershed_inflow": {
+    "don_river": {
+      "station_id": "02HC003",
+      "station_name": "Don River at Todmorden (watershed indicator)",
+      "role": "watershed_indicator",
+      "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02HC003_hourly_hydrometric.csv",
+      "level_m": 2.217,
+      "discharge_cms": 2.51,
+      "timestamp": "2026-06-14T04:40:00-05:00",
+      "status": "ok"
+    },
+    "humber_river": {
+      "station_id": "02HC009",
+      "station_name": "Humber River at Raymore Drive",
+      "role": "watershed_indicator",
+      "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02HC009_hourly_hydrometric.csv",
+      "level_m": 2.044,
+      "discharge_cms": 0.473,
+      "timestamp": "2026-06-14T04:40:00-05:00",
+      "status": "ok"
+    }
+  }
+}
