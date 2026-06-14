@@ -187,8 +187,30 @@
 
   <!-- STATIONS -->
   <p class="section-label">North Saskatchewan River — Real-Time Stations</p>
-  <div class="stations-grid">
+  <div class="stations-grid" style="grid-template-columns:repeat(3,1fr)">
 
+    <div class="station-card">
+      <div class="station-head">
+        <div>
+          <div class="station-name">North Saskatchewan R. at Drayton Valley</div>
+          <div class="station-id">05DC001</div>
+        </div>
+        <span class="river-badge badge-upstream">Mid-stream</span>
+      </div>
+      <div class="station-metrics">
+        <div>
+          <div class="stn-metric-label">Discharge</div>
+          <div class="stn-metric-value" id="flow-nsr_drayton">—</div>
+          <div class="stn-metric-unit">m³/s</div>
+        </div>
+        <div>
+          <div class="stn-metric-label">Level</div>
+          <div class="stn-metric-value" id="level-nsr_drayton">—</div>
+          <div class="stn-metric-unit">m</div>
+        </div>
+      </div>
+      <div class="station-trend" id="trend-nsr_drayton"></div>
+    </div>
     <div class="station-card">
       <div class="station-head">
         <div>
@@ -324,8 +346,8 @@
 </footer>
 
 <script>
-const STATION_KEYS = ['nsr_edmonton', 'nsr_upstream'];
-const COLOURS = { nsr_edmonton: '#7a5c00', nsr_upstream: '#b08020' };
+const STATION_KEYS = ['nsr_upstream', 'nsr_drayton', 'nsr_edmonton'];
+const COLOURS = { nsr_upstream: '#c49000', nsr_drayton: '#9a7010', nsr_edmonton: '#7a5c00' };
 let chartInstance = null, chartScale = 'linear';
 
 async function loadData() {
