@@ -7,7 +7,7 @@
     "per_capita_lpd": 215,
     "per_capita_lpd_source": "City of Calgary 2023 Water Use Report",
     "dashboard": "waterwatch.criticalto.ca/calgary",
-    "generated_utc": "2026-06-14T09:52:18.060999+00:00",
+    "generated_utc": "2026-06-14T10:03:09.643830+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -109,31 +109,31 @@
       "station_id": "05BH004",
       "station_name": "Bow River at Calgary",
       "role": "primary_source",
-      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BH004_hourly_hydrometric.csv",
-      "level_m": null,
-      "discharge_cms": null,
-      "timestamp": null,
-      "status": "error: <urlopen error timed out>"
+      "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BH004_hourly_hydrometric.csv",
+      "level_m": 1.767,
+      "discharge_cms": 236.0,
+      "timestamp": "2026-06-14T02:05:00-07:00",
+      "status": "ok"
     },
     "elbow_glenmore": {
       "station_id": "05BJ001",
       "station_name": "Elbow River below Glenmore Dam",
       "role": "primary_source",
-      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BJ001_hourly_hydrometric.csv",
-      "level_m": null,
-      "discharge_cms": null,
-      "timestamp": null,
-      "status": "error: <urlopen error timed out>"
+      "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BJ001_hourly_hydrometric.csv",
+      "level_m": 1.174,
+      "discharge_cms": 23.0,
+      "timestamp": "2026-06-14T02:05:00-07:00",
+      "status": "ok"
     },
     "elbow_bragg": {
       "station_id": "05BJ004",
       "station_name": "Elbow River at Bragg Creek",
       "role": "upstream_context",
-      "url": "https://dd.weather.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BJ004_hourly_hydrometric.csv",
-      "level_m": null,
-      "discharge_cms": null,
-      "timestamp": null,
-      "status": "error: <urlopen error timed out>"
+      "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BJ004_hourly_hydrometric.csv",
+      "level_m": 1.029,
+      "discharge_cms": 21.0,
+      "timestamp": "2026-06-14T02:25:00-07:00",
+      "status": "ok"
     }
   },
   "glenmore": {
