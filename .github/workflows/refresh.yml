@@ -6,11 +6,14 @@ on:
     - cron: '0 18 * * 1'
     # Also every 6 hours for watershed inflow (Environment Canada updates hourly)
     - cron: '0 */6 * * *'
-  workflow_dispatch:  # Allow manual trigger from GitHub Actions UI
+  workflow_dispatch:
 
 jobs:
   fetch:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
     steps:
       - uses: actions/checkout@v4
 
@@ -19,6 +22,9 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Install dependencies
+        run: pip install pdfminer.six
+
       - name: Run data scraper
         run: python3 scraper/fetch_data.py
 
@@ -26,6 +32,10 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "WaterWatch Bot"
-          git add site/data/vancouver.json site/data/canmore.json
-          git diff --staged --quiet || git commit -m "data: refresh vancouver + canmore [$(date -u '+%Y-%m-%d %H:%M UTC')]"
+          git add site/data/vancouver.json \
+                  site/data/victoria.json \
+                  site/data/calgary.json \
+                  site/data/edmonton.json \
+                  site/data/canmore.json
+          git diff --staged --quiet || git commit -m "data: refresh all cities [$(date -u '+%Y-%m-%d %H:%M UTC')]"
           git push
