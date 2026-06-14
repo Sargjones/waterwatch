@@ -37,7 +37,7 @@
   body { background: var(--paper); color: var(--ink); font-family: var(--mono); font-size: 14px; line-height: 1.6; min-height: 100vh; }
 
   /* ── Header ── */
-  .site-header { border-bottom: 1px solid var(--border-strong); padding: 1.25rem 2rem; display: flex; align-items: center; justify-content: space-between; background: var(--paper); position: sticky; top: 0; z-index: 1000; }
+  .site-header { border-bottom: 1px solid var(--border-strong); padding: 1.25rem 2rem; display: flex; align-items: center; justify-content: space-between; background: var(--paper); position: sticky; top: 0; z-index: 1001; }
   .logo { display: flex; align-items: baseline; gap: 0.5rem; }
   .logo-mark { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
   .logo-region { font-size: 11px; font-weight: 500; color: var(--ink-muted); letter-spacing: 0.08em; text-transform: uppercase; }
@@ -223,15 +223,29 @@
 </head>
 <body>
 
-<header class="site-header">
-  <div class="logo">
-    <span class="logo-mark">WaterWatch</span>
-    <span class="logo-region">Canmore, AB · criticalto.ca</span>
+<header class="site-header" style="flex-direction:column;align-items:flex-start;gap:0.5rem">
+  <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+    <div class="logo">
+      <span class="logo-mark">WaterWatch</span>
+      <span class="logo-region">Canmore, AB · criticalto.ca</span>
+    </div>
+    <div class="header-meta">
+      <span><span class="live-dot"></span>Updated every 6 hours</span>
+      <span id="last-updated">Loading...</span>
+    </div>
   </div>
-  <div class="header-meta">
-    <span><span class="live-dot"></span>Updated every 6 hours</span>
-    <span id="last-updated">Loading...</span>
-  </div>
+  <nav style="display:flex;gap:1rem;flex-wrap:wrap;font-size:11px;padding-top:0.5rem;border-top:1px solid rgba(13,26,15,0.12);width:100%">
+    <a href="/" style="color:var(--ink-muted);text-decoration:none">← National</a>
+    <a href="/vancouver.html" style="color:var(--ink-muted);text-decoration:none">Metro Vancouver</a>
+    <a href="/victoria.html" style="color:var(--ink-muted);text-decoration:none">Victoria, BC</a>
+    <a href="/calgary.html" style="color:var(--ink-muted);text-decoration:none">Calgary, AB</a>
+    <a href="/edmonton.html" style="color:var(--ink-muted);text-decoration:none">Edmonton, AB</a>
+    <a href="/canmore.html" style="color:var(--ink);font-weight:500;border-bottom:2px solid var(--ink);padding-bottom:1px;text-decoration:none">Canmore, AB</a>
+    <a href="/regina.html" style="color:var(--ink-muted);text-decoration:none">Regina, SK</a>
+    <a href="/winnipeg.html" style="color:var(--ink-muted);text-decoration:none">Winnipeg, MB</a>
+    <a href="/toronto.html" style="color:var(--ink-muted);text-decoration:none">Toronto, ON</a>
+    <a href="/ottawa.html" style="color:var(--ink-muted);text-decoration:none">Ottawa, ON</a>
+  </nav>
 </header>
 
 <div class="status-banner" id="status-banner">
@@ -240,18 +254,7 @@
 </div>
 
 <main>
-  <div class="city-switch">
-    <a href="/">← National</a>
-    <a href="/">National</a> · <a href="/vancouver.html">Metro Vancouver</a>
-    <a href="/victoria.html">Victoria, BC</a>
-    <a href="/calgary.html">Calgary, AB</a>
-    <a href="/edmonton.html">Edmonton, AB</a>
-    <a href="/canmore.html" class="active">Canmore, AB</a>
-    <a href="/regina.html">Regina, SK</a>
-    <a href="/winnipeg.html">Winnipeg, MB</a>
-    <a href="/toronto.html">Toronto, ON</a>
-    <a href="/ottawa.html">Ottawa, ON</a>
-  </div>
+
 
   <!-- Key metrics -->
   <div class="metrics-row">
@@ -393,7 +396,7 @@
     <a href="https://www.canmore.ca/your-community/public-safety/hazard-monitoring/drought-monitoring" target="_blank">Canmore drought monitoring</a> ·
     <a href="https://www.epcor.com/ca/en/about/our-company/where-we-operate/canmore.html" target="_blank">EPCOR Canmore</a> ·
     <a href="https://wateroffice.ec.gc.ca" target="_blank">Environment Canada</a> ·
-    <a href="/">National</a> · <a href="/vancouver.html">Metro Vancouver</a>
+    <a href="/">WaterWatch National</a>
   </div>
 </footer>
 
