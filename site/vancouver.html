@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WaterWatch — Metro Vancouver</title>
 <meta name="description" content="Live water supply intelligence for Metro Vancouver. Reservoir levels, restriction stage, watershed inflow, and conservation guidance. Stage 3 restrictions in effect.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -553,10 +555,33 @@
   </div>
 
   <!-- What's allowed -->
+
+  <!-- Station Map -->
+  <p class="section-label">Source Watershed Locations</p>
+  <div id="map" style="height:220px;border-radius:4px;border:1px solid var(--border);margin-bottom:2rem;position:relative;z-index:1"></div>
+  <script>
+  (function() {
+    var mapEl = document.getElementById('map');
+    if (!mapEl || typeof L === 'undefined') return;
+    var map = L.map('map').setView([49.4, -123.0], 9);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+      {attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
+    [
+      {c:[49.4050,-123.0600],id:'08GA010',name:'Capilano River above Intake',col:'#8b2020'},
+      {c:[49.4500,-122.9800],id:'08GA030',name:'Seymour River at Seymour Falls',col:'#8b2020'},
+      {c:[49.2800,-122.7800],id:'08MH141',name:'Coquitlam River near Port Coquitlam',col:'#8b2020'},
+    ].forEach(function(s){
+      var icon=L.divIcon({className:'',html:'<div style="width:12px;height:12px;background:'+s.col+';border:2px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.3)"></div>',iconSize:[12,12],iconAnchor:[6,6]});
+      L.marker(s.c,{icon}).addTo(map).bindPopup('<strong>'+s.name+'</strong><br><code>'+s.id+'</code>');
+    });
+    setTimeout(function(){map.invalidateSize();},300);
+  })();
+  </script>
+
   <p class="section-label">Stage 3 — what's allowed right now</p>
   <div class="restrictions-card">
     <div class="rules-grid" id="rules-grid"><!-- populated by JS --></div>
-    <div class="tunnel-note" id="tunnel-note"></div>
+    <div class="tunnel-note" id="tunnel-note" style="display:none"></div>
   </div>
 
   <!-- Countdown + Snowpack -->
@@ -735,7 +760,7 @@ function renderRules() {
 
 function renderTunnelNote(restriction) {
   if (restriction.stanley_park_tunnel) {
-    document.getElementById('tunnel-note').innerHTML =
+    const tn=document.getElementById('tunnel-note'); tn.style.display='block'; tn.innerHTML =
       `<strong>Why Stage 3, not Stage 2?</strong> Stage 3 was triggered by two factors: low snowpack (53% of normal) ` +
       `<em>and</em> construction of the Stanley Park Water Supply Tunnel, which has temporarily reduced pipe capacity ` +
       `from the North Shore reservoirs. Both factors are expected to resolve — snowpack will recover in winter; ` +
