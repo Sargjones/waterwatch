@@ -36,6 +36,10 @@ jobs:
                   site/data/victoria.json \
                   site/data/calgary.json \
                   site/data/edmonton.json \
-                  site/data/canmore.json
+                  site/data/canmore.json \
+                  site/data/regina.json \
+                  site/data/winnipeg.json \
+                  site/data/toronto.json \
+                  site/data/ottawa.json
           git diff --staged --quiet || git commit -m "data: refresh all cities [$(date -u '+%Y-%m-%d %H:%M UTC')]"
           git push
