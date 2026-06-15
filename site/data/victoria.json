@@ -7,7 +7,7 @@
     "per_capita_lpd": 330,
     "per_capita_lpd_source": "CRD 2023 Annual Water Report",
     "dashboard": "waterwatch.criticalto.ca/victoria",
-    "generated_utc": "2026-06-15T20:44:19.972437+00:00",
+    "generated_utc": "2026-06-15T20:58:04.809847+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -112,7 +112,7 @@
       "level_m": null,
       "discharge_cms": null,
       "timestamp": null,
-      "status": "no_data_wateroffice"
+      "status": "error: <urlopen error timed out>"
     }
   }
 }
