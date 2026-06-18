@@ -7,7 +7,7 @@
     "per_capita_lpd": 280,
     "per_capita_lpd_source": "City of Winnipeg 2023 Water Quality Report",
     "dashboard": "waterwatch.criticalto.ca/winnipeg",
-    "generated_utc": "2026-06-18T04:15:19.285451+00:00",
+    "generated_utc": "2026-06-18T10:28:32.301876+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -97,9 +97,9 @@
       "station_name": "Red River at Emerson (US border crossing)",
       "role": "upstream_context",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/MB/hourly/MB_05OG001_hourly_hydrometric.csv",
-      "level_m": 232.458,
-      "discharge_cms": 12.0,
-      "timestamp": "2026-06-17T21:05:00-06:00",
+      "level_m": 232.393,
+      "discharge_cms": 11.1,
+      "timestamp": "2026-06-18T03:05:00-06:00",
       "status": "ok"
     },
     "red_river": {
