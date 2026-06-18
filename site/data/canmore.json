@@ -8,7 +8,7 @@
     "per_capita_lpd_source": null,
     "per_capita_lpd_data_note": "Not publicly reported by EPCOR for Canmore separately",
     "dashboard": "waterwatch.criticalto.ca/canmore",
-    "generated_utc": "2026-06-18T15:31:36.381203+00:00",
+    "generated_utc": "2026-06-18T20:28:42.848988+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -97,9 +97,9 @@
       "station_name": "Bow River at Banff (25km upstream)",
       "role": "upstream_context",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BB001_hourly_hydrometric.csv",
-      "level_m": 2.971,
-      "discharge_cms": 161.0,
-      "timestamp": "2026-06-18T07:25:00-07:00",
+      "level_m": 2.955,
+      "discharge_cms": 157.0,
+      "timestamp": "2026-06-18T12:25:00-07:00",
       "status": "ok"
     },
     "spray_banff": {
@@ -107,9 +107,9 @@
       "station_name": "Spray River at Banff",
       "role": "upstream_context",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BC001_hourly_hydrometric.csv",
-      "level_m": 1.238,
-      "discharge_cms": 11.7,
-      "timestamp": "2026-06-18T07:25:00-07:00",
+      "level_m": 1.235,
+      "discharge_cms": 11.6,
+      "timestamp": "2026-06-18T12:25:00-07:00",
       "status": "ok"
     },
     "waiparous": {
@@ -117,9 +117,9 @@
       "station_name": "Waiparous Creek near Cochrane",
       "role": "tributary",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BG006_hourly_hydrometric.csv",
-      "level_m": 0.902,
-      "discharge_cms": 4.33,
-      "timestamp": "2026-06-18T08:05:00-07:00",
+      "level_m": 0.896,
+      "discharge_cms": 4.24,
+      "timestamp": "2026-06-18T12:05:00-07:00",
       "status": "ok"
     },
     "bow_cochrane": {
@@ -129,7 +129,7 @@
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BH005_hourly_hydrometric.csv",
       "level_m": 17.175,
       "discharge_cms": 288.0,
-      "timestamp": "2026-06-18T06:15:00-07:00",
+      "timestamp": "2026-06-18T12:15:00-07:00",
       "status": "ok"
     }
   },
