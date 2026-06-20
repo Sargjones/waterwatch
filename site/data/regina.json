@@ -7,7 +7,7 @@
     "per_capita_lpd": 330,
     "per_capita_lpd_source": "City of Regina 2023 Water Quality Report",
     "dashboard": "waterwatch.criticalto.ca/regina",
-    "generated_utc": "2026-06-19T19:53:03.366209+00:00",
+    "generated_utc": "2026-06-20T03:58:08.231306+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -99,7 +99,7 @@
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/SK/hourly/SK_05HG001_hourly_hydrometric.csv",
       "level_m": 2.425,
       "discharge_cms": 289.0,
-      "timestamp": "2026-06-19T13:00:00-06:00",
+      "timestamp": "2026-06-19T21:00:00-06:00",
       "status": "ok"
     },
     "qu_appelle_lumsden": {
@@ -107,9 +107,9 @@
       "station_name": "Qu'Appelle River near Lumsden",
       "role": "downstream_context",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/SK/hourly/SK_05JF006_hourly_hydrometric.csv",
-      "level_m": 1.073,
-      "discharge_cms": 0.185,
-      "timestamp": "2026-06-19T13:05:00-06:00",
+      "level_m": 1.062,
+      "discharge_cms": 0.17,
+      "timestamp": "2026-06-19T21:05:00-06:00",
       "status": "ok"
     }
   }
