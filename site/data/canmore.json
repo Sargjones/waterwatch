@@ -8,7 +8,7 @@
     "per_capita_lpd_source": null,
     "per_capita_lpd_data_note": "Not publicly reported by EPCOR for Canmore separately",
     "dashboard": "waterwatch.criticalto.ca/canmore",
-    "generated_utc": "2026-06-24T03:51:02.740906+00:00",
+    "generated_utc": "2026-06-24T09:35:44.356518+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -97,9 +97,9 @@
       "station_name": "Bow River at Banff (25km upstream)",
       "role": "upstream_context",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BB001_hourly_hydrometric.csv",
-      "level_m": 2.779,
-      "discharge_cms": 119.0,
-      "timestamp": "2026-06-23T19:25:00-07:00",
+      "level_m": 2.777,
+      "discharge_cms": 118.0,
+      "timestamp": "2026-06-24T01:25:00-07:00",
       "status": "ok"
     },
     "spray_banff": {
@@ -107,9 +107,9 @@
       "station_name": "Spray River at Banff",
       "role": "upstream_context",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BC001_hourly_hydrometric.csv",
-      "level_m": 1.178,
-      "discharge_cms": 8.69,
-      "timestamp": "2026-06-23T19:25:00-07:00",
+      "level_m": 1.181,
+      "discharge_cms": 8.81,
+      "timestamp": "2026-06-24T01:25:00-07:00",
       "status": "ok"
     },
     "waiparous": {
@@ -119,7 +119,7 @@
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BG006_hourly_hydrometric.csv",
       "level_m": 0.839,
       "discharge_cms": 3.46,
-      "timestamp": "2026-06-23T20:05:00-07:00",
+      "timestamp": "2026-06-24T02:05:00-07:00",
       "status": "ok"
     },
     "bow_cochrane": {
@@ -127,9 +127,9 @@
       "station_name": "Bow River near Cochrane (downstream indicator)",
       "role": "downstream_context",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BH005_hourly_hydrometric.csv",
-      "level_m": 17.065,
-      "discharge_cms": 246.0,
-      "timestamp": "2026-06-23T18:15:00-07:00",
+      "level_m": 17.067,
+      "discharge_cms": 247.0,
+      "timestamp": "2026-06-24T00:15:00-07:00",
       "status": "ok"
     }
   },
