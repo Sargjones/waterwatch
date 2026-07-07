@@ -7,7 +7,7 @@
     "per_capita_lpd": 215,
     "per_capita_lpd_source": "City of Calgary 2023 Water Use Report",
     "dashboard": "waterwatch.criticalto.ca/calgary",
-    "generated_utc": "2026-07-03T09:22:41.514073+00:00",
+    "generated_utc": "2026-07-07T09:46:53.101758+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -110,9 +110,9 @@
       "station_name": "Bow River at Calgary",
       "role": "primary_source",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BH004_hourly_hydrometric.csv",
-      "level_m": 2.051,
-      "discharge_cms": 345.0,
-      "timestamp": "2026-07-03T01:05:00-07:00",
+      "level_m": 1.772,
+      "discharge_cms": 239.0,
+      "timestamp": "2026-07-07T02:05:00-07:00",
       "status": "ok"
     },
     "elbow_glenmore": {
@@ -120,9 +120,9 @@
       "station_name": "Elbow River below Glenmore Dam",
       "role": "primary_source",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BJ001_hourly_hydrometric.csv",
-      "level_m": 1.789,
-      "discharge_cms": 76.7,
-      "timestamp": "2026-07-03T01:05:00-07:00",
+      "level_m": 1.465,
+      "discharge_cms": 44.5,
+      "timestamp": "2026-07-07T02:05:00-07:00",
       "status": "ok"
     },
     "elbow_bragg": {
@@ -130,9 +130,9 @@
       "station_name": "Elbow River at Bragg Creek",
       "role": "upstream_context",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BJ004_hourly_hydrometric.csv",
-      "level_m": 1.561,
-      "discharge_cms": 66.9,
-      "timestamp": "2026-07-03T01:25:00-07:00",
+      "level_m": 1.322,
+      "discharge_cms": 40.0,
+      "timestamp": "2026-07-07T01:25:00-07:00",
       "status": "ok"
     }
   },
