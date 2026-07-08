@@ -8,7 +8,7 @@
     "per_capita_lpd_source": null,
     "per_capita_lpd_data_note": "Not publicly reported by EPCOR for Canmore separately",
     "dashboard": "waterwatch.criticalto.ca/canmore",
-    "generated_utc": "2026-07-08T02:53:48.268244+00:00",
+    "generated_utc": "2026-07-08T08:33:21.073423+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -97,9 +97,9 @@
       "station_name": "Bow River at Banff (25km upstream)",
       "role": "upstream_context",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BB001_hourly_hydrometric.csv",
-      "level_m": 2.824,
-      "discharge_cms": 127.0,
-      "timestamp": "2026-07-07T18:25:00-07:00",
+      "level_m": 2.813,
+      "discharge_cms": 125.0,
+      "timestamp": "2026-07-08T00:25:00-07:00",
       "status": "ok"
     },
     "spray_banff": {
@@ -107,9 +107,9 @@
       "station_name": "Spray River at Banff",
       "role": "upstream_context",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BC001_hourly_hydrometric.csv",
-      "level_m": 1.223,
-      "discharge_cms": 10.6,
-      "timestamp": "2026-07-07T18:25:00-07:00",
+      "level_m": 1.229,
+      "discharge_cms": 10.8,
+      "timestamp": "2026-07-08T00:25:00-07:00",
       "status": "ok"
     },
     "waiparous": {
@@ -117,9 +117,9 @@
       "station_name": "Waiparous Creek near Cochrane",
       "role": "tributary",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BG006_hourly_hydrometric.csv",
-      "level_m": 1.072,
-      "discharge_cms": 13.1,
-      "timestamp": "2026-07-07T19:05:00-07:00",
+      "level_m": 1.067,
+      "discharge_cms": 12.9,
+      "timestamp": "2026-07-08T01:05:00-07:00",
       "status": "ok"
     },
     "bow_cochrane": {
@@ -127,9 +127,9 @@
       "station_name": "Bow River near Cochrane (downstream indicator)",
       "role": "downstream_context",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BH005_hourly_hydrometric.csv",
-      "level_m": 17.015,
-      "discharge_cms": 229.0,
-      "timestamp": "2026-07-07T18:15:00-07:00",
+      "level_m": 17.014,
+      "discharge_cms": 228.0,
+      "timestamp": "2026-07-08T00:15:00-07:00",
       "status": "ok"
     }
   },
