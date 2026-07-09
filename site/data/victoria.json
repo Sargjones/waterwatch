@@ -7,7 +7,7 @@
     "per_capita_lpd": 330,
     "per_capita_lpd_source": "CRD 2023 Annual Water Report",
     "dashboard": "waterwatch.criticalto.ca/victoria",
-    "generated_utc": "2026-07-09T15:15:05.008914+00:00",
+    "generated_utc": "2026-07-09T19:49:39.921330+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -99,9 +99,9 @@
       "station_name": "Sooke River below Millar Creek",
       "role": "watershed_inflow",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/BC/hourly/BC_08HA010_hourly_hydrometric.csv",
-      "level_m": 2.031,
-      "discharge_cms": 0.781,
-      "timestamp": "2026-07-09T06:15:00-08:00",
+      "level_m": 2.03,
+      "discharge_cms": 2.11,
+      "timestamp": "2026-07-09T11:15:00-08:00",
       "status": "ok"
     },
     "sooke_upper": {
