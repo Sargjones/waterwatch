@@ -7,7 +7,7 @@
     "per_capita_lpd": 280,
     "per_capita_lpd_source": "City of Winnipeg 2023 Water Quality Report",
     "dashboard": "waterwatch.criticalto.ca/winnipeg",
-    "generated_utc": "2026-07-15T19:15:24.744851+00:00",
+    "generated_utc": "2026-07-16T02:47:54.196364+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -97,9 +97,9 @@
       "station_name": "Red River at Emerson (US border crossing)",
       "role": "upstream_context",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/MB/hourly/MB_05OG001_hourly_hydrometric.csv",
-      "level_m": 231.411,
-      "discharge_cms": 1.51,
-      "timestamp": "2026-07-15T12:05:00-06:00",
+      "level_m": 231.387,
+      "discharge_cms": 1.44,
+      "timestamp": "2026-07-15T20:05:00-06:00",
       "status": "ok"
     },
     "red_river": {
@@ -110,7 +110,7 @@
       "level_m": null,
       "discharge_cms": null,
       "timestamp": null,
-      "status": "no_data_wateroffice"
+      "status": "wateroffice_error: <urlopen error timed out>"
     },
     "assiniboine": {
       "station_id": "05QB004",
@@ -120,7 +120,7 @@
       "level_m": null,
       "discharge_cms": null,
       "timestamp": null,
-      "status": "no_data_wateroffice"
+      "status": "wateroffice_error: <urlopen error timed out>"
     }
   }
 }
