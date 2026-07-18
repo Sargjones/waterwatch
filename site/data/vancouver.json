@@ -7,7 +7,7 @@
     "per_capita_lpd": 490,
     "per_capita_lpd_source": "Metro Vancouver 2023 Annual Water Report",
     "dashboard": "waterwatch.criticalto.ca/vancouver",
-    "generated_utc": "2026-07-18T02:41:01.699018+00:00",
+    "generated_utc": "2026-07-18T07:55:02.588530+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -128,7 +128,7 @@
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/BC/hourly/BC_08GA010_hourly_hydrometric.csv",
       "level_m": 0.681,
       "discharge_cms": 1.11,
-      "timestamp": "2026-07-17T18:10:00-08:00",
+      "timestamp": "2026-07-17T23:20:00-08:00",
       "status": "ok"
     },
     "seymour": {
@@ -136,9 +136,9 @@
       "station_name": "Seymour River at Seymour Falls",
       "role": "primary_source",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/BC/hourly/BC_08GA030_hourly_hydrometric.csv",
-      "level_m": 0.854,
-      "discharge_cms": 2.12,
-      "timestamp": "2026-07-17T18:05:00-08:00",
+      "level_m": 0.851,
+      "discharge_cms": 2.08,
+      "timestamp": "2026-07-17T23:05:00-08:00",
       "status": "ok"
     },
     "coquitlam": {
@@ -146,9 +146,9 @@
       "station_name": "Coquitlam River near Port Coquitlam",
       "role": "primary_source",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/BC/hourly/BC_08MH141_hourly_hydrometric.csv",
-      "level_m": 1.676,
-      "discharge_cms": 1.34,
-      "timestamp": "2026-07-17T18:20:00-08:00",
+      "level_m": 1.675,
+      "discharge_cms": 1.33,
+      "timestamp": "2026-07-17T23:20:00-08:00",
       "status": "ok"
     }
   },
