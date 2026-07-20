@@ -8,7 +8,7 @@
     "per_capita_lpd_source": null,
     "per_capita_lpd_data_note": "Not publicly reported by EPCOR for Canmore separately",
     "dashboard": "waterwatch.criticalto.ca/canmore",
-    "generated_utc": "2026-07-20T19:24:03.253577+00:00",
+    "generated_utc": "2026-07-20T19:45:57.847205+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -117,9 +117,9 @@
       "station_name": "Waiparous Creek near Cochrane",
       "role": "tributary",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BG006_hourly_hydrometric.csv",
-      "level_m": 0.864,
-      "discharge_cms": 3.52,
-      "timestamp": "2026-07-20T11:05:00-07:00",
+      "level_m": 0.865,
+      "discharge_cms": 3.54,
+      "timestamp": "2026-07-20T12:05:00-07:00",
       "status": "ok"
     },
     "bow_cochrane": {
@@ -127,9 +127,9 @@
       "station_name": "Bow River near Cochrane (downstream indicator)",
       "role": "downstream_context",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BH005_hourly_hydrometric.csv",
-      "level_m": 16.934,
-      "discharge_cms": 201.0,
-      "timestamp": "2026-07-20T09:15:00-07:00",
+      "level_m": 16.939,
+      "discharge_cms": 203.0,
+      "timestamp": "2026-07-20T12:15:00-07:00",
       "status": "ok"
     }
   },

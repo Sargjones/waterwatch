@@ -7,7 +7,7 @@
     "per_capita_lpd": 280,
     "per_capita_lpd_source": "City of Winnipeg 2023 Water Quality Report",
     "dashboard": "waterwatch.criticalto.ca/winnipeg",
-    "generated_utc": "2026-07-20T19:24:05.566502+00:00",
+    "generated_utc": "2026-07-20T19:45:58.447739+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -99,7 +99,7 @@
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/MB/hourly/MB_05OG001_hourly_hydrometric.csv",
       "level_m": 231.309,
       "discharge_cms": 1.19,
-      "timestamp": "2026-07-20T12:05:00-06:00",
+      "timestamp": "2026-07-20T13:05:00-06:00",
       "status": "ok"
     },
     "red_river": {
