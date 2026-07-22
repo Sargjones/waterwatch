@@ -7,7 +7,7 @@
     "per_capita_lpd": 200,
     "per_capita_lpd_source": "Toronto Water 2023 Annual Report",
     "dashboard": "waterwatch.criticalto.ca/toronto",
-    "generated_utc": "2026-07-22T08:32:49.756904+00:00",
+    "generated_utc": "2026-07-22T14:01:36.045339+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -116,9 +116,9 @@
       "station_name": "Humber River at Raymore Drive",
       "role": "watershed_indicator",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02HC009_hourly_hydrometric.csv",
-      "level_m": 2.049,
-      "discharge_cms": 0.518,
-      "timestamp": "2026-07-22T02:40:00-05:00",
+      "level_m": 2.053,
+      "discharge_cms": 0.555,
+      "timestamp": "2026-07-22T08:40:00-05:00",
       "status": "ok"
     },
     "don_river": {
@@ -126,9 +126,9 @@
       "station_name": "Don River at Todmorden",
       "role": "watershed_indicator",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02HC003_hourly_hydrometric.csv",
-      "level_m": 2.245,
-      "discharge_cms": 3.18,
-      "timestamp": "2026-07-22T03:10:00-05:00",
+      "level_m": 2.235,
+      "discharge_cms": 2.93,
+      "timestamp": "2026-07-22T08:50:00-05:00",
       "status": "ok"
     },
     "credit_river": {
@@ -138,7 +138,7 @@
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02HB008_hourly_hydrometric.csv",
       "level_m": 2.331,
       "discharge_cms": 2.39,
-      "timestamp": "2026-07-22T03:20:00-05:00",
+      "timestamp": "2026-07-22T08:50:00-05:00",
       "status": "ok"
     }
   }
