@@ -7,7 +7,7 @@
     "per_capita_lpd": 225,
     "per_capita_lpd_source": "EPCOR 2023 Annual Water Quality Report",
     "dashboard": "waterwatch.criticalto.ca/edmonton",
-    "generated_utc": "2026-08-03T14:43:25.708238+00:00",
+    "generated_utc": "2026-08-03T19:17:35.482589+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -112,9 +112,9 @@
       "station_name": "North Saskatchewan R. at Drayton Valley",
       "role": "upstream_context",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05DC001_hourly_hydrometric.csv",
-      "level_m": 2.031,
-      "discharge_cms": 184.0,
-      "timestamp": "2026-08-03T07:10:00-07:00",
+      "level_m": 2.026,
+      "discharge_cms": 182.0,
+      "timestamp": "2026-08-03T11:10:00-07:00",
       "status": "ok"
     },
     "nsr_edmonton": {
@@ -122,9 +122,9 @@
       "station_name": "North Saskatchewan River at Edmonton (intake)",
       "role": "primary_source",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05DF001_hourly_hydrometric.csv",
-      "level_m": 3.6,
-      "discharge_cms": 291.0,
-      "timestamp": "2026-08-03T06:25:00-07:00",
+      "level_m": 3.549,
+      "discharge_cms": 279.0,
+      "timestamp": "2026-08-03T11:25:00-07:00",
       "status": "ok"
     }
   }
