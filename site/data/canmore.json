@@ -8,7 +8,7 @@
     "per_capita_lpd_source": null,
     "per_capita_lpd_data_note": "Not publicly reported by EPCOR for Canmore separately",
     "dashboard": "waterwatch.criticalto.ca/canmore",
-    "generated_utc": "2026-08-06T08:39:56.370415+00:00",
+    "generated_utc": "2026-08-06T14:16:12.569848+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -99,7 +99,7 @@
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BB001_hourly_hydrometric.csv",
       "level_m": 2.402,
       "discharge_cms": 57.0,
-      "timestamp": "2026-08-06T00:25:00-07:00",
+      "timestamp": "2026-08-06T06:25:00-07:00",
       "status": "ok"
     },
     "spray_banff": {
@@ -107,9 +107,9 @@
       "station_name": "Spray River at Banff",
       "role": "upstream_context",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BC001_hourly_hydrometric.csv",
-      "level_m": 1.069,
-      "discharge_cms": 4.02,
-      "timestamp": "2026-08-06T00:25:00-07:00",
+      "level_m": 1.071,
+      "discharge_cms": 4.07,
+      "timestamp": "2026-08-06T06:25:00-07:00",
       "status": "ok"
     },
     "waiparous": {
@@ -119,7 +119,7 @@
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BG006_hourly_hydrometric.csv",
       "level_m": 0.783,
       "discharge_cms": 2.55,
-      "timestamp": "2026-08-06T01:05:00-07:00",
+      "timestamp": "2026-08-06T06:05:00-07:00",
       "status": "ok"
     },
     "bow_cochrane": {
@@ -127,9 +127,9 @@
       "station_name": "Bow River near Cochrane (downstream indicator)",
       "role": "downstream_context",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BH005_hourly_hydrometric.csv",
-      "level_m": 16.638,
-      "discharge_cms": 119.0,
-      "timestamp": "2026-08-06T00:15:00-07:00",
+      "level_m": 16.634,
+      "discharge_cms": 118.0,
+      "timestamp": "2026-08-06T06:15:00-07:00",
       "status": "ok"
     }
   },
