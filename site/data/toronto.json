@@ -7,7 +7,7 @@
     "per_capita_lpd": 200,
     "per_capita_lpd_source": "Toronto Water 2023 Annual Report",
     "dashboard": "waterwatch.criticalto.ca/toronto",
-    "generated_utc": "2026-08-09T01:53:44.321278+00:00",
+    "generated_utc": "2026-08-09T06:59:50.172088+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -116,9 +116,9 @@
       "station_name": "Humber River at Raymore Drive",
       "role": "watershed_indicator",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02HC009_hourly_hydrometric.csv",
-      "level_m": 2.048,
-      "discharge_cms": 0.524,
-      "timestamp": "2026-08-08T19:40:00-05:00",
+      "level_m": 2.04,
+      "discharge_cms": 0.475,
+      "timestamp": "2026-08-09T00:40:00-05:00",
       "status": "ok"
     },
     "don_river": {
@@ -126,9 +126,9 @@
       "station_name": "Don River at Todmorden",
       "role": "watershed_indicator",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02HC003_hourly_hydrometric.csv",
-      "level_m": 2.211,
-      "discharge_cms": 2.53,
-      "timestamp": "2026-08-08T20:20:00-05:00",
+      "level_m": 2.203,
+      "discharge_cms": 2.36,
+      "timestamp": "2026-08-09T01:20:00-05:00",
       "status": "ok"
     },
     "credit_river": {
@@ -136,9 +136,9 @@
       "station_name": "Credit River at Streetsville",
       "role": "watershed_indicator",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02HB008_hourly_hydrometric.csv",
-      "level_m": 2.185,
-      "discharge_cms": 0.534,
-      "timestamp": "2026-08-08T20:15:00-05:00",
+      "level_m": 2.18,
+      "discharge_cms": 0.499,
+      "timestamp": "2026-08-09T01:15:00-05:00",
       "status": "ok"
     }
   }
