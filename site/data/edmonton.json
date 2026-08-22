@@ -7,7 +7,7 @@
     "per_capita_lpd": 225,
     "per_capita_lpd_source": "EPCOR 2023 Annual Water Quality Report",
     "dashboard": "waterwatch.criticalto.ca/edmonton",
-    "generated_utc": "2026-08-21T18:38:51.751791+00:00",
+    "generated_utc": "2026-08-22T01:19:40.891969+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -114,7 +114,7 @@
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05DC001_hourly_hydrometric.csv",
       "level_m": 1.799,
       "discharge_cms": 112.0,
-      "timestamp": "2026-08-21T11:10:00-07:00",
+      "timestamp": "2026-08-21T17:10:00-07:00",
       "status": "ok"
     },
     "nsr_edmonton": {
@@ -122,9 +122,9 @@
       "station_name": "North Saskatchewan River at Edmonton (intake)",
       "role": "primary_source",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05DF001_hourly_hydrometric.csv",
-      "level_m": 3.554,
-      "discharge_cms": 231.0,
-      "timestamp": "2026-08-21T10:25:00-07:00",
+      "level_m": 3.234,
+      "discharge_cms": 165.0,
+      "timestamp": "2026-08-21T17:25:00-07:00",
       "status": "ok"
     }
   }
