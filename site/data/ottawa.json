@@ -7,7 +7,7 @@
     "per_capita_lpd": 230,
     "per_capita_lpd_source": "City of Ottawa 2023 Drinking Water Quality Report",
     "dashboard": "waterwatch.criticalto.ca/ottawa",
-    "generated_utc": "2026-08-30T04:21:03.611214+00:00",
+    "generated_utc": "2026-08-30T11:29:54.959618+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -111,9 +111,9 @@
       "station_name": "Ottawa River at Ottawa (Britannia)",
       "role": "primary_source",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02KF005_hourly_hydrometric.csv",
-      "level_m": 57.946,
-      "discharge_cms": 732.0,
-      "timestamp": "2026-08-29T22:35:00-05:00",
+      "level_m": 57.861,
+      "discharge_cms": 631.0,
+      "timestamp": "2026-08-30T05:35:00-05:00",
       "status": "ok"
     },
     "rideau_river": {
@@ -121,9 +121,9 @@
       "station_name": "Rideau River at Ottawa",
       "role": "secondary_source",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02LA004_hourly_hydrometric.csv",
-      "level_m": 3.215,
-      "discharge_cms": 53.2,
-      "timestamp": "2026-08-29T22:40:00-05:00",
+      "level_m": 3.209,
+      "discharge_cms": 52.5,
+      "timestamp": "2026-08-30T05:40:00-05:00",
       "status": "ok"
     }
   }
