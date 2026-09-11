@@ -7,7 +7,7 @@
     "per_capita_lpd": 490,
     "per_capita_lpd_source": "Metro Vancouver 2023 Annual Water Report",
     "dashboard": "waterwatch.criticalto.ca/vancouver",
-    "generated_utc": "2026-09-10T20:33:47.843963+00:00",
+    "generated_utc": "2026-09-11T03:38:33.325612+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -83,7 +83,7 @@
       "hand watering"
     ],
     "last_verified": "2026-06-08",
-    "days_remaining": 34
+    "days_remaining": 33
   },
   "snowpack": {
     "pct_of_normal": 53,
@@ -126,9 +126,9 @@
       "station_name": "Capilano River above Intake",
       "role": "primary_source",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/BC/hourly/BC_08GA010_hourly_hydrometric.csv",
-      "level_m": 0.727,
-      "discharge_cms": 1.54,
-      "timestamp": "2026-09-10T12:10:00-08:00",
+      "level_m": 0.722,
+      "discharge_cms": 1.5,
+      "timestamp": "2026-09-10T19:10:00-08:00",
       "status": "ok"
     },
     "seymour": {
@@ -138,7 +138,7 @@
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/BC/hourly/BC_08GA030_hourly_hydrometric.csv",
       "level_m": 0.877,
       "discharge_cms": 2.26,
-      "timestamp": "2026-09-10T12:05:00-08:00",
+      "timestamp": "2026-09-10T19:05:00-08:00",
       "status": "ok"
     },
     "coquitlam": {
@@ -146,9 +146,9 @@
       "station_name": "Coquitlam River near Port Coquitlam",
       "role": "primary_source",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/BC/hourly/BC_08MH141_hourly_hydrometric.csv",
-      "level_m": 1.618,
-      "discharge_cms": 0.581,
-      "timestamp": "2026-09-10T12:15:00-08:00",
+      "level_m": 1.613,
+      "discharge_cms": 0.548,
+      "timestamp": "2026-09-10T19:15:00-08:00",
       "status": "ok"
     }
   },
