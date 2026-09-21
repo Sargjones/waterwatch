@@ -8,7 +8,7 @@
     "per_capita_lpd_source": null,
     "per_capita_lpd_data_note": "Not publicly reported by EPCOR for Canmore separately",
     "dashboard": "waterwatch.criticalto.ca/canmore",
-    "generated_utc": "2026-09-21T21:21:58.867779+00:00",
+    "generated_utc": "2026-09-21T21:48:16.916784+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -119,7 +119,7 @@
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/AB/hourly/AB_05BG006_hourly_hydrometric.csv",
       "level_m": 0.829,
       "discharge_cms": 1.98,
-      "timestamp": "2026-09-21T13:05:00-07:00",
+      "timestamp": "2026-09-21T14:05:00-07:00",
       "status": "ok"
     },
     "bow_cochrane": {
