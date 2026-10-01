@@ -7,7 +7,7 @@
     "per_capita_lpd": 200,
     "per_capita_lpd_source": "Toronto Water 2023 Annual Report",
     "dashboard": "waterwatch.criticalto.ca/toronto",
-    "generated_utc": "2026-09-30T21:59:24.539909+00:00",
+    "generated_utc": "2026-10-01T04:49:18.139163+00:00",
     "data_licences": [
       "Open Government Licence \u2013 Canada (Environment and Climate Change Canada)"
     ]
@@ -118,7 +118,7 @@
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02HC009_hourly_hydrometric.csv",
       "level_m": 2.047,
       "discharge_cms": 0.757,
-      "timestamp": "2026-09-30T15:40:00-05:00",
+      "timestamp": "2026-09-30T22:40:00-05:00",
       "status": "ok"
     },
     "don_river": {
@@ -126,9 +126,9 @@
       "station_name": "Don River at Todmorden",
       "role": "watershed_indicator",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02HC003_hourly_hydrometric.csv",
-      "level_m": 2.185,
-      "discharge_cms": 1.97,
-      "timestamp": "2026-09-30T16:25:00-05:00",
+      "level_m": 2.202,
+      "discharge_cms": 2.3,
+      "timestamp": "2026-09-30T23:15:00-05:00",
       "status": "ok"
     },
     "credit_river": {
@@ -136,9 +136,9 @@
       "station_name": "Credit River at Streetsville",
       "role": "watershed_indicator",
       "url": "https://hpfx.collab.science.gc.ca/today/hydrometric/csv/ON/hourly/ON_02HB008_hourly_hydrometric.csv",
-      "level_m": 2.149,
-      "discharge_cms": 0.351,
-      "timestamp": "2026-09-30T16:20:00-05:00",
+      "level_m": 2.153,
+      "discharge_cms": 0.374,
+      "timestamp": "2026-09-30T23:10:00-05:00",
       "status": "ok"
     }
   }
